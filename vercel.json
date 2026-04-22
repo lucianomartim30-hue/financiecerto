@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "name": "financiecerto",
+  "builds": [
+    {
+      "src": "api/chat.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/chat",
+      "dest": "/api/chat.js",
+      "methods": ["POST", "OPTIONS"]
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "GEMINI_MODEL": "gemini-2.0-flash"
+  }
+}
