@@ -14,6 +14,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FinancieCerto">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -590,6 +593,38 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 .app-manual{margin-top:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:16px 20px;font-size:.84rem;color:rgba(255,255,255,.8);line-height:1.6;text-align:left}
 .app-manual strong{color:#fff}
 
+/* CONTATO */
+#contato-sec{background:var(--bg);padding:52px 24px}
+.contato-wrap{max-width:680px;margin:0 auto}
+.contato-form{display:flex;flex-direction:column;gap:16px;margin-top:24px}
+.contato-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.contato-row{grid-template-columns:1fr}}
+.contato-field{display:flex;flex-direction:column;gap:6px}
+.contato-field label{font-size:.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+.contato-field input,.contato-field textarea,.contato-field select{padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.93rem;color:var(--text);background:var(--bg-card);font-family:inherit;transition:border-color .15s,box-shadow .15s;outline:none}
+.contato-field input:focus,.contato-field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,86,219,.12)}
+.contato-field textarea{resize:vertical;min-height:120px}
+.contato-submit{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;background:var(--primary);color:#fff;border:none;border-radius:11px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s,transform .12s,box-shadow .15s;align-self:flex-start}
+.contato-submit:hover{background:#1447c4;transform:translateY(-1px);box-shadow:0 6px 18px rgba(26,86,219,.28)}
+.contato-notice{font-size:.8rem;color:var(--text3);margin-top:6px;line-height:1.55}
+.contato-lgpd{background:var(--bg-card);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px}
+.lgpd-label{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:.83rem;color:var(--text2);line-height:1.55}
+.lgpd-check{margin-top:2px;width:17px;height:17px;flex-shrink:0;accent-color:var(--primary);cursor:pointer}
+.lgpd-label strong{color:var(--text)}
+.contato-success{display:none;background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:1.5px solid #6EE7B7;border-radius:12px;padding:20px 24px;text-align:center;margin-top:10px}
+.contato-success.show{display:block}
+.contato-success p{font-size:.95rem;font-weight:600;color:#065F46;margin:0}
+.contato-email-dest{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#EFF6FF,#E0F2FE);border:1.5px solid var(--primary-muted);border-radius:12px;padding:16px 20px;margin-top:28px}
+.ced-ic{font-size:1.6rem;flex-shrink:0}
+.ced-lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--primary);margin-bottom:3px}
+.ced-val{font-size:.97rem;font-weight:700;color:var(--primary);text-decoration:none}
+.ced-val:hover{text-decoration:underline}
+.contato-info-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+.contato-info-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;text-align:center}
+.contato-info-card .cic-ic{font-size:1.5rem;margin-bottom:6px}
+.contato-info-card .cic-lbl{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px}
+.contato-info-card .cic-val{font-size:.78rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 /* ORULO UX GRID */
 .orulo-ux-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
 .orulo-ux-btn{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px 16px;background:#fff;border:1.5px solid var(--border);border-radius:12px;text-decoration:none;transition:border-color .15s,box-shadow .15s;cursor:pointer}
@@ -647,6 +682,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
       <button class="nb" onclick="ir('guia-sec')">Guia</button>
       <button class="nb" onclick="ir('parceiros-sec')">Parceiros</button>
       <button class="nb" onclick="ir('quem-somos-sec')">Quem Somos</button>
+      <button class="nb" onclick="ir('contato-sec')">✉️ Contato</button>
       <button class="nb" onclick="ir('app-sec')" style="color:var(--primary);font-weight:700">📲 App</button>
     </nav>
     <button class="ham-btn" onclick="toggleMobMenu()" aria-label="Menu" id="hamBtn">
@@ -674,6 +710,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
     <button class="mob-nav-btn" onclick="mobGo('guia-sec')"><span class="mnb-ic">📚</span>Guia Completo</button>
     <button class="mob-nav-btn" onclick="mobGo('parceiros-sec')"><span class="mnb-ic">🤝</span>Parceiros</button>
     <button class="mob-nav-btn" onclick="mobGo('quem-somos-sec')"><span class="mnb-ic">🏛️</span>Quem Somos</button>
+    <button class="mob-nav-btn" onclick="mobGo('contato-sec')"><span class="mnb-ic">✉️</span>Contato</button>
     <div class="mob-nav-divider"></div>
     <button class="mob-nav-btn mnb-app" onclick="mobGo('app-sec')"><span class="mnb-ic">📲</span>Instalar App</button>
   </div>
@@ -693,7 +730,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
       <span class="bnav-lbl">Simular</span>
     </button>
     <!-- Faixas MCMV -->
-    <button class="bnav-btn" id="btab-faixas" onclick="bnavGo('entenda-sec','btab-faixas')" aria-label="Faixas MCMV">
+    <button class="bnav-btn" id="btab-faixas" onclick="bnavGo('faixas-sec','btab-faixas')" aria-label="Faixas MCMV">
       <div class="bnav-ic-wrap"><span class="bnav-ic">📋</span></div>
       <span class="bnav-lbl">Faixas</span>
     </button>
@@ -714,6 +751,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
         <button class="bnav-more-item" onclick="bnavMore('docs-sec')"><span class="bmi-ic">📋</span>Documentos</button>
         <button class="bnav-more-item" onclick="bnavMore('parceiros-sec')"><span class="bmi-ic">🤝</span>Parceiros</button>
         <button class="bnav-more-item" onclick="bnavMore('quem-somos-sec')"><span class="bmi-ic">🏛️</span>Quem Somos</button>
+        <button class="bnav-more-item" onclick="bnavMore('contato-sec')"><span class="bmi-ic">✉️</span>Contato</button>
         <button class="bnav-more-item" onclick="bnavMore('app-sec')" style="color:var(--primary);font-weight:700"><span class="bmi-ic">📲</span>Instalar App</button>
       </div>
     </button>
@@ -746,7 +784,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   <div id="sim-wrap">
     <div class="sim-hd">
       <h2>🏦 Simulador Inteligente — Lógica Real da CAIXA ECONÔMICA FEDERAL</h2>
-      <p>Todos os cálculos são estimativas baseadas nas regras do SFH/MCMV (2026) · LTV: SAC 80% / Price 70% · Limite SFH: R$ 2.250.000 · As regras podem variar conforme políticas da CAIXA ECONÔMICA FEDERAL e atualizações do mercado · nenhum dado é enviado a servidores</p>
+      <p>Todos os cálculos são estimativas baseadas nas regras do SFH/MCMV (2026) · LTV: SAC 80% / Price 70% · Limite SFH: R$ 2.250.000 · As regras podem variar conforme políticas da CAIXA ECONÔMICA FEDERAL e atualizações do mercado · os cálculos do simulador são feitos localmente no navegador</p>
     </div>
     <div class="sim-bd">
       <div class="sim-section-title">📋 Dados dos Proponentes e do Imóvel</div>
@@ -1942,6 +1980,104 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 
 </section>
 
+<!-- ═══════════════════════════════════════════ CONTATO ═══════════════════════════════════════════ -->
+<section class="sec st" id="contato-sec">
+  <div class="sec-c">
+    <span class="stag stag-g">✉️ Contato</span>
+    <h2 class="stitle">Fale conosco</h2>
+    <p class="sdesc">Dúvidas, sugestões ou parceria? Preencha o formulário abaixo e entraremos em contato pelo e-mail informado.</p>
+  </div>
+
+  <div class="contato-wrap">
+    <!-- E-mail em destaque -->
+    <div class="contato-email-dest">
+      <span class="ced-ic">✉️</span>
+      <div>
+        <div class="ced-lbl">E-mail direto</div>
+        <a href="mailto:contato@financiecerto.com.br" class="ced-val">contato@financiecerto.com.br</a>
+      </div>
+    </div>
+
+    <!-- Cartões de informação -->
+    <div class="contato-info-cards">
+      <div class="contato-info-card">
+        <div class="cic-ic">⏱️</div>
+        <div class="cic-lbl">Resposta</div>
+        <div class="cic-val">Em até 2 dias úteis</div>
+      </div>
+      <div class="contato-info-card">
+        <div class="cic-ic">📍</div>
+        <div class="cic-lbl">Atendimento</div>
+        <div class="cic-val">São Paulo — SP</div>
+      </div>
+    </div>
+
+    <!-- Formulário Formspree -->
+    <form
+      class="contato-form"
+      id="contatoForm"
+      action="https://formspree.io/f/xdkoqpej"
+      method="POST"
+      onsubmit="handleContatoSubmit(event)"
+    >
+      <div class="contato-row">
+        <div class="contato-field">
+          <label for="cf-nome">Nome *</label>
+          <input type="text" id="cf-nome" name="nome" placeholder="Seu nome completo" required autocomplete="name">
+        </div>
+        <div class="contato-field">
+          <label for="cf-email">E-mail *</label>
+          <input type="email" id="cf-email" name="email" placeholder="seu@email.com" required autocomplete="email">
+        </div>
+      </div>
+
+      <div class="contato-row">
+        <div class="contato-field">
+          <label for="cf-tel">Telefone / WhatsApp</label>
+          <input type="tel" id="cf-tel" name="telefone" placeholder="+55 (11) 99999-9999" autocomplete="tel" oninput="maskPhone(this)" maxlength="20">
+        </div>
+        <div class="contato-field">
+          <label for="cf-assunto">Assunto</label>
+          <select id="cf-assunto" name="assunto">
+            <option value="">Selecione...</option>
+            <option value="Dúvida sobre financiamento">Dúvida sobre financiamento</option>
+            <option value="Simulação personalizada">Simulação personalizada</option>
+            <option value="Parceria comercial">Parceria comercial</option>
+            <option value="Sugestão para o site">Sugestão para o site</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="contato-field">
+        <label for="cf-msg">Mensagem *</label>
+        <textarea id="cf-msg" name="mensagem" placeholder="Descreva sua dúvida ou mensagem..." required></textarea>
+      </div>
+
+      <input type="hidden" name="_subject" value="Novo contato — FinancieCerto">
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+      <div class="contato-lgpd">
+        <label class="lgpd-label">
+          <input type="checkbox" name="lgpd_consent" value="Autorizado" required class="lgpd-check">
+          <span>Autorizo o FinancieCerto a armazenar e utilizar meus dados (nome, e-mail e telefone) exclusivamente para responder a esta mensagem, conforme a <strong>Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018)</strong>. Meus dados não serão compartilhados com terceiros. *</span>
+        </label>
+      </div>
+
+      <div>
+        <button type="submit" class="contato-submit" id="contatoBtn">
+          📨 Enviar mensagem
+        </button>
+        <p class="contato-notice">* Campos obrigatórios.</p>
+      </div>
+    </form>
+
+    <div class="contato-success" id="contatoSuccess">
+      <p>✅ Mensagem enviada com sucesso! Retornaremos em até 2 dias úteis.</p>
+    </div>
+  </div>
+</section>
+
 <section class="app-sec st" id="app-sec">
   <div class="app-sec-inner">
     <div class="app-ic">📲</div>
@@ -1956,13 +2092,13 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
     <button id="installBtn" onclick="pwaTrigger()">
       📲 Instalar no celular
     </button>
-    <div class="app-manual" id="appManual" style="display:none">
-      <strong>Como instalar manualmente:</strong><br>
+    <div class="app-manual" id="appManual">
+      <strong>Como instalar:</strong><br>
       • <strong>Android (Chrome):</strong> Menu (⋮) → "Adicionar à tela inicial"<br>
-      • <strong>iPhone (Safari):</strong> Botão de compartilhamento → "Adicionar à tela de início"<br>
-      • <strong>Desktop (Chrome/Edge):</strong> Ícone de instalação na barra de endereço
+      • <strong>iPhone (Safari):</strong> Botão de compartilhamento ↑ → "Adicionar à tela de início"<br>
+      • <strong>Desktop (Chrome/Edge):</strong> Ícone de instalação (⊕) na barra de endereço
     </div>
-    <p class="app-note" id="appNote">O botão aparece automaticamente quando seu navegador suporta a instalação. Se não aparecer, use as instruções acima.</p>
+    <p class="app-note" id="appNote">Nos navegadores compatíveis o botão acima abre o instalador automático. Nos demais, use as instruções acima.</p>
   </div>
 </section>
 
@@ -2006,7 +2142,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 </div>
 
 <div id="lgpd">
-  <div class="lgpd-t"><strong>🔒 Privacidade:</strong> Este site não coleta dados pessoais. Todos os cálculos são feitos localmente no seu navegador e nenhuma informação é enviada a servidores. <a href="#" onclick="openModal();return false">Saiba mais</a></div>
+  <div class="lgpd-t"><strong>🔒 Privacidade:</strong> Os cálculos do simulador são feitos localmente no seu navegador. O chatbot envia suas perguntas à API do Google Gemini apenas para gerar a resposta — sem armazenar dados pessoais. O formulário de contato coleta nome, e-mail e telefone somente com seu consentimento expresso, conforme a LGPD. <a href="#" onclick="openModal();return false">Saiba mais</a></div>
   <div class="lgpd-bs">
     <button class="lgpd-ok" onclick="lgpdOk()">Entendi</button>
     <button class="lgpd-more" onclick="openModal()">Política de Privacidade</button>
@@ -2017,7 +2153,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   <div class="modal-box">
     <h2>🔒 Política de Privacidade</h2>
     <p><strong>Coleta de dados:</strong> Este site não coleta, armazena nem transmite nenhum dado pessoal. Todas as simulações são processadas localmente no JavaScript do seu navegador.</p>
-    <p><strong>Chatbot:</strong> As perguntas feitas ao especialista são respondidas por sistema local de palavras-chave. Nenhuma conversa é armazenada ou enviada.</p>
+    <p><strong>Chatbot:</strong> As perguntas feitas ao assistente são enviadas à API do Google Gemini (Google LLC) para geração da resposta. Não inclua dados pessoais nas mensagens. Nenhuma conversa é armazenada em nossos servidores. A política de privacidade do Google se aplica ao processamento pela API.</p>
     <p><strong>Cookies:</strong> Utilizamos apenas um cookie de sessão para lembrar o aceite deste aviso. Sem cookies de rastreamento ou marketing.</p>
     <p><strong>LGPD (Lei 13.709/2018):</strong> Esta plataforma está em conformidade com a LGPD por não processar dados pessoais identificáveis.</p>
     <p><strong>Dados financeiros:</strong> Os valores digitados no simulador são usados somente para o cálculo local e descartados ao fechar a aba.</p>
@@ -2564,10 +2700,10 @@ function simular(){
     alerts.push({t:'ok',ic:'🎁',m:'<strong>Subsídio estimado aplicado ao cálculo:</strong> O subsídio de '+fmt(subsidioEstimado)+' foi descontado do saldo a financiar, reduzindo a parcela. '+
     (compSemSub>comprometimento?'Sem o subsídio, o comprometimento seria de '+fmtN(compSemSub,1)+'% da renda.':'')+
     ' O valor real depende da análise da CAIXA ECONÔMICA FEDERAL, da cidade, da faixa e das regras vigentes do programa.'});
-  }else if(isMCMV&&faixa&&faixa.n<4&&!cotista){
-    alerts.push({t:'warn',ic:'🎁',m:'<strong>Subsídio não aplicado:</strong> Sem FGTS ativo há 3+ anos, o subsídio MCMV não é concedido. Se você regularizar o FGTS antes da contratação, pode reduzir significativamente o valor financiado.'});
-  }else if(isMCMV&&faixa&&faixa.n<4&&benef){
-    alerts.push({t:'warn',ic:'🎁',m:'<strong>Subsídio zerado:</strong> Quem já recebeu benefício habitacional anterior não tem direito ao subsídio novamente. O cálculo foi feito sem subsídio.'});
+  }else if(isMCMV&&faixa&&faixa.n<3&&!cotista){
+    alerts.push({t:'warn',ic:'🎁',m:'<strong>Subsídio não aplicado:</strong> Sem FGTS ativo há 3+ anos, o subsídio MCMV não é concedido para Faixas 1 e 2. Se você regularizar o FGTS antes da contratação, pode reduzir significativamente o valor financiado.'});
+  }else if(isMCMV&&faixa&&faixa.n<3&&benef){
+    alerts.push({t:'warn',ic:'🎁',m:'<strong>Subsídio zerado:</strong> Quem já recebeu benefício habitacional anterior não tem direito ao subsídio novamente (Faixas 1 e 2). O cálculo foi feito sem subsídio.'});
   }
 
   // ── LTV (Loan-to-Value) — Limite de financiamento por sistema de amortização ──
@@ -2809,7 +2945,7 @@ function simular(){
         <div class="cenario-row"><span>Valor financiado</span><span>${fmt(valorFinanciado)}</span></div>
         <div class="cenario-row"><span>A) Parcela A+J (taxa nominal)</span><span style="font-weight:600">${fmt(parcelaAJ)}/mês</span></div>
         <div class="cenario-row destaque"><span>B) Encargo mensal c/ seguros</span><span>${fmt(totalParcelaPrice)}/mês</span></div>
-        <div class="cenario-row breakdown"><span>↳ A+J ${fmt(parcelaAJ)} + Seguros ${fmt(mipEstimado+dfiEstimado)} + TA ${fmt(tarifaAdmin)} · (contrato B.9.1.4)</span><span></span></div>
+        <div class="cenario-row breakdown"><span>↳ A+J ${fmt(parcelaAJ)} + Seguros MIP+DFI ${fmt(mipEstimado+dfiEstimado)} + Tarifa Admin. ${fmt(tarifaAdmin)}</span><span></span></div>
         <div class="cenario-row"><span>Comprometimento de renda</span><span style="color:${comprometimentoPrice>30?'var(--danger)':comprometimentoPrice>25?'var(--warning)':'var(--accent)'}">${fmtN(comprometimentoPrice,1)}%</span></div>
         <div class="cenario-row"><span>C) Total ${prazo} parcelas amortização (MIP crescente, sem TR) ◇</span><span style="font-weight:700">${fmt(totalPago_Price)}</span></div>
         ${tipo==='planta'?`<div class="cenario-row breakdown"><span>↳ + Fase obra estimada (${prazoObra} meses): ${fmt(totalObra)} · Total operação: ${fmt(totalPago_Price+totalObra)}</span><span></span></div>`:''}
@@ -2844,7 +2980,7 @@ function simular(){
         <p>${taxaSFIAnual}% a.a. estimado · Sem TR · Sem subsídio</p>
       </div>
       <div class="cenario-bd">
-        <div class="cenario-row"><span>Aplicação</span><span>Imóvel acima de R$ 1.500.000</span></div>
+        <div class="cenario-row"><span>Aplicação</span><span>Imóvel acima de R$ 2.250.000 (limite SFH)</span></div>
         <div class="cenario-row"><span>Taxa estimada</span><span>${taxaSFIAnual}% a.a. (sem TR)</span></div>
         <div class="cenario-row"><span>Subsídio</span><span style="color:var(--text3)">Sem subsídio</span></div>
         <div class="cenario-row"><span>Valor financiado</span><span>${fmt(vfSemSub)}</span></div>
@@ -2960,7 +3096,7 @@ function simular(){
     </ul></div>
   </div>
 
-    <div class="sim-bloco-title">🏦 Bloco 3 — Taxas estimadas dos principais bancos (SBPE/SFH 2026)</div>
+    <div class="sim-bloco-title">🏦 Bloco 4 — Taxas estimadas dos principais bancos (SBPE/SFH 2026)</div>
 
   <div class="bancos-disclaimer">⚠️ <strong>Referências de mercado — não constituem proposta bancária.</strong> As taxas abaixo são estimativas para o SBPE/SFH em 2026 e podem variar conforme score de crédito, relacionamento com o banco, valor de entrada, prazo contratado, perfil do mutuário e análise individual. Solicite simulação oficial diretamente em cada banco antes de tomar qualquer decisão.</div>
 
@@ -2978,7 +3114,7 @@ function simular(){
     💡 <strong>No MCMV, a taxa é definida pela faixa:</strong> ${faixa.l} = <strong>${taxaAnual}% a.a. + TR</strong> — contratada diretamente na CAIXA ECONÔMICA FEDERAL e definida por portaria ministerial. ${subsidioEstimado>0?'O subsídio reduz o saldo financiado, mas a taxa não muda.':''}
   </div>`}
 
-    <div class="sim-bloco-title">🧠 Bloco 4 — Diagnóstico consultivo</div>
+    <div class="sim-bloco-title">🧠 Bloco 5 — Diagnóstico consultivo</div>
 
   <div class="cons-block">
     <div class="cons-label-sm">Caminho recomendado com base no perfil simulado</div>
@@ -3279,15 +3415,18 @@ const CHAT_API_URL='/api/chat'; // relativo: funciona local (Express) e Vercel
 // ── FUNÇÃO CENTRAL DE RESPOSTA DO CHAT ────────────────────────────────────────
 async function getChatResponse(userMessage){
   try{
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),25000);
     const resp=await fetch(CHAT_API_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         message:userMessage,
-        history:_chatHistory.slice(-18) // últimas 18 msgs (9 turnos)
+        history:_chatHistory.slice(-18)
       }),
-      signal:AbortSignal.timeout(25000) // timeout 25s
+      signal:ctrl.signal
     });
+    clearTimeout(timer);
 
     if(!resp.ok){
       const err=await resp.json().catch(()=>({}));
@@ -3415,6 +3554,61 @@ function closeBnavMore(){
 function bnavMore(sectionId){
   closeBnavMore();
   ir(sectionId);
+}
+// ── Máscara de telefone internacional ─────────────────────────────────────────
+function maskPhone(input){
+  const digits = input.value.replace(/\D/g,'');
+  if(!digits){input.value='';return;}
+
+  // Detecta tamanho do DDI:
+  // 1 dígito: DDIs que começam com 1 (EUA/Canadá) ou 7 (Rússia)
+  // 2 dígitos: maioria, incluindo 55 (Brasil), 44 (UK), 49 (Alemanha)
+  // 3 dígitos: 351 (Portugal), 598 (Uruguai), etc. — detectamos se os 2 primeiros não formam DDI válido
+  let ddiLen = 2; // padrão
+  if(digits[0]==='1'||digits[0]==='7') ddiLen=1;
+
+  const ddi  = digits.slice(0, ddiLen);
+  const rest  = digits.slice(ddiLen);
+  const ddd   = rest.slice(0,2);
+  const num   = rest.slice(2);
+
+  let out = '+' + ddi;
+  if(ddd)  out += ' (' + ddd + (num?')':' ');
+  if(num){
+    // 9 dígitos → celular: XXXXX-XXXX | 8 dígitos → fixo: XXXX-XXXX
+    if(num.length<=4)        out += ' ' + num;
+    else if(num.length<=8)   out += ' ' + num.slice(0,4) + '-' + num.slice(4);
+    else                      out += ' ' + num.slice(0,5) + '-' + num.slice(5,9);
+  }
+
+  input.value = out;
+}
+
+// ── Formulário de Contato (Formspree) ─────────────────────────────────────────
+async function handleContatoSubmit(e){
+  e.preventDefault();
+  const btn=document.getElementById('contatoBtn');
+  const form=document.getElementById('contatoForm');
+  const success=document.getElementById('contatoSuccess');
+  btn.disabled=true;
+  btn.textContent='Enviando…';
+  try{
+    const resp=await fetch(form.action,{
+      method:'POST',
+      body:new FormData(form),
+      headers:{Accept:'application/json'}
+    });
+    if(resp.ok){
+      form.style.display='none';
+      success.classList.add('show');
+    }else{
+      throw new Error('Falha');
+    }
+  }catch{
+    btn.disabled=false;
+    btn.innerHTML='📨 Enviar mensagem';
+    alert('Não foi possível enviar. Tente novamente ou envie diretamente para contato@financiecerto.com.br');
+  }
 }
 // Atualiza tab ativo baseado no scroll
 (function(){
