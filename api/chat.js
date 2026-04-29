@@ -1,14 +1,14 @@
 /**
  * FinancieCerto — Serverless Function para Vercel
  * Arquivo: api/chat.js
- * Provedor: Google Gemini (GRATUITO)
+ * Provedor: OpenAI GPT-4o-mini
  *
- * Chave gratuita: https://aistudio.google.com/apikey
+ * Variável necessária no Vercel: OPENAI_API_KEY
  */
 
 'use strict';
 
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const OpenAI = require('openai');
 
 // ── System Prompt ─────────────────────────────────────────────────────────────
 const SYSTEM_PROMPT = `
@@ -35,11 +35,11 @@ DOMÍNIO DE CONHECIMENTO:
 - TR: Impacto no saldo devedor
 - Análise de crédito: Score, Cadmut, Caehis, restrições, pré-análise
 
-DADOS DE REFERÊNCIA (2026):
+DADOS DE REFERÊNCIA — MCMV 2026 (regras vigentes desde 22/04/2026):
 - Faixa 1 MCMV: renda até R$ 3.200 · taxa 4–5% a.a. + TR · subsídio até R$ 55.000 · LTV até 95%
 - Faixa 2 MCMV: renda até R$ 5.000 · taxa 4,75–7% a.a. + TR · subsídio até R$ 29.000 · LTV até 90%
 - Faixa 3 MCMV: renda até R$ 9.600 · taxa 7,66–8,16% a.a. + TR · sem subsídio · LTV até 80%
-- Faixa 4 MCMV: renda até R$ 13.000 · taxa até 10,5% a.a. + TR · sem subsídio · LTV até 80%
+- Faixa 4 MCMV: renda até R$ 13.000 · taxa até 10% a.a. + TR · sem subsídio · LTV até 80% · prazo máximo 420 meses
 - SBPE 2026: 12–14,5% a.a. + TR
 - Limite SFH: imóvel até R$ 2.250.000
 - TR 2026: ~0,17% ao mês (variável)
@@ -59,14 +59,14 @@ function sanitizeInput(str) {
   return str.trim().slice(0, 500).replace(/<[^>]*>/g, '');
 }
 
-function buildGeminiHistory(history) {
+function buildOpenAIHistory(history) {
   if (!Array.isArray(history)) return [];
   return history
     .slice(-18)
-    .filter(m => m && ['user','assistant'].includes(m.role) && typeof m.content === 'string')
+    .filter(m => m && ['user', 'assistant'].includes(m.role) && typeof m.content === 'string')
     .map(m => ({
-      role:  m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content.slice(0, 500) }]
+      role:    m.role,
+      content: m.content.slice(0, 500)
     }));
 }
 
@@ -97,39 +97,42 @@ module.exports = async function handler(req, res) {
 
   try {
     const { message, history } = req.body || {};
-    const cleanMsg   = sanitizeInput(message);
-    const geminiHist = buildGeminiHistory(history);
+    const cleanMsg    = sanitizeInput(message);
+    const openAIHist  = buildOpenAIHistory(history);
 
     if (!cleanMsg) return res.status(400).json({ error: 'Mensagem inválida.' });
 
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY não configurada no servidor.' });
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ error: 'OPENAI_API_KEY não configurada no servidor.' });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
-      systemInstruction: SYSTEM_PROMPT,
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const completion = await openai.chat.completions.create({
+      model:      'gpt-4o-mini',
+      max_tokens: 600,
+      temperature: 0.7,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...openAIHist,
+        { role: 'user',   content: cleanMsg }
+      ]
     });
 
-    const chat = model.startChat({
-      history: geminiHist,
-      generationConfig: { maxOutputTokens: 600, temperature: 0.7 },
-    });
-
-    const result = await chat.sendMessage(cleanMsg);
-    const replyText = result.response.text();
-
+    const replyText = completion.choices[0].message.content;
     return res.status(200).json({ reply: replyText });
 
   } catch (err) {
     console.error('[api/chat] Erro:', err?.message);
 
-    if (err?.message?.includes('API_KEY')) {
-      return res.status(500).json({ error: 'Chave de API inválida.' });
+    if (err?.status === 401) {
+      return res.status(500).json({ error: 'Chave de API inválida. Verifique a OPENAI_API_KEY.' });
     }
-    if (err?.message?.includes('quota') || err?.status === 429) {
-      return res.status(429).json({ error: 'Limite diário do Gemini atingido. Tente amanhã.' });
+    if (err?.status === 429) {
+      return res.status(429).json({ error: 'Limite de uso atingido. Tente novamente em instantes.' });
+    }
+    if (err?.status === 503 || err?.code === 'ECONNREFUSED') {
+      return res.status(503).json({ error: 'Serviço temporariamente indisponível. Tente novamente.' });
     }
 
     return res.status(500).json({ error: 'Erro interno. Tente novamente.' });
