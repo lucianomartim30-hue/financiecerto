@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-5FCF1KE9XP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-5FCF1KE9XP');
-</script>  
-  
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Simule seu financiamento imobiliário com base nas regras da CAIXA ECONÔMICA FEDERAL. Veja parcelas, juros de obra, TR e compare MCMV e SBPE antes de financiar.">
@@ -840,7 +829,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           <label>🏗️ Tipo de imóvel</label>
           <select id="sTipo" onchange="atualizarPrazoHint()">
             <option value="pronto">Pronto (usado ou novo)</option>
-            <option value="planta" selected>Na planta (Crédito Associativo)</option>
+            <option value="planta" selected>Na planta (fase de obra)</option>
           </select>
         </div>
         <div class="sf">
@@ -2618,8 +2607,12 @@ function simular(){
   const taxaSBPEMensal=13.5/100/12;           // referência SBPE mercado 2026 (SEM TR)
 
   // ── COMPOSIÇÃO FINANCEIRA (NÚCLEO DO CÁLCULO) ───────────────────────────────
+  // Para SBPE + na planta: FGTS exige habite-se e matrícula individualizada
+  // (regra SFH/CEF). Só é permitido na assinatura no MCMV/Crédito Associativo.
   // Garante que nenhum componente supere o valor do imóvel
-  const fgtsUsado=Math.max(0,Math.min(fgts,imovel));
+  const fgtsNaPlantaSBPE = (tipo==='planta' && !isMCMV);
+  const fgtsDisponivel = fgtsNaPlantaSBPE ? 0 : fgts;
+  const fgtsUsado=Math.max(0,Math.min(fgtsDisponivel,imovel));
   const entradaUsada=Math.max(0,Math.min(entradaP,imovel-fgtsUsado));
   // Subsídio estimado: calculado APÓS entrada e FGTS, sobre o que ainda falta financiar
   const subsidioRaw=isMCMV?calcSubsidioEstimado(faixa,renda,imovel,cotista,primeiroImovel,benef,dependentes):0;
@@ -2740,14 +2733,16 @@ function simular(){
 
   // FGTS
   if(fgts>0&&!cotista)alerts.push({t:'warn',ic:'💳',m:'<strong>FGTS: elegibilidade não confirmada.</strong> Para usar o FGTS, são necessários 3 anos de trabalho sob o regime do FGTS (soma de todos os empregos). Verifique antes de incluir no cálculo.'});
-  if(fgts>0&&cotista&&primeiroImovel&&!benef)alerts.push({t:'ok',ic:'✅',m:'<strong>FGTS elegível:</strong> Cotista há 3+ anos, primeiro imóvel. Saldo de '+fmt(fgtsUsado)+' aplicado à entrada — sujeito às demais regras do SFH (imóvel no município, sem financiamento ativo).'});
+  if(fgts>0&&cotista&&primeiroImovel&&!benef&&!(tipo==='planta'&&!isMCMV))alerts.push({t:'ok',ic:'✅',m:'<strong>FGTS elegível:</strong> Cotista há 3+ anos, primeiro imóvel. Saldo de '+fmt(fgtsUsado)+' aplicado à entrada — sujeito às demais regras do SFH (imóvel no município, sem financiamento ativo).'});
+  if(fgts>0&&tipo==='planta'&&!isMCMV)alerts.push({t:'warn',ic:'💳',m:'<strong>FGTS não contabilizado na entrada — SBPE na planta:</strong> Para imóvel na planta financiado via SBPE, o uso do FGTS exige habite-se emitido e matrícula individualizada no cartório (regra SFH). O FGTS <strong>não pode ser usado como entrada durante a obra</strong> — apenas na assinatura do Crédito Associativo (MCMV/CAIXA). Neste cálculo, o FGTS de '+fmt(fgts)+' foi <strong>excluído da entrada</strong> e ficará disponível para <strong>amortização após a entrega das chaves</strong>. Isso eleva o saldo financiado e pode impactar o LTV — verifique os alertas abaixo.'});
   if(fgts>0&&fgtsUsado<imovel*0.10)alerts.push({t:'warn',ic:'💳',m:'<strong>FGTS abaixo de 10% do imóvel:</strong> O saldo FGTS representa menos de 10% do valor do imóvel. Algumas análises exigem esse mínimo para uso como entrada. Verifique com a CAIXA ECONÔMICA FEDERAL.'});
 
   // Dependentes
   if(temDep)alerts.push({t:'info',ic:'👨‍👩‍👧',m:`<strong>Dependentes declarados: ${numDep} ${numDep===1?'dependente':'dependentes'}.</strong> A presença de dependentes pode ampliar o acesso ao subsídio habitacional em algumas faixas do MCMV. A CAIXA ECONÔMICA FEDERAL considera a composição familiar completa na análise — informe todos os dependentes na documentação para garantir o benefício correto.`});
 
   // Tipo planta
-  if(tipo==='planta')alerts.push({t:'warn',ic:'🏗️',m:'<strong>Imóvel na planta — fase de obra:</strong> Encargos mensais crescentes são cobrados durante a construção (juros sobre o saldo liberado — sem amortização de capital). Com base em contrato real CAIXA ECONÔMICA FEDERAL (SIOPI): mês 1 ≈ 25% do encargo definitivo · mês 12 ≈ 44% · mês 24 ≈ 77% · mês final (36) ≈ 88% a 100% — dependendo do saldo e prazo de obra. Planeje esse custo junto ao aluguel atual.'});
+  if(tipo==='planta'&&isMCMV)alerts.push({t:'warn',ic:'🏗️',m:'<strong>Imóvel na planta — fase de obra (MCMV/Crédito Associativo):</strong> Durante a construção você paga juros evolutivos mensais ao banco sobre o saldo já liberado à construtora — sem amortizar o capital. Com base em contrato real CAIXA ECONÔMICA FEDERAL (SIOPI): mês 1 ≈ 25% do encargo definitivo · mês 12 ≈ 44% · mês 24 ≈ 77% · mês final ≈ 88–100%. Planeje esse custo junto ao aluguel atual.'});
+  if(tipo==='planta'&&!isMCMV)alerts.push({t:'warn',ic:'🏗️',m:'<strong>Imóvel na planta — fase de obra (SBPE):</strong> Dois custos simultâneos durante a construção: (1) <strong>Boletos à incorporadora</strong> — a parcela da entrada ('+fmt(entradaUsada)+') costuma ser paga em prestações mensais durante a obra (~'+fmt(Math.round(entradaUsada/(prazoObra||36)))+'/mês); (2) <strong>Juros evolutivos ao banco</strong> — cobrados mensalmente sobre o saldo liberado à construtora, crescentes conforme o andamento da obra. Após a entrega das chaves inicia a amortização normal ('+( sistema==='price'?'Tabela Price':'SAC')+'). Planeje ter capacidade financeira para as duas cobranças, além do aluguel se for o caso.'});
 
   // MCMV vs SBPE
   if(!isMCMV&&faixa===null)alerts.push({t:'warn',ic:'📊',m:'<strong>Fora do MCMV (renda acima de R$ 13.000):</strong> O financiamento será via SBPE. Compare taxas entre CAIXA ECONÔMICA FEDERAL, Bradesco, Itaú e Santander — diferença pode ser R$ 400–800/mês na parcela para o mesmo valor financiado.'});
@@ -2867,7 +2862,7 @@ function simular(){
   // ── HTML — 5 BLOCOS ───────────────────────────────────────────────────────────
   let html=`
 
-  <div class="res-verdict v-${verdict}"><div class="v-icon">${vIcon}</div><div class="v-text"><h3>${vTitle}</h3><p>${vDesc}</p></div></div>
+  <div class="res-verdict v-${verdict}"><div class="v-icon">${vIcon}</div><div class="v-text"><h3>${vTitle}</h3><p>${vDesc}</p>${verdict==='err'&&bloqueios.length>0?'<ul style="margin:8px 0 0 0;padding-left:18px;">'+bloqueios.map(b=>`<li style="margin-bottom:6px;">${b.m}</li>`).join('')+'</ul>':''}</div></div>
 
     <div class="sim-bloco-title">📊 Bloco 1 — Resultado principal</div>
 
