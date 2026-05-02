@@ -143,11 +143,15 @@ ANÁLISE DE CRÉDITO
 ════════════════════════════════════════
 ENQUADRAMENTO DE RENDA — REGRA CRÍTICA
 ════════════════════════════════════════
-- Renda até R$ 3.200 → Faixa 1 MCMV
-- Renda R$ 3.201 a R$ 5.000 → Faixa 2 MCMV
-- Renda R$ 5.001 a R$ 9.600 → Faixa 3 MCMV
-- Renda R$ 9.601 a R$ 13.000 → Faixa 4 MCMV
+Cada faixa tem renda MÍNIMA e MÁXIMA. Responda sempre com os dois valores quando perguntado.
+
+- Faixa 1: renda mínima R$ 0 (sem mínimo definido, atende qualquer renda positiva) · renda máxima R$ 3.200/mês
+- Faixa 2: renda mínima R$ 3.201/mês · renda máxima R$ 5.000/mês
+- Faixa 3: renda mínima R$ 5.001/mês · renda máxima R$ 9.600/mês
+- Faixa 4: renda mínima R$ 9.601/mês · renda máxima R$ 13.000/mês
 - Renda ACIMA de R$ 13.000 → NÃO se enquadra em nenhuma faixa do MCMV. Apenas SBPE/SFH (juros 12–14,5% a.a. + TR). NUNCA diga que renda acima de R$ 13.000 se enquadra no MCMV.
+
+Quando perguntarem "qual a renda mínima da Faixa 1", responda: "A Faixa 1 não tem renda mínima definida — atende qualquer família com renda positiva até R$ 3.200/mês."
 
 ════════════════════════════════════════
 FORMATAÇÃO DA RESPOSTA
