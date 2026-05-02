@@ -743,7 +743,7 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
       <button class="nb" onclick="ir('parceiros-sec')">Parceiros</button>
       <button class="nb" onclick="ir('quem-somos-sec')">Quem Somos</button>
       <button class="nb" onclick="ir('contato-sec')">✉️ Contato</button>
-      <button class="nb" onclick="ir('app-sec')" style="color:var(--primary);font-weight:700">📲 App</button>
+      <button class="nb" onclick="openInstallModal()" style="color:var(--primary);font-weight:700">📲 App</button>
     </nav>
     <button class="ham-btn" onclick="toggleMobMenu()" aria-label="Menu" id="hamBtn">
       <span></span><span></span><span></span>
@@ -772,7 +772,7 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
     <button class="mob-nav-btn" onclick="mobGo('quem-somos-sec')"><span class="mnb-ic">🏛️</span>Quem Somos</button>
     <button class="mob-nav-btn" onclick="mobGo('contato-sec')"><span class="mnb-ic">✉️</span>Contato</button>
     <div class="mob-nav-divider"></div>
-    <button class="mob-nav-btn mnb-app" onclick="mobGo('app-sec')"><span class="mnb-ic">📲</span>Instalar App</button>
+    <button class="mob-nav-btn mnb-app" onclick="closeMobMenu();openInstallModal()"><span class="mnb-ic">📲</span>Instalar App</button>
   </div>
 </div>
 
@@ -824,7 +824,7 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
         <button class="bnav-more-item" onclick="bnavMore('parceiros-sec')"><span class="bmi-ic">🤝</span>Parceiros</button>
         <button class="bnav-more-item" onclick="bnavMore('quem-somos-sec')"><span class="bmi-ic">🏛️</span>Quem Somos</button>
         <button class="bnav-more-item" onclick="bnavMore('contato-sec')"><span class="bmi-ic">✉️</span>Contato</button>
-        <button class="bnav-more-item" onclick="bnavMore('app-sec')" style="color:var(--primary);font-weight:700"><span class="bmi-ic">📲</span>Instalar App</button>
+        <button class="bnav-more-item" onclick="closeBnavMore();openInstallModal()" style="color:var(--primary);font-weight:700"><span class="bmi-ic">📲</span>Instalar App</button>
       </div>
     </button>
   </div>
@@ -2224,6 +2224,69 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
     <p id="installDone" style="display:none;font-size:1rem;font-weight:700;color:#fff;margin-top:16px">✅ App já instalado no seu dispositivo!</p>
   </div>
 </section>
+
+<!-- MODAL DE INSTALAÇÃO DO APP -->
+<div id="installModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeInstallModal()">
+  <div style="background:var(--bg-card);border-radius:20px;max-width:540px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;max-height:90vh;overflow-y:auto">
+    <!-- Cabeçalho -->
+    <div style="background:linear-gradient(135deg,var(--primary),var(--accent));padding:24px 24px 20px;color:#fff;display:flex;align-items:flex-start;gap:14px">
+      <div style="width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">📲</div>
+      <div style="flex:1">
+        <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:4px;color:#fff">Instale o FinancieCerto</h3>
+        <p style="font-size:.82rem;color:rgba(255,255,255,.8);margin:0">Atalho na tela inicial · sem loja de apps · sem cadastro</p>
+      </div>
+      <button onclick="closeInstallModal()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
+    <!-- Botão automático Chrome/Edge (aparece quando disponível) -->
+    <div id="iModalAuto" style="display:none;padding:16px 24px 0;flex-direction:column;align-items:center;gap:6px">
+      <button id="iModalBtn" onclick="pwaTrigger()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;border:none;border-radius:12px;font-size:.97rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📲 Instalar agora — automático</button>
+      <p style="font-size:.72rem;color:var(--text3);margin:0">Seu navegador vai abrir o diálogo de instalação</p>
+    </div>
+    <!-- Cards de dispositivo -->
+    <div id="iModalCards" style="padding:16px 24px 24px;display:flex;flex-direction:column;gap:12px">
+      <!-- iPhone -->
+      <div style="border:1.5px solid var(--border);border-radius:12px;padding:16px;background:var(--bg)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:1.3rem">📱</span>
+          <strong style="font-size:.92rem;color:var(--text)">iPhone / iPad (Safari)</strong>
+        </div>
+        <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px">
+          <li style="font-size:.83rem;color:var(--text2)">Abra <strong>www.financiecerto.com.br</strong> no <strong>Safari</strong></li>
+          <li style="font-size:.83rem;color:var(--text2)">Toque no ícone <strong>Compartilhar ↑</strong> (barra inferior)</li>
+          <li style="font-size:.83rem;color:var(--text2)">Role a lista e toque em <strong>"Adicionar à Tela de Início"</strong></li>
+          <li style="font-size:.83rem;color:var(--text2)">Toque em <strong>"Adicionar"</strong> — pronto!</li>
+        </ol>
+      </div>
+      <!-- Android -->
+      <div style="border:1.5px solid var(--border);border-radius:12px;padding:16px;background:var(--bg)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:1.3rem">🤖</span>
+          <strong style="font-size:.92rem;color:var(--text)">Android (Chrome)</strong>
+        </div>
+        <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px">
+          <li style="font-size:.83rem;color:var(--text2)">Abra <strong>www.financiecerto.com.br</strong> no <strong>Chrome</strong></li>
+          <li style="font-size:.83rem;color:var(--text2)">Toque no menu <strong>⋮</strong> (canto superior direito)</li>
+          <li style="font-size:.83rem;color:var(--text2)">Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong></li>
+          <li style="font-size:.83rem;color:var(--text2)">Confirme tocando em <strong>"Instalar"</strong></li>
+        </ol>
+      </div>
+      <!-- Desktop -->
+      <div style="border:1.5px solid var(--border);border-radius:12px;padding:16px;background:var(--bg)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:1.3rem">💻</span>
+          <strong style="font-size:.92rem;color:var(--text)">Desktop (Chrome / Edge)</strong>
+        </div>
+        <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px">
+          <li style="font-size:.83rem;color:var(--text2)">Procure o ícone <strong>⊕</strong> no final da barra de endereço</li>
+          <li style="font-size:.83rem;color:var(--text2)">Clique e selecione <strong>"Instalar"</strong></li>
+          <li style="font-size:.83rem;color:var(--text2)">Ou: menu <strong>⋮</strong> → <strong>"Instalar FinancieCerto"</strong></li>
+        </ol>
+        <p style="font-size:.72rem;color:var(--text3);margin-top:8px;margin-bottom:0">O ícone ⊕ aparece após algumas visitas ao site</p>
+      </div>
+      <p id="iModalDone" style="display:none;text-align:center;font-weight:700;color:var(--accent);font-size:.97rem">✅ App instalado com sucesso!</p>
+    </div>
+  </div>
+</div>
 
 <div class="divider"></div>
 <footer>
@@ -3768,52 +3831,64 @@ async function handleContatoSubmit(e){
 // ─── PWA INSTALL ──────────────────────────────────────────────────────────────
 let _pwaPrompt=null;
 
-// Se Chrome/Edge oferecer o prompt automático: mostra o botão de instalação rápida
+// Chrome/Edge oferece o prompt automático: guarda e mostra botão no modal
 window.addEventListener('beforeinstallprompt',(e)=>{
   e.preventDefault();
   _pwaPrompt=e;
-  const auto=document.getElementById('installAuto');
-  if(auto)auto.style.display='flex';
+  // Mostra botão automático no modal e na seção app-sec
+  ['iModalAuto','installAuto'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='flex';
+  });
 });
+
+function openInstallModal(){
+  const m=document.getElementById('installModal');
+  if(!m)return;
+  m.style.display='flex';
+  document.body.style.overflow='hidden';
+  // Se app já instalado: mostra confirmação
+  if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
+    const cards=document.getElementById('iModalCards');
+    const done=document.getElementById('iModalDone');
+    const auto=document.getElementById('iModalAuto');
+    if(cards)cards.style.display='none';
+    if(auto)auto.style.display='none';
+    if(done)done.style.display='block';
+  }
+}
+
+function closeInstallModal(){
+  const m=document.getElementById('installModal');
+  if(m)m.style.display='none';
+  document.body.style.overflow='';
+}
 
 function pwaTrigger(){
   if(!_pwaPrompt)return;
   _pwaPrompt.prompt();
   _pwaPrompt.userChoice.then(choice=>{
     if(choice.outcome==='accepted'){
-      const cards=document.getElementById('appDeviceCards');
-      if(cards)cards.style.display='none';
-      const auto=document.getElementById('installAuto');
-      if(auto)auto.style.display='none';
-      const done=document.getElementById('installDone');
-      if(done)done.style.display='block';
+      // Mostra sucesso no modal e na seção
+      ['iModalAuto','iModalCards','installAuto','appDeviceCards'].forEach(id=>{
+        const el=document.getElementById(id);if(el)el.style.display='none';
+      });
+      ['iModalDone','installDone'].forEach(id=>{
+        const el=document.getElementById(id);if(el)el.style.display='block';
+      });
     }
     _pwaPrompt=null;
   });
 }
 
-// App já instalado: oculta cards e mostra confirmação
 window.addEventListener('appinstalled',()=>{
   _pwaPrompt=null;
-  const cards=document.getElementById('appDeviceCards');
-  if(cards)cards.style.display='none';
-  const auto=document.getElementById('installAuto');
-  if(auto)auto.style.display='none';
-  const done=document.getElementById('installDone');
-  if(done)done.style.display='block';
-});
-
-// Se já está instalado (standalone): oculta tudo e mostra confirmação
-if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
-  document.addEventListener('DOMContentLoaded',()=>{
-    const cards=document.getElementById('appDeviceCards');
-    if(cards)cards.style.display='none';
-    const auto=document.getElementById('installAuto');
-    if(auto)auto.style.display='none';
-    const done=document.getElementById('installDone');
-    if(done)done.style.display='block';
+  ['iModalAuto','iModalCards','installAuto','appDeviceCards'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
   });
-}
+  ['iModalDone','installDone'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='block';
+  });
+});
 
 // ─── APP MODE (PWA) ───────────────────────────────────────────────────────────
 // Ativa no celular automaticamente OU quando instalado como PWA (standalone)
