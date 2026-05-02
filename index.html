@@ -476,7 +476,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 /* ── PRINT STYLES ─────────────────────────────────────────────────────────── */
 @media print{
   #hdr,#mobOverlay,#mobDrawer,#chat-fab,#chat-win,#lgpd,#modal,.sec-bridge,
-  .next-step-sec,.app-sec,.parc-sec,#quem-somos-sec,footer,.sim-orulo-bridge{display:none!important}
+  .next-step-sec,.parc-sec,#quem-somos-sec,footer,.sim-orulo-bridge{display:none!important}
   body{background:#fff!important;color:#000!important}
   .sim-bd{box-shadow:none!important;border:1px solid #ccc!important}
   #resultado{display:block!important}
@@ -521,58 +521,6 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   .nav{display:none}
 }
 
-/* ─── APP MODE (PWA standalone — celular e desktop) ─────────────────────── */
-:root{--ath:52px}
-/* Topbar do app */
-#app-topbar{display:none;position:fixed;top:0;left:0;right:0;height:var(--ath);background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);z-index:120;padding:0 18px;align-items:center;gap:10px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.app-tb-ic{width:30px;height:30px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0}
-.app-tb-name{font-weight:800;font-size:.92rem;color:var(--text)}
-.app-tb-badge{margin-left:auto;font-size:.72rem;font-weight:600;color:var(--primary);background:var(--primary-light);padding:3px 10px;border-radius:20px;border:1px solid var(--primary-muted)}
-/* Ativa topbar e ajustes de layout */
-body.app-mode #app-topbar{display:flex}
-body.app-mode{padding-top:var(--ath)!important;padding-bottom:70px!important}
-/* Oculta elementos de site que não fazem parte do app */
-body.app-mode #hdr,
-body.app-mode #hero,
-body.app-mode .next-step-sec,
-body.app-mode #app-sec,
-body.app-mode #parceiros-sec,
-body.app-mode #quem-somos-sec,
-body.app-mode footer,
-body.app-mode .divider,
-body.app-mode .sec-bridge,
-body.app-mode #chat-fab,
-body.app-mode #chat-win{display:none!important}
-/* Força bottom-nav em todas as telas no app */
-body.app-mode #bottom-nav{display:block!important}
-body.app-mode #lgpd{bottom:70px}
-/* Troca as abas: esconde Início e Mais, mostra Assistente */
-body.app-mode #btab-home,
-body.app-mode #btab-mais{display:none!important}
-#btab-chat{display:none}
-body.app-mode #btab-chat{display:flex!important}
-/* Painéis de aba — ocultos por padrão no app */
-body.app-mode .app-tab-panel{display:none!important}
-body.app-mode .app-tab-panel.app-active{display:block!important}
-/* Painel do chat (aba Assistente) */
-#app-chat-panel{display:none;flex-direction:column;background:var(--bg-card)}
-body.app-mode #app-chat-panel.app-tab-panel{display:none}
-body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;height:calc(100vh - var(--ath) - 70px);overflow:hidden}
-.app-chat-hd{background:linear-gradient(135deg,var(--primary),var(--primary-d));padding:16px 20px;color:#fff;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.app-chat-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-.app-chat-info h4{font-size:.88rem;font-weight:700}
-.app-chat-info p{font-size:.72rem;opacity:.82;margin-top:1px}
-#appChatMsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
-#appChatSuggs{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 10px;flex-shrink:0}
-#appChatInp{display:flex;gap:7px;padding:10px 14px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg-card)}
-#appChatInput{flex:1;padding:9px 13px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);font-size:.87rem;outline:none;transition:border .2s}
-#appChatInput:focus{border-color:var(--primary)}
-/* Desktop: centraliza o conteúdo das abas */
-@media(min-width:769px){
-  body.app-mode .app-tab-panel.app-active{max-width:960px;margin:0 auto;box-sizing:border-box}
-  body.app-mode #app-chat-panel.app-tab-panel.app-active{max-width:720px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
-}
-
 /* MOBILE DRAWER */
 .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:199;backdrop-filter:blur(2px)}
 .mob-overlay.open{display:block}
@@ -586,8 +534,6 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
 .mob-nav-btn:hover,.mob-nav-btn:active{background:var(--bg)}
 .mob-nav-btn .mnb-ic{font-size:1rem;width:22px;text-align:center;flex-shrink:0}
 .mob-nav-divider{height:1px;background:var(--border);margin:6px 20px}
-.mob-nav-btn.mnb-app{color:var(--primary);font-weight:700;background:var(--primary-light)}
-.mob-nav-btn.mnb-app:hover{background:var(--primary-muted)}
 
 /* PARCEIROS */
 .parc-sec{padding:60px 24px;background:var(--bg)}
@@ -631,27 +577,6 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
 .parc-evo-card ul li{font-size:.8rem;color:var(--text2);line-height:1.5}
 .parc-evo-card ul li::before{content:'→ ';color:var(--text3)}
 
-/* SEÇÃO APP (PWA) */
-.app-sec{background:linear-gradient(135deg,#0f2d5a 0%,#1A56DB 100%);color:#fff;padding:52px 24px;text-align:center}
-.app-sec-inner{max-width:520px;margin:0 auto}
-.app-ic{font-size:2.8rem;margin-bottom:14px}
-.app-sec h2{font-size:1.55rem;font-weight:800;margin-bottom:8px;color:#fff}
-.app-sec p{font-size:.97rem;color:rgba(255,255,255,.82);line-height:1.65;margin-bottom:22px}
-.app-features{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}
-.app-feat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:7px 16px;font-size:.82rem;font-weight:600;color:#fff}
-#installBtn{display:inline-flex;align-items:center;gap:10px;padding:14px 30px;background:#fff;color:#1A56DB;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.18);transition:transform .15s,box-shadow .15s;margin:0 auto}
-#installBtn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.22)}
-#installBtn.installed{opacity:.5;cursor:default;pointer-events:none}
-.app-note{font-size:.8rem;color:rgba(255,255,255,.55);margin-top:14px}
-.app-manual{margin-top:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:16px 20px;font-size:.84rem;color:rgba(255,255,255,.8);line-height:1.6;text-align:left}
-.app-manual strong{color:#fff}
-.app-device-cards{display:flex;flex-direction:column;gap:12px;margin-top:18px;text-align:left;width:100%}
-.app-dev-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:16px 18px}
-.app-dev-title{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:10px}
-.app-dev-steps{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
-.app-dev-steps li{font-size:.83rem;color:rgba(255,255,255,.82);line-height:1.5}
-.app-dev-steps li strong{color:#fff}
-@media(min-width:600px){.app-device-cards{flex-direction:row;gap:10px}.app-dev-card{flex:1}}
 
 /* CONTATO */
 #contato-sec{background:var(--bg);padding:52px 24px}
@@ -743,7 +668,6 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
       <button class="nb" onclick="ir('parceiros-sec')">Parceiros</button>
       <button class="nb" onclick="ir('quem-somos-sec')">Quem Somos</button>
       <button class="nb" onclick="ir('contato-sec')">✉️ Contato</button>
-      <button class="nb" onclick="openInstallModal()" style="color:var(--primary);font-weight:700">📲 App</button>
     </nav>
     <button class="ham-btn" onclick="toggleMobMenu()" aria-label="Menu" id="hamBtn">
       <span></span><span></span><span></span>
@@ -771,22 +695,13 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
     <button class="mob-nav-btn" onclick="mobGo('parceiros-sec')"><span class="mnb-ic">🤝</span>Parceiros</button>
     <button class="mob-nav-btn" onclick="mobGo('quem-somos-sec')"><span class="mnb-ic">🏛️</span>Quem Somos</button>
     <button class="mob-nav-btn" onclick="mobGo('contato-sec')"><span class="mnb-ic">✉️</span>Contato</button>
-    <div class="mob-nav-divider"></div>
-    <button class="mob-nav-btn mnb-app" onclick="closeMobMenu();openInstallModal()"><span class="mnb-ic">📲</span>Instalar App</button>
   </div>
-</div>
-
-<!-- APP TOPBAR (visível apenas no modo app) -->
-<div id="app-topbar">
-  <div class="app-tb-ic">💰</div>
-  <span class="app-tb-name">FinancieCerto</span>
-  <span class="app-tb-badge" id="appTopbarTitle">Simulador</span>
 </div>
 
 <!-- BOTTOM TAB BAR -->
 <nav id="bottom-nav" role="navigation" aria-label="Navegação principal">
   <div class="bnav-inner">
-    <!-- Início (site) -->
+    <!-- Início -->
     <button class="bnav-btn active" id="btab-home" onclick="bnavGo('hero','btab-home')" aria-label="Início">
       <div class="bnav-ic-wrap"><span class="bnav-ic">🏠</span></div>
       <span class="bnav-lbl">Início</span>
@@ -806,12 +721,7 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
       <div class="bnav-ic-wrap"><span class="bnav-ic">📚</span></div>
       <span class="bnav-lbl">Guia</span>
     </button>
-    <!-- Assistente (app mode only) -->
-    <button class="bnav-btn" id="btab-chat" onclick="appBnavGo('chat','btab-chat')" aria-label="Assistente">
-      <div class="bnav-ic-wrap"><span class="bnav-ic">🤖</span></div>
-      <span class="bnav-lbl">Assistente</span>
-    </button>
-    <!-- Mais (site only) -->
+    <!-- Mais -->
     <button class="bnav-btn" id="btab-mais" onclick="toggleBnavMore()" aria-label="Mais opções">
       <div class="bnav-ic-wrap"><span class="bnav-ic">⋯</span></div>
       <span class="bnav-lbl">Mais</span>
@@ -824,33 +734,10 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
         <button class="bnav-more-item" onclick="bnavMore('parceiros-sec')"><span class="bmi-ic">🤝</span>Parceiros</button>
         <button class="bnav-more-item" onclick="bnavMore('quem-somos-sec')"><span class="bmi-ic">🏛️</span>Quem Somos</button>
         <button class="bnav-more-item" onclick="bnavMore('contato-sec')"><span class="bmi-ic">✉️</span>Contato</button>
-        <button class="bnav-more-item" onclick="closeBnavMore();openInstallModal()" style="color:var(--primary);font-weight:700"><span class="bmi-ic">📲</span>Instalar App</button>
       </div>
     </button>
   </div>
 </nav>
-
-<!-- APP CHAT PANEL (aba Assistente — modo app) -->
-<div id="app-chat-panel" class="app-tab-panel">
-  <div class="app-chat-hd">
-    <div class="app-chat-av">🤖</div>
-    <div class="app-chat-info">
-      <h4>Assistente de Financiamento</h4>
-      <p>MCMV · Fase de obra · FGTS · Custos · Assistente automatizado</p>
-    </div>
-  </div>
-  <div id="appChatMsgs"></div>
-  <div id="appChatSuggs">
-    <button class="chat-sug" onclick="askAppS('Qual minha faixa MCMV?')">📊 Qual minha faixa?</button>
-    <button class="chat-sug" onclick="askAppS('Como usar o FGTS na compra?')">💼 Como usar FGTS?</button>
-    <button class="chat-sug" onclick="askAppS('O que é fase de obra?')">🏗️ Fase de obra</button>
-    <button class="chat-sug" onclick="askAppS('Quais documentos preciso?')">📋 Documentos</button>
-  </div>
-  <div id="appChatInp">
-    <input id="appChatInput" type="text" placeholder="Sua dúvida sobre financiamento..." onkeydown="if(event.key==='Enter')sendAppMsg()">
-    <button class="chat-send" onclick="sendAppMsg()">➤</button>
-  </div>
-</div>
 
 <section id="hero">
   <div class="hero-badge">📊 FinancieCerto · Simulador de financiamento imobiliário · MCMV · SBPE · 2026</div>
@@ -2172,121 +2059,6 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
   </div>
 </section>
 
-<section class="app-sec st" id="app-sec">
-  <div class="app-sec-inner">
-    <div class="app-ic">📲</div>
-    <h2>Instale o FinancieCerto no seu dispositivo</h2>
-    <p>Sem loja de aplicativos. Sem cadastro. Siga o passo a passo do seu dispositivo:</p>
-    <div class="app-features">
-      <span class="app-feat">⚡ Acesso rápido</span>
-      <span class="app-feat">📶 Funciona offline</span>
-      <span class="app-feat">🔒 Sem coleta de dados</span>
-      <span class="app-feat">📱 Tela inicial</span>
-    </div>
-
-    <!-- Botão automático Chrome/Edge (aparece quando o navegador oferece) -->
-    <div id="installAuto" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-bottom:16px">
-      <button id="installBtn" onclick="pwaTrigger()">📲 Instalar agora</button>
-      <p style="font-size:.75rem;color:rgba(255,255,255,.55);margin:0">Seu navegador vai abrir o instalador</p>
-    </div>
-
-    <!-- Cards de dispositivo — sempre visíveis, um por tipo -->
-    <div class="app-device-cards" id="appDeviceCards">
-      <div class="app-dev-card" id="cardIOS">
-        <div class="app-dev-title">📱 iPhone / iPad (Safari)</div>
-        <ol class="app-dev-steps">
-          <li>Abra este site no <strong>Safari</strong></li>
-          <li>Toque no ícone <strong>Compartilhar ↑</strong> (barra de baixo)</li>
-          <li>Role e toque em <strong>"Adicionar à Tela de Início"</strong></li>
-          <li>Toque em <strong>"Adicionar"</strong> — pronto!</li>
-        </ol>
-      </div>
-      <div class="app-dev-card" id="cardAndroid">
-        <div class="app-dev-title">🤖 Android (Chrome)</div>
-        <ol class="app-dev-steps">
-          <li>Abra este site no <strong>Chrome</strong></li>
-          <li>Toque no menu <strong>⋮</strong> (três pontos, canto superior direito)</li>
-          <li>Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong></li>
-          <li>Confirme — pronto!</li>
-        </ol>
-      </div>
-      <div class="app-dev-card" id="cardDesktop">
-        <div class="app-dev-title">💻 Desktop (Chrome ou Edge)</div>
-        <ol class="app-dev-steps">
-          <li>Procure o ícone <strong>⊕</strong> no final da barra de endereço</li>
-          <li>Clique e selecione <strong>"Instalar"</strong></li>
-          <li>Ou: clique no menu <strong>⋮</strong> → <strong>"Instalar FinancieCerto"</strong></li>
-        </ol>
-        <p style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:8px">O ícone aparece após algumas visitas ao site</p>
-      </div>
-    </div>
-
-    <p id="installDone" style="display:none;font-size:1rem;font-weight:700;color:#fff;margin-top:16px">✅ App já instalado no seu dispositivo!</p>
-  </div>
-</section>
-
-<!-- MODAL DE INSTALAÇÃO DO APP -->
-<div id="installModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeInstallModal()">
-  <div style="background:var(--bg-card);border-radius:20px;max-width:540px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;max-height:90vh;overflow-y:auto">
-    <!-- Cabeçalho -->
-    <div style="background:linear-gradient(135deg,var(--primary),var(--accent));padding:24px 24px 20px;color:#fff;display:flex;align-items:flex-start;gap:14px">
-      <div style="width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">📲</div>
-      <div style="flex:1">
-        <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:4px;color:#fff">Instale o FinancieCerto</h3>
-        <p style="font-size:.82rem;color:rgba(255,255,255,.8);margin:0">Atalho na tela inicial · sem loja de apps · sem cadastro</p>
-      </div>
-      <button onclick="closeInstallModal()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
-    </div>
-    <!-- Botão automático Chrome/Edge (aparece quando disponível) -->
-    <div id="iModalAuto" style="display:none;padding:16px 24px 0;flex-direction:column;align-items:center;gap:6px">
-      <button id="iModalBtn" onclick="pwaTrigger()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;border:none;border-radius:12px;font-size:.97rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📲 Instalar agora — automático</button>
-      <p style="font-size:.72rem;color:var(--text3);margin:0">Seu navegador vai abrir o diálogo de instalação</p>
-    </div>
-    <!-- Cards de dispositivo -->
-    <div id="iModalCards" style="padding:16px 24px 24px;display:flex;flex-direction:column;gap:12px">
-      <!-- iPhone -->
-      <div style="border:1.5px solid var(--border);border-radius:12px;padding:16px;background:var(--bg)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="font-size:1.3rem">📱</span>
-          <strong style="font-size:.92rem;color:var(--text)">iPhone / iPad (Safari)</strong>
-        </div>
-        <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px">
-          <li style="font-size:.83rem;color:var(--text2)">Abra <strong>www.financiecerto.com.br</strong> no <strong>Safari</strong></li>
-          <li style="font-size:.83rem;color:var(--text2)">Toque no ícone <strong>Compartilhar ↑</strong> (barra inferior)</li>
-          <li style="font-size:.83rem;color:var(--text2)">Role a lista e toque em <strong>"Adicionar à Tela de Início"</strong></li>
-          <li style="font-size:.83rem;color:var(--text2)">Toque em <strong>"Adicionar"</strong> — pronto!</li>
-        </ol>
-      </div>
-      <!-- Android -->
-      <div style="border:1.5px solid var(--border);border-radius:12px;padding:16px;background:var(--bg)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="font-size:1.3rem">🤖</span>
-          <strong style="font-size:.92rem;color:var(--text)">Android (Chrome)</strong>
-        </div>
-        <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px">
-          <li style="font-size:.83rem;color:var(--text2)">Abra <strong>www.financiecerto.com.br</strong> no <strong>Chrome</strong></li>
-          <li style="font-size:.83rem;color:var(--text2)">Toque no menu <strong>⋮</strong> (canto superior direito)</li>
-          <li style="font-size:.83rem;color:var(--text2)">Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong></li>
-          <li style="font-size:.83rem;color:var(--text2)">Confirme tocando em <strong>"Instalar"</strong></li>
-        </ol>
-      </div>
-      <!-- Desktop -->
-      <div style="border:1.5px solid var(--border);border-radius:12px;padding:16px;background:var(--bg)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="font-size:1.3rem">💻</span>
-          <strong style="font-size:.92rem;color:var(--text)">Desktop (Chrome / Edge)</strong>
-        </div>
-        <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px">
-          <li style="font-size:.83rem;color:var(--text2)">Procure o ícone <strong>⊕</strong> no final da barra de endereço</li>
-          <li style="font-size:.83rem;color:var(--text2)">Clique e selecione <strong>"Instalar"</strong></li>
-          <li style="font-size:.83rem;color:var(--text2)">Ou: menu <strong>⋮</strong> → <strong>"Instalar FinancieCerto"</strong></li>
-        </ol>
-        <p style="font-size:.72rem;color:var(--text3);margin-top:8px;margin-bottom:0">O ícone ⊕ aparece após algumas visitas ao site</p>
-      </div>
-      <p id="iModalDone" style="display:none;text-align:center;font-weight:700;color:var(--accent);font-size:.97rem">✅ App instalado com sucesso!</p>
-    </div>
-  </div>
-</div>
 
 <div class="divider"></div>
 <footer>
@@ -3802,7 +3574,7 @@ async function handleContatoSubmit(e){
     alert('Não foi possível enviar. Tente novamente ou envie diretamente para contato@financiecerto.com.br');
   }
 }
-// Atualiza tab ativo baseado no scroll (apenas no site, não no app)
+// Atualiza tab ativo baseado no scroll
 (function(){
   const sections=[
     {id:'hero',tab:'btab-home'},
@@ -3812,7 +3584,6 @@ async function handleContatoSubmit(e){
   ];
   let ticking=false;
   window.addEventListener('scroll',function(){
-    if(document.body.classList.contains('app-mode'))return;
     if(ticking)return;
     ticking=true;
     requestAnimationFrame(function(){
@@ -3828,181 +3599,8 @@ async function handleContatoSubmit(e){
   },{passive:true});
 })();
 
-// ─── PWA INSTALL ──────────────────────────────────────────────────────────────
-let _pwaPrompt=null;
-
-// Chrome/Edge oferece o prompt automático: guarda e mostra botão no modal
-window.addEventListener('beforeinstallprompt',(e)=>{
-  e.preventDefault();
-  _pwaPrompt=e;
-  // Mostra botão automático no modal e na seção app-sec
-  ['iModalAuto','installAuto'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.style.display='flex';
-  });
-});
-
-function openInstallModal(){
-  const m=document.getElementById('installModal');
-  if(!m)return;
-  m.style.display='flex';
-  document.body.style.overflow='hidden';
-  // Se app já instalado: mostra confirmação
-  if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
-    const cards=document.getElementById('iModalCards');
-    const done=document.getElementById('iModalDone');
-    const auto=document.getElementById('iModalAuto');
-    if(cards)cards.style.display='none';
-    if(auto)auto.style.display='none';
-    if(done)done.style.display='block';
-  }
-}
-
-function closeInstallModal(){
-  const m=document.getElementById('installModal');
-  if(m)m.style.display='none';
-  document.body.style.overflow='';
-}
-
-function pwaTrigger(){
-  if(!_pwaPrompt)return;
-  _pwaPrompt.prompt();
-  _pwaPrompt.userChoice.then(choice=>{
-    if(choice.outcome==='accepted'){
-      // Mostra sucesso no modal e na seção
-      ['iModalAuto','iModalCards','installAuto','appDeviceCards'].forEach(id=>{
-        const el=document.getElementById(id);if(el)el.style.display='none';
-      });
-      ['iModalDone','installDone'].forEach(id=>{
-        const el=document.getElementById(id);if(el)el.style.display='block';
-      });
-    }
-    _pwaPrompt=null;
-  });
-}
-
-window.addEventListener('appinstalled',()=>{
-  _pwaPrompt=null;
-  ['iModalAuto','iModalCards','installAuto','appDeviceCards'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.style.display='none';
-  });
-  ['iModalDone','installDone'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.style.display='block';
-  });
-});
-
-// ─── APP MODE (PWA) ───────────────────────────────────────────────────────────
-// Ativa no celular automaticamente OU quando instalado como PWA (standalone)
-const IS_MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||window.innerWidth<=768;
-const IS_STANDALONE=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-const IS_PWA=IS_MOBILE||IS_STANDALONE;
-
-const APP_TAB_MAP={
-  sim:   {label:'Simulador',    ids:['sim-sec']},
-  faixas:{label:'Faixas MCMV', ids:['faixas-sec','entenda-sec']},
-  guia:  {label:'Guia',        ids:['guia-sec','siglas-sec','obra-sec','incc-sec','custos-sec','docs-sec','caso-sec']},
-  chat:  {label:'Assistente',  ids:['app-chat-panel']}
-};
-const ALL_APP_IDS=Object.values(APP_TAB_MAP).flatMap(t=>t.ids);
-
-function appTabSwitch(tabId){
-  if(!document.body.classList.contains('app-mode'))return;
-  const def=APP_TAB_MAP[tabId];
-  if(!def)return;
-  // Oculta todos os painéis
-  ALL_APP_IDS.forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.classList.remove('app-active');
-  });
-  // Exibe painéis da aba ativa
-  def.ids.forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.classList.add('app-active');
-  });
-  // Atualiza título no topbar
-  const title=document.getElementById('appTopbarTitle');
-  if(title)title.textContent=def.label;
-  // Atualiza botão ativo
-  document.querySelectorAll('#bottom-nav .bnav-btn').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('btab-'+tabId);
-  if(btn)btn.classList.add('active');
-  // Volta ao topo
-  window.scrollTo(0,0);
-  // Inicia chat na primeira abertura da aba
-  if(tabId==='chat'&&!appChatInited){
-    appChatInited=true;
-    setTimeout(()=>addAppMsg('Olá! Sou o Assistente de Financiamento. Posso responder dúvidas sobre MCMV, fase de obra, FGTS, seguros, documentação e custos. Como posso te ajudar?','bot'),300);
-  }
-}
-
-function appBnavGo(tabId,btnId){
-  bnavSetActive(btnId);
-  closeBnavMore();
-  appTabSwitch(tabId);
-}
-
-// Chat da aba Assistente
-let appChatInited=false;
-const _appChatHist=[];
-
-function addAppMsg(t,w){
-  const msgs=document.getElementById('appChatMsgs');
-  if(!msgs)return;
-  const d=document.createElement('div');
-  d.className='msg '+w;
-  d.innerHTML=t.replace(/\n/g,'<br>');
-  msgs.appendChild(d);
-  msgs.scrollTop=9999;
-}
-function addAppTyp(){
-  const msgs=document.getElementById('appChatMsgs');
-  if(!msgs)return;
-  const d=document.createElement('div');d.className='msg-typ';d.id='app-typ';
-  d.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-  msgs.appendChild(d);
-  msgs.scrollTop=9999;
-}
-function sendAppMsg(preset){
-  const inp=document.getElementById('appChatInput');
-  const t=(preset||inp?.value||'').trim();
-  if(!t)return;
-  if(inp)inp.value='';
-  const suggs=document.getElementById('appChatSuggs');
-  if(suggs)suggs.style.display='none';
-  addAppMsg(t,'user');
-  addAppTyp();
-  const delay=700+Math.random()*500;
-  // Reutiliza a função central de resposta do chat existente
-  getChatResponse(t).then(reply=>{
-    setTimeout(()=>{document.getElementById('app-typ')?.remove();addAppMsg(reply,'bot');},delay);
-  }).catch(()=>{
-    setTimeout(()=>{document.getElementById('app-typ')?.remove();addAppMsg(matchLocal(t),'bot');},delay);
-  });
-}
-function askAppS(q){sendAppMsg(q);}
-
-function initAppMode(){
-  document.body.classList.add('app-mode');
-  // Marca todas as seções gerenciadas como painéis de aba
-  ALL_APP_IDS.forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.classList.add('app-tab-panel');
-  });
-  // Override dos botões do bottom-nav para o modo app
-  const btnSim=document.getElementById('btab-sim');
-  if(btnSim)btnSim.onclick=()=>appBnavGo('sim','btab-sim');
-  const btnFaixas=document.getElementById('btab-faixas');
-  if(btnFaixas)btnFaixas.onclick=()=>appBnavGo('faixas','btab-faixas');
-  const btnGuia=document.getElementById('btab-guia');
-  if(btnGuia)btnGuia.onclick=()=>appBnavGo('guia','btab-guia');
-  // Inicia na aba Simulador
-  appTabSwitch('sim');
-}
-
 // ─── SERVICE WORKER ───────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{
-  atualizarPrazoHint();
-  if(IS_PWA)initAppMode();
-});
+document.addEventListener('DOMContentLoaded',()=>{ atualizarPrazoHint(); });
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
