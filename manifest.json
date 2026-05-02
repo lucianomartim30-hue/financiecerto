@@ -2,7 +2,7 @@
   "name": "FinancieCerto — Financiamento Imobiliário",
   "short_name": "FinancieCerto",
   "description": "Simule seu financiamento imobiliário MCMV e SBPE com base em regras reais da CAIXA.",
-  "start_url": "/?pwa=1",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#1A56DB",

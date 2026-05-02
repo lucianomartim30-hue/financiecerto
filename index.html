@@ -639,11 +639,15 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
 .app-sec p{font-size:.97rem;color:rgba(255,255,255,.82);line-height:1.65;margin-bottom:22px}
 .app-features{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}
 .app-feat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:7px 16px;font-size:.82rem;font-weight:600;color:#fff}
-#installBtn{display:none;align-items:center;gap:10px;padding:14px 30px;background:#fff;color:#1A56DB;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.18);transition:transform .15s,box-shadow .15s;margin:0 auto}
+#installBtn{display:inline-flex;align-items:center;gap:10px;padding:14px 30px;background:#fff;color:#1A56DB;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.18);transition:transform .15s,box-shadow .15s;margin:0 auto}
 #installBtn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.22)}
+#installBtn.installed{opacity:.5;cursor:default;pointer-events:none}
 .app-note{font-size:.8rem;color:rgba(255,255,255,.55);margin-top:14px}
 .app-manual{margin-top:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:16px 20px;font-size:.84rem;color:rgba(255,255,255,.8);line-height:1.6;text-align:left}
 .app-manual strong{color:#fff}
+.app-device-steps{display:flex;flex-direction:column;gap:10px;margin-top:18px;text-align:left}
+.app-step{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 16px;font-size:.83rem;color:rgba(255,255,255,.85);line-height:1.5}
+.app-step strong{color:#fff;display:block;margin-bottom:3px}
 
 /* CONTATO */
 #contato-sec{background:var(--bg);padding:52px 24px}
@@ -2167,24 +2171,23 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
 <section class="app-sec st" id="app-sec">
   <div class="app-sec-inner">
     <div class="app-ic">📲</div>
-    <h2>Instale no seu celular</h2>
-    <p>Este site pode ser instalado como atalho na tela inicial do seu dispositivo, permitindo acesso rápido como um aplicativo — sem precisar da loja de aplicativos. Após a primeira visita, o conteúdo principal fica em cache para acesso mesmo sem sinal.</p>
+    <h2>Instale o FinancieCerto no seu dispositivo</h2>
+    <p>Sem loja de aplicativos. Sem cadastro. Clique no botão abaixo — o seu navegador vai pedir para adicionar o app à tela inicial.</p>
     <div class="app-features">
       <span class="app-feat">⚡ Acesso rápido</span>
-      <span class="app-feat">📶 Cache offline</span>
+      <span class="app-feat">📶 Funciona offline</span>
       <span class="app-feat">🔒 Sem coleta de dados</span>
-      <span class="app-feat">📱 Atalho na tela inicial</span>
+      <span class="app-feat">📱 Tela inicial</span>
     </div>
     <button id="installBtn" onclick="pwaTrigger()">
-      📲 Instalar no celular
+      📲 Instalar agora
     </button>
-    <div class="app-manual" id="appManual">
-      <strong>Como instalar:</strong><br>
-      • <strong>Android (Chrome):</strong> Menu (⋮) → "Adicionar à tela inicial"<br>
-      • <strong>iPhone (Safari):</strong> Botão de compartilhamento ↑ → "Adicionar à tela de início"<br>
-      • <strong>Desktop (Chrome/Edge):</strong> Ícone de instalação (⊕) na barra de endereço
+    <p class="app-note" id="appNote" style="margin-top:12px">No Chrome e Edge o botão abre o instalador automático.</p>
+    <div class="app-device-steps" id="appManual">
+      <div class="app-step"><strong>📱 iPhone / iPad (Safari)</strong>Toque em Compartilhar ↑ → "Adicionar à Tela de Início"</div>
+      <div class="app-step"><strong>🤖 Android (Chrome)</strong>Menu ⋮ → "Adicionar à tela inicial" ou "Instalar app"</div>
+      <div class="app-step"><strong>💻 Desktop (Chrome / Edge)</strong>Ícone ⊕ na barra de endereço → "Instalar"</div>
     </div>
-    <p class="app-note" id="appNote">Nos navegadores compatíveis o botão acima abre o instalador automático. Nos demais, use as instruções acima.</p>
   </div>
 </section>
 
@@ -3729,47 +3732,66 @@ async function handleContatoSubmit(e){
 })();
 
 // ─── PWA INSTALL ──────────────────────────────────────────────────────────────
-// Ocultar botão de instalação se o app já está instalado (modo standalone)
-(function(){
-  if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
-    document.addEventListener('DOMContentLoaded',()=>{
-      const btn=document.getElementById('installBtn');
-      if(btn)btn.style.display='none';
-      const note=document.getElementById('appNote');
-      if(note)note.style.display='none';
-    });
-  }
-})();
 let _pwaPrompt=null;
+
+// Captura o prompt automático do Chrome/Edge quando disponível
 window.addEventListener('beforeinstallprompt',(e)=>{
   e.preventDefault();
   _pwaPrompt=e;
+  // Destaca o botão indicando que o instalador automático está disponível
   const btn=document.getElementById('installBtn');
-  if(btn){btn.style.display='inline-flex';}
+  if(btn){
+    btn.innerHTML='📲 Instalar agora <span style="font-size:.75rem;opacity:.7;font-weight:500">(automático)</span>';
+    btn.style.background='#fff';
+  }
   const note=document.getElementById('appNote');
-  if(note)note.style.display='none';
+  if(note)note.style.display='block';
 });
+
 function pwaTrigger(){
   if(_pwaPrompt){
+    // Chrome/Edge: abre o diálogo de instalação automático
     _pwaPrompt.prompt();
-    _pwaPrompt.userChoice.then(()=>{_pwaPrompt=null;});
+    _pwaPrompt.userChoice.then(choice=>{
+      if(choice.outcome==='accepted'){
+        const btn=document.getElementById('installBtn');
+        if(btn){btn.innerHTML='✅ App instalado!';btn.classList.add('installed');}
+      }
+      _pwaPrompt=null;
+    });
   } else {
+    // iOS Safari e outros: mostra as instruções manuais
     const manual=document.getElementById('appManual');
-    if(manual)manual.style.display='block';
+    if(manual){manual.style.display='flex';manual.scrollIntoView({behavior:'smooth',block:'nearest'});}
     const note=document.getElementById('appNote');
     if(note)note.style.display='none';
+    const btn=document.getElementById('installBtn');
+    if(btn)btn.innerHTML='📋 Veja as instruções abaixo ↓';
   }
 }
+
+// Quando o app for instalado com sucesso
 window.addEventListener('appinstalled',()=>{
   const btn=document.getElementById('installBtn');
-  if(btn)btn.style.display='none';
+  if(btn){btn.innerHTML='✅ App instalado!';btn.classList.add('installed');}
   _pwaPrompt=null;
 });
 
+// Se já está instalado (standalone), muda o botão
+if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
+  document.addEventListener('DOMContentLoaded',()=>{
+    const btn=document.getElementById('installBtn');
+    if(btn){btn.innerHTML='✅ App já instalado';btn.classList.add('installed');}
+    const note=document.getElementById('appNote');
+    if(note)note.style.display='none';
+  });
+}
+
 // ─── APP MODE (PWA) ───────────────────────────────────────────────────────────
-const IS_PWA=window.matchMedia('(display-mode: standalone)').matches||
-             window.navigator.standalone===true||
-             new URLSearchParams(location.search).get('pwa')==='1';
+// Ativa no celular automaticamente OU quando instalado como PWA (standalone)
+const IS_MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||window.innerWidth<=768;
+const IS_STANDALONE=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+const IS_PWA=IS_MOBILE||IS_STANDALONE;
 
 const APP_TAB_MAP={
   sim:   {label:'Simulador',    ids:['sim-sec']},
