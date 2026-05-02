@@ -36,13 +36,15 @@ DOMÍNIO DE CONHECIMENTO:
 - Análise de crédito: Score, Cadmut, Caehis, restrições, pré-análise
 
 DADOS DE REFERÊNCIA — MCMV 2026 (regras vigentes desde 22/04/2026):
-- Faixa 1 MCMV: renda até R$ 3.200 · taxa 4–5% a.a. + TR · subsídio até R$ 55.000 · LTV até 95%
-- Faixa 2 MCMV: renda até R$ 5.000 · taxa 4,75–7% a.a. + TR · subsídio até R$ 29.000 · LTV até 90%
-- Faixa 3 MCMV: renda até R$ 9.600 · taxa 7,66–8,16% a.a. + TR · sem subsídio · LTV até 80%
+- Faixa 1 MCMV: renda até R$ 3.200 · taxa 4–5% a.a. + TR · subsídio até R$ 55.000 · LTV até 95% · prazo máximo 420 meses
+- Faixa 2 MCMV: renda até R$ 5.000 · taxa 4,75–7% a.a. + TR · subsídio até R$ 29.000 · LTV até 90% · prazo máximo 420 meses
+- Faixa 3 MCMV: renda até R$ 9.600 · taxa 7,66–8,16% a.a. + TR · sem subsídio · LTV até 80% · prazo máximo 420 meses
 - Faixa 4 MCMV: renda até R$ 13.000 · taxa até 10% a.a. + TR · sem subsídio · LTV até 80% · prazo máximo 420 meses
-- SBPE 2026: 12–14,5% a.a. + TR
+- SBPE 2026: 12–14,5% a.a. + TR · prazo máximo 420 meses
+- PRAZO MÁXIMO — REGRA CRÍTICA: tanto no SAC quanto na Tabela Price o prazo máximo é 420 meses (35 anos). O prazo real é limitado pela idade do proponente mais velho: a operação precisa ser quitada antes de o proponente mais velho completar 80 anos e 6 meses. NUNCA diga que o prazo máximo é 30 anos ou 360 meses — isso está ERRADO para o MCMV e SFH.
+- LTV: SAC até 80% · Tabela Price até 70%
 - Limite SFH: imóvel até R$ 2.250.000
-- TR 2026: ~0,17% ao mês (variável)
+- TR abril/2026: ~0,001679% ao mês (variável, calculada pelo Banco Central)
 - ITBI: 2–3% (varia por município) · Cartório + Registro: 0,5–1,5%
 
 REGRAS ABSOLUTAS:
@@ -51,6 +53,7 @@ REGRAS ABSOLUTAS:
 3. Nunca finjas ser humano. Diga que é um assistente automatizado quando perguntado.
 4. Se a pergunta for fora do tema, recuse gentilmente.
 5. Quando cabível, sugira usar o Simulador do site para os números específicos do usuário.
+6. Se usar pesquisa web para complementar a resposta, indique brevemente a fonte consultada.
 `.trim();
 
 // ── Sanitização ───────────────────────────────────────────────────────────────
@@ -108,18 +111,29 @@ module.exports = async function handler(req, res) {
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const completion = await openai.chat.completions.create({
-      model:      'gpt-4o-mini',
-      max_tokens: 600,
-      temperature: 0.7,
-      messages: [
+    // Usa a Responses API com busca web habilitada
+    const response = await openai.responses.create({
+      model: 'gpt-4o-mini',
+      tools: [{ type: 'web_search_preview' }],
+      tool_choice: 'auto',
+      max_output_tokens: 700,
+      input: [
         { role: 'system', content: SYSTEM_PROMPT },
         ...openAIHist,
         { role: 'user',   content: cleanMsg }
       ]
     });
 
-    const replyText = completion.choices[0].message.content;
+    // Extrai o texto da resposta final
+    const messageItem = response.output.find(item => item.type === 'message');
+    const replyText = messageItem
+      ? messageItem.content
+          .filter(c => c.type === 'output_text')
+          .map(c => c.text)
+          .join('')
+      : '';
+
+    if (!replyText) throw new Error('Resposta vazia da API.');
     return res.status(200).json({ reply: replyText });
 
   } catch (err) {
