@@ -2,14 +2,11 @@
   "version": 2,
   "name": "financiecerto",
   "builds": [
-    {
-      "src": "api/chat.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    }
+    { "src": "api/chat.js",    "use": "@vercel/node"   },
+    { "src": "index.html",     "use": "@vercel/static" },
+    { "src": "*.png",          "use": "@vercel/static" },
+    { "src": "manifest.json",  "use": "@vercel/static" },
+    { "src": "sw.js",          "use": "@vercel/static" }
   ],
   "routes": [
     {
@@ -17,12 +14,10 @@
       "dest": "/api/chat.js",
       "methods": ["POST", "OPTIONS"]
     },
+    { "handle": "filesystem" },
     {
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "GEMINI_MODEL": "gemini-2.0-flash"
-  }
+  ]
 }
