@@ -2172,22 +2172,42 @@ body.app-mode #app-chat-panel.app-tab-panel.app-active{display:flex!important;he
   <div class="app-sec-inner">
     <div class="app-ic">📲</div>
     <h2>Instale o FinancieCerto no seu dispositivo</h2>
-    <p>Sem loja de aplicativos. Sem cadastro. Clique no botão abaixo — o seu navegador vai pedir para adicionar o app à tela inicial.</p>
+    <p>Sem loja de aplicativos. Sem cadastro. Acesso rápido pela tela inicial.</p>
     <div class="app-features">
       <span class="app-feat">⚡ Acesso rápido</span>
       <span class="app-feat">📶 Funciona offline</span>
       <span class="app-feat">🔒 Sem coleta de dados</span>
       <span class="app-feat">📱 Tela inicial</span>
     </div>
-    <button id="installBtn" onclick="pwaTrigger()">
-      📲 Instalar agora
-    </button>
-    <p class="app-note" id="appNote" style="margin-top:12px">No Chrome e Edge o botão abre o instalador automático.</p>
-    <div class="app-device-steps" id="appManual" style="display:none">
-      <div class="app-step"><strong>📱 iPhone / iPad (Safari)</strong>Toque em Compartilhar ↑ → "Adicionar à Tela de Início"</div>
-      <div class="app-step"><strong>🤖 Android (Chrome)</strong>Menu ⋮ → "Adicionar à tela inicial" ou "Instalar app"</div>
-      <div class="app-step"><strong>💻 Desktop (Chrome / Edge)</strong>Ícone ⊕ na barra de endereço → "Instalar"</div>
+    <!-- Botão automático: Chrome/Edge -->
+    <div id="installAuto" style="display:none;flex-direction:column;align-items:center;gap:10px">
+      <button id="installBtn" onclick="pwaTrigger()" style="display:inline-flex">
+        📲 Instalar agora
+      </button>
+      <p style="font-size:.78rem;color:rgba(255,255,255,.6);margin:0">Seu navegador vai abrir o instalador automático</p>
     </div>
+    <!-- Instrução iOS -->
+    <div id="installIOS" style="display:none" class="app-manual">
+      <strong>📱 iPhone / iPad — como instalar:</strong><br><br>
+      1. Toque no ícone de <strong>Compartilhar</strong> ↑ (barra inferior do Safari)<br>
+      2. Role a lista e toque em <strong>"Adicionar à Tela de Início"</strong><br>
+      3. Confirme tocando em <strong>"Adicionar"</strong>
+    </div>
+    <!-- Instrução Android -->
+    <div id="installAndroid" style="display:none" class="app-manual">
+      <strong>🤖 Android (Chrome) — como instalar:</strong><br><br>
+      1. Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito<br>
+      2. Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong><br>
+      3. Confirme tocando em <strong>"Instalar"</strong>
+    </div>
+    <!-- Instrução Desktop -->
+    <div id="installDesktop" style="display:none" class="app-manual">
+      <strong>💻 Desktop Chrome / Edge — como instalar:</strong><br><br>
+      1. Procure o ícone <strong>⊕</strong> no canto direito da barra de endereço<br>
+      2. Clique nele e selecione <strong>"Instalar"</strong><br>
+      3. Se não aparecer, acesse pelo Chrome: Menu ⋮ → <strong>"Instalar FinancieCerto"</strong>
+    </div>
+    <p id="installDone" style="display:none;font-size:1rem;font-weight:700;color:#fff;margin-top:14px">✅ App instalado com sucesso!</p>
   </div>
 </section>
 
@@ -3734,58 +3754,79 @@ async function handleContatoSubmit(e){
 // ─── PWA INSTALL ──────────────────────────────────────────────────────────────
 let _pwaPrompt=null;
 
-// Captura o prompt automático do Chrome/Edge quando disponível
+// Detecta o tipo de dispositivo
+const _isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+const _isAndroid=/Android/i.test(navigator.userAgent);
+const _isDesktop=!_isIOS&&!_isAndroid;
+
+// Captura o prompt automático (Chrome/Edge Android e Desktop)
 window.addEventListener('beforeinstallprompt',(e)=>{
   e.preventDefault();
   _pwaPrompt=e;
-  // Destaca o botão indicando que o instalador automático está disponível
-  const btn=document.getElementById('installBtn');
-  if(btn){
-    btn.innerHTML='📲 Instalar agora <span style="font-size:.75rem;opacity:.7;font-weight:500">(automático)</span>';
-    btn.style.background='#fff';
+  // Mostra o botão automático e esconde as instruções manuais
+  const auto=document.getElementById('installAuto');
+  if(auto)auto.style.display='flex';
+  ['installIOS','installAndroid','installDesktop'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
+});
+
+// Inicializa a seção de instalação com base no dispositivo
+document.addEventListener('DOMContentLoaded',()=>{
+  // Se já está instalado: mostra mensagem de sucesso
+  if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
+    ['installAuto','installIOS','installAndroid','installDesktop'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.style.display='none';
+    });
+    const done=document.getElementById('installDone');
+    if(done)done.style.display='block';
+    return;
   }
-  const note=document.getElementById('appNote');
-  if(note)note.style.display='block';
+  // Se o beforeinstallprompt ainda não disparou (iOS ou Chrome ainda carregando):
+  // mostra instrução do dispositivo detectado
+  if(!_pwaPrompt){
+    if(_isIOS){
+      const el=document.getElementById('installIOS');if(el)el.style.display='block';
+    } else if(_isAndroid){
+      const el=document.getElementById('installAndroid');if(el)el.style.display='block';
+    } else {
+      // Desktop: mostra botão mesmo sem prompt (instruções aparecem ao clicar)
+      const auto=document.getElementById('installAuto');
+      if(auto)auto.style.display='flex';
+    }
+  }
 });
 
 function pwaTrigger(){
   if(_pwaPrompt){
-    // Chrome/Edge: abre o diálogo de instalação automático
     _pwaPrompt.prompt();
     _pwaPrompt.userChoice.then(choice=>{
       if(choice.outcome==='accepted'){
-        const btn=document.getElementById('installBtn');
-        if(btn){btn.innerHTML='✅ App instalado!';btn.classList.add('installed');}
+        ['installAuto','installIOS','installAndroid','installDesktop'].forEach(id=>{
+          const el=document.getElementById(id);if(el)el.style.display='none';
+        });
+        const done=document.getElementById('installDone');
+        if(done)done.style.display='block';
       }
       _pwaPrompt=null;
     });
-  } else {
-    // iOS Safari e outros: mostra as instruções manuais
-    const manual=document.getElementById('appManual');
-    if(manual){manual.style.display='flex';manual.scrollIntoView({behavior:'smooth',block:'nearest'});}
-    const note=document.getElementById('appNote');
-    if(note)note.style.display='none';
-    const btn=document.getElementById('installBtn');
-    if(btn)btn.innerHTML='📋 Veja as instruções abaixo ↓';
+  } else if(_isDesktop){
+    // Desktop sem prompt automático: mostra instrução de como instalar manualmente
+    const el=document.getElementById('installDesktop');
+    if(el){el.style.display='block';el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+    const auto=document.getElementById('installAuto');
+    if(auto)auto.style.display='none';
   }
 }
 
-// Quando o app for instalado com sucesso
 window.addEventListener('appinstalled',()=>{
-  const btn=document.getElementById('installBtn');
-  if(btn){btn.innerHTML='✅ App instalado!';btn.classList.add('installed');}
+  ['installAuto','installIOS','installAndroid','installDesktop'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  const done=document.getElementById('installDone');
+  if(done)done.style.display='block';
   _pwaPrompt=null;
 });
-
-// Se já está instalado (standalone), muda o botão
-if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
-  document.addEventListener('DOMContentLoaded',()=>{
-    const btn=document.getElementById('installBtn');
-    if(btn){btn.innerHTML='✅ App já instalado';btn.classList.add('installed');}
-    const note=document.getElementById('appNote');
-    if(note)note.style.display='none';
-  });
-}
 
 // ─── APP MODE (PWA) ───────────────────────────────────────────────────────────
 // Ativa no celular automaticamente OU quando instalado como PWA (standalone)
