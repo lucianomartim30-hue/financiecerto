@@ -2077,7 +2077,8 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 </footer>
 
 <button id="chat-fab" onclick="toggleChat()" title="Fale com o especialista">
-  <img src="/Avatar-Joao.png" alt="João" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none';this.parentElement.innerHTML='💬'">
+  <img src="/Avatar-Joao.png" alt="João" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;top:0;left:0" onerror="this.style.display='none'">
+  <span style="font-size:1.4rem;position:relative">💬</span>
   <span class="cfab-badge" id="cfb">1</span>
 </button>
 
