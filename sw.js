@@ -1,10 +1,10 @@
 // Service Worker — FinancieCerto
 // Estratégia: cache individual por asset (falha parcial não bloqueia o resto)
 // Cache-first para app shell; stale-while-revalidate para fontes externas
-const CACHE = 'financiecerto-v1';
+const CACHE = 'financiecerto-v2';
 
 // Assets essenciais do app shell (single-file HTML — tudo inline)
-const SHELL = ['/index.html', '/manifest.json', '/'];
+const SHELL = ['/index.html', '/manifest.json', '/', '/?pwa=1'];
 
 // Assets externos opcionais (falha não impede instalação)
 const OPTIONAL = [
