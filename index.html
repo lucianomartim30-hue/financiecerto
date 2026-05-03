@@ -471,6 +471,29 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   .versus-table td:first-child{width:auto}
 }
 
+/* ── SELETOR DE MODO DO SIMULADOR ─────────────────────────────────────────── */
+.sim-mode-sel{display:flex;gap:0;background:var(--bg);border-bottom:2px solid var(--border);overflow:hidden;border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+.sim-mode-btn{flex:1;display:flex;align-items:center;gap:14px;padding:18px 24px;border:none;background:transparent;cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;margin-bottom:-2px;text-align:left}
+.sim-mode-btn:hover{background:var(--primary-light)}
+.sim-mode-btn.smb-active{background:var(--primary-light);border-bottom-color:var(--primary)}
+.smb-ic{font-size:1.6rem;flex-shrink:0}
+.smb-txt h4{font-size:.93rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.smb-txt p{font-size:.76rem;color:var(--text2);line-height:1.4}
+.sim-mode-btn.smb-active .smb-txt h4{color:var(--primary)}
+.smb-divider{width:1px;background:var(--border);flex-shrink:0}
+.smb-rec{background:var(--accent);color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;margin-left:auto;align-self:flex-start;margin-top:2px}
+@media(max-width:600px){.sim-mode-btn{padding:12px 14px;gap:8px}.smb-txt p{display:none}}
+
+/* ── ABAS DE RESULTADO ────────────────────────────────────────────────────── */
+.res-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding-top:4px}
+.res-tab-btn{padding:8px 18px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-card);font-size:.83rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2)}
+.res-tab-btn:hover{border-color:var(--border2);color:var(--text)}
+.res-tab-btn.rt-active{color:#fff;border-color:transparent}
+.res-tab-btn.rt-mcmv.rt-active{background:var(--accent);border-color:var(--accent)}
+.res-tab-btn.rt-conv.rt-active{background:var(--warning);border-color:var(--warning)}
+.res-tab-btn.rt-sfi.rt-active{background:var(--purple);border-color:var(--purple)}
+.res-tab-btn.rt-all.rt-active{background:var(--primary);border-color:var(--primary)}
+
 
 
 /* ── AÇÕES PÓS-SIMULAÇÃO removido — usuário retorna ao simulador */
@@ -767,6 +790,23 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
     <p class="sdesc">Preencha todos os campos para uma análise completa: faixa, parcela estimada, fase de obra, comparação SAC vs Price e diagnóstico de risco.</p>
   </div>
   <div id="sim-wrap">
+    <div class="sim-mode-sel">
+      <button class="sim-mode-btn smb-active" id="smbMCMV" onclick="selectSimMode('mcmv')">
+        <span class="smb-ic">🏠</span>
+        <div class="smb-txt">
+          <h4>Minha Casa Minha Vida (MCMV)</h4>
+          <p>Renda até R$ 13.000 · Subsídio de até R$ 55.000 · Faixas 1 a 4 · CAIXA e Banco do Brasil</p>
+        </div>
+      </button>
+      <div class="smb-divider"></div>
+      <button class="sim-mode-btn" id="smbConv" onclick="selectSimMode('conv')">
+        <span class="smb-ic">🏦</span>
+        <div class="smb-txt">
+          <h4>Financiamento Convencional</h4>
+          <p>SBPE · SFI · Todos os bancos · Sem limite de renda · Imóveis de alto padrão</p>
+        </div>
+      </button>
+    </div>
     <div class="sim-hd">
       <h2>🏦 Simulador Inteligente — Lógica Real da CAIXA ECONÔMICA FEDERAL</h2>
       <p>Todos os cálculos são estimativas baseadas nas regras do SFH/MCMV (2026) · LTV: SAC 80% / Price 70% · Limite SFH: R$ 2.250.000 · As regras podem variar conforme políticas da CAIXA ECONÔMICA FEDERAL e atualizações do mercado · os cálculos do simulador são feitos localmente no navegador</p>
@@ -2358,6 +2398,46 @@ function calcCET_DecliningMIP(pv, taxaMensal, n, mipCoeff, dfiFixo, taFixo){
   return (Math.pow(1+(lo+hi)/2,12)-1)*100;
 }
 
+// ─── SELETOR DE MODO DO SIMULADOR ────────────────────────────────────────────
+function selectSimMode(mode){
+  document.getElementById('smbMCMV').classList.toggle('smb-active',mode==='mcmv');
+  document.getElementById('smbConv').classList.toggle('smb-active',mode==='conv');
+  // Atualiza hint do simulador
+  const hd=document.querySelector('.sim-hd p');
+  if(hd){
+    if(mode==='conv'){
+      hd.textContent='Financiamento via SBPE/SFH/SFI — bancos privados, sem limite de renda. Para imóveis acima de R$ 2.250.000 o sistema enquadra automaticamente no SFI.';
+    }else{
+      hd.textContent='Todos os cálculos são estimativas baseadas nas regras do SFH/MCMV (2026) · LTV: SAC 80% / Price 70% · Limite SFH: R$ 2.250.000 · As regras podem variar conforme políticas da CAIXA ECONÔMICA FEDERAL e atualizações do mercado · os cálculos do simulador são feitos localmente no navegador';
+    }
+  }
+}
+
+// ─── ABAS DE RESULTADO ───────────────────────────────────────────────────────
+function switchResTab(tab){
+  document.querySelectorAll('.res-tab-btn').forEach(b=>b.classList.remove('rt-active'));
+  const active=document.getElementById('rTab_'+tab);
+  if(active)active.classList.add('rt-active');
+  const mc=document.getElementById('cenCard_mcmv');
+  const co=document.getElementById('cenCard_conv');
+  const sf=document.getElementById('cenCard_sfi');
+  if(tab==='all'){
+    if(mc)mc.style.display='';
+    if(co)co.style.display='';
+    if(sf)sf.style.display='';
+  }else{
+    if(mc)mc.style.display=tab==='mcmv'?'':'none';
+    if(co)co.style.display=tab==='conv'?'':'none';
+    if(sf)sf.style.display=tab==='sfi'?'':'none';
+  }
+  // Ajusta grid
+  const grid=document.getElementById('cenariosGrid');
+  if(grid){
+    const visible=[mc,co,sf].filter(c=>c&&c.style.display!=='none').length;
+    grid.style.gridTemplateColumns=visible===1?'1fr':visible===2?'1fr 1fr':'';
+  }
+}
+
 // ─── ACCORDION ───────────────────────────────────────────────────────────────
 function toggleAcc(i){
   const it=document.getElementById('a'+i);
@@ -2918,10 +2998,16 @@ function simular(){
     </div>`;
   })()}
 
-    <div class="sim-bloco-title">⚖️ Bloco 3 — Comparação entre modelos${isSFI?' (MCMV × SBPE × SFI)':' (MCMV × SBPE)'}</div>
+    <div class="sim-bloco-title">⚖️ Bloco 3 — Comparação entre modelos</div>
+  <div class="res-tabs">
+    ${isMCMV?`<button class="res-tab-btn rt-mcmv" id="rTab_mcmv" onclick="switchResTab('mcmv')">🏠 MCMV — ${faixa.l}</button>`:''}
+    <button class="res-tab-btn rt-conv" id="rTab_conv" onclick="switchResTab('conv')">🏦 Convencional (SBPE)</button>
+    ${isSFI?`<button class="res-tab-btn rt-sfi" id="rTab_sfi" onclick="switchResTab('sfi')">🏛️ SFI — Alto Padrão</button>`:''}
+    <button class="res-tab-btn rt-all" id="rTab_all" onclick="switchResTab('all')">📊 Ver todos</button>
+  </div>
 
-  <div class="cenarios-grid${isSFI?' has-sfi':''}">
-    <div class="cenario-card ${isMCMV?'cenario-mcmv':'cenario-na'}">
+  <div class="cenarios-grid${isSFI?' has-sfi':''}" id="cenariosGrid">
+    <div class="cenario-card ${isMCMV?'cenario-mcmv':'cenario-na'}" id="cenCard_mcmv">
       <div class="cenario-hd">
         <h4>🏠 MCMV — ${isMCMV?faixa.l:'Não elegível'}</h4>
         <p>${isMCMV?taxaAnual+'% a.a. + TR · '+(subsidioEstimado>0?'Com subsídio estimado':'Sem subsídio nesta simulação'):'Verifique renda ou teto do imóvel'}</p>
@@ -2943,7 +3029,7 @@ function simular(){
       ${isMCMV?`<div class="cenario-footer">Os coeficientes deste simulador foram calibrados com base em contratos reais da CAIXA ECONÔMICA FEDERAL, validados contra Planilhas de Evolução SIOPI. A Planilha SIOPI do seu contrato é a referência oficial de conferência.<br>✦ Subsídio estimado — sujeito à análise da CAIXA, município e regras vigentes.<br>◇ Total calculado mês a mês: Σ(A+J + MIP(saldo × coeff(idade)) + DFI + TA) para cada mês do prazo. O MIP cresce conforme a faixa etária do proponente ao longo do contrato. Sem TR — a TR é cobrada à parte sobre o saldo devedor. ${temIdade?'':'⚠️ Informe a idade do proponente para ativar o cálculo de MIP crescente.'}<br>◆ CET informativo calculado sobre taxa nominal + MIP + DFI + Tarifa de Administração. O CET oficial consta exclusivamente na Planilha de Evolução emitida pelo SIOPI.</div>`:''}
     </div>
 
-    <div class="cenario-card cenario-sbpe">
+    <div class="cenario-card cenario-sbpe" id="cenCard_conv">
       <div class="cenario-hd">
         <h4>🏦 SBPE — Financiamento bancário</h4>
         <p>13,5% a.a. + TR (ref. 2026) · Sem subsídio</p>
@@ -2963,7 +3049,7 @@ function simular(){
       <div class="cenario-footer">Sem limite de renda ou teto de imóvel. Compare o CET real entre bancos — a diferença pode ser R$ 200–500/mês na mesma operação.<br>◆ CET estimado (Res. CMN 3.517): A taxa nominal reflete apenas os juros. O CET é maior pois inclui MIP + DFI + Tarifa de Administração. Solicite a Planilha de Evolução em cada banco para comparar o CET oficial.</div>
     </div>
 
-    ${isSFI?`<div class="cenario-card cenario-sfi">
+    ${isSFI?`<div class="cenario-card cenario-sfi" id="cenCard_sfi">
       <div class="cenario-hd">
         <h4>🏛️ SFI — Sistema de Financiamento Imobiliário</h4>
         <p>${taxaSFIAnual}% a.a. estimado · Sem TR · Sem subsídio</p>
@@ -2983,6 +3069,7 @@ function simular(){
       <div class="cenario-footer">SFI: sem limite de valor. Taxas e condições variam significativamente por banco e perfil de crédito.</div>
     </div>`:''}
   </div>
+  <script>switchResTab('${isMCMV?'mcmv':isSFI?'sfi':'conv'}');</script>
 
   ${diagComp?`<div class="diag-auto"><h5>📋 Análise comparativa dos modelos</h5><p>${diagComp}</p></div>`:''}
 
