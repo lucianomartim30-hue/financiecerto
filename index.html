@@ -808,16 +808,16 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
       </button>
     </div>
     <div class="sim-hd">
-      <h2>🏦 Simulador Inteligente — Lógica Real da CAIXA ECONÔMICA FEDERAL</h2>
-      <p>Todos os cálculos são estimativas baseadas nas regras do SFH/MCMV (2026) · LTV: SAC 80% / Price 70% · Limite SFH: R$ 2.250.000 · As regras podem variar conforme políticas da CAIXA ECONÔMICA FEDERAL e atualizações do mercado · os cálculos do simulador são feitos localmente no navegador</p>
+      <h2>🏦 Simulador Inteligente — MCMV · SBPE · SFI · Todos os Bancos</h2>
+      <p>Estimativas baseadas nas regras do SFH/MCMV (2026) · MCMV via CAIXA e Banco do Brasil · SBPE/SFI disponível em todos os bancos · LTV: SAC 80% / Price 70% · Limite SFH: R$ 2.250.000 · Cálculos feitos localmente no navegador</p>
     </div>
     <div class="sim-bd">
-      <div class="sim-section-title">📋 Dados dos Proponentes e do Imóvel</div>
+      <div class="sim-section-title">📋 Dados dos Participantes e do Imóvel</div>
       <div class="sim-grid">
         <div class="sf">
           <label>💰 Renda familiar bruta (R$)</label>
           <input type="text" inputmode="numeric" id="sRenda" placeholder="Ex: 6.000" oninput="maskBRL(this)" autocomplete="off">
-          <span class="sf-hint">Some a renda de todos os proponentes da composição · o sistema formata automaticamente</span>
+          <span class="sf-hint">Some a renda de todos os participantes · o sistema formata automaticamente</span>
         </div>
         <div class="sf">
           <label>🏠 Valor do imóvel (R$)</label>
@@ -883,7 +883,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
         <div class="sf">
           <label>📅 Prazo de amortização (meses)</label>
           <input type="number" id="sPrazo" placeholder="Ex: 420" min="1" max="420" value="420" oninput="atualizarPrazoHint()">
-          <span class="sf-hint" id="sPrazoHint">Prazo máximo estimado calculado com base na idade do proponente mais velho da composição. Limite total da operação: 80 anos e 6 meses. A definição final depende da análise da CAIXA ECONÔMICA FEDERAL.</span>
+          <span class="sf-hint" id="sPrazoHint">Prazo máximo estimado calculado com base na idade do participante mais velho. Limite total da operação: 80 anos e 6 meses. A definição final depende da análise de crédito do banco.</span>
           <div id="sPrazoMaxInfo" style="display:none;margin-top:8px;padding:10px 14px;background:rgba(16,185,129,.07);border-left:3px solid var(--accent);border-radius:0 6px 6px 0">
             <span id="sPrazoMaxText" style="font-size:.8rem;line-height:1.55;display:block"></span>
           </div>
@@ -894,23 +894,43 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           <span class="sf-hint">Só para imóvel na planta · altera o prazo máximo disponível de amortização</span>
         </div>
       </div>
-      <div class="sim-section-title">👥 Proponentes e Prazo</div>
+      <div class="sim-section-title">👥 Participantes e Prazo</div>
       <div style="background:var(--primary-light);border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.82rem;color:var(--text2);line-height:1.6">
-        💡 <strong style="color:var(--text)">Composição de renda:</strong> a renda bruta familiar informada já deve incluir a soma de todos os proponentes. Informe aqui a <strong>idade de cada proponente</strong> para o cálculo correto do prazo máximo — o sistema usa sempre a maior idade. A CAIXA aceita até 4 pessoas na composição de renda.
+        💡 <strong style="color:var(--text)">Composição de renda:</strong> some a renda de todos os participantes no campo acima. Informe a idade de cada um — o prazo máximo é definido pela <strong>maior idade</strong> entre todos. Até 4 participantes são aceitos na composição.
       </div>
       <div class="sim-grid">
         <div class="sf">
-          <label>🎂 Idade — 1º Proponente (anos)</label>
-          <input type="number" id="sIdade1" placeholder="Ex: 43" min="18" max="79" oninput="atualizarPrazoHint()">
-          <span class="sf-hint">Prazo máximo calculado com base na maior idade · limite de 80 anos e 6 meses da CAIXA ECONÔMICA FEDERAL</span>
+          <label>👥 Quantas pessoas vão participar do financiamento?</label>
+          <select id="sNumParticipantes" onchange="atualizarParticipantes()">
+            <option value="1">1 pessoa</option>
+            <option value="2" selected>2 pessoas</option>
+            <option value="3">3 pessoas</option>
+            <option value="4">4 pessoas</option>
+          </select>
+          <span class="sf-hint">Todos que vão compor a renda para o financiamento</span>
         </div>
+      </div>
+      <div class="sim-grid" id="participantesGrid">
         <div class="sf">
-          <label>🎂 Idade — 2º Proponente (opcional)</label>
-          <input type="number" id="sIdade2" placeholder="Opcional" min="18" max="79" oninput="atualizarPrazoHint()">
-          <span class="sf-hint">Preencha se houver outro proponente na composição · o sistema usa sempre a maior idade entre os dois</span>
+          <label>🎂 Idade — 1º Participante (anos)</label>
+          <input type="number" id="sIdade1" placeholder="Ex: 43" min="18" max="79" oninput="atualizarPrazoHint()">
+          <span class="sf-hint">Prazo máximo calculado com base na maior idade · limite de 80 anos e 6 meses</span>
         </div>
-        <input type="hidden" id="sIdade3" value="">
-        <input type="hidden" id="sIdade4" value="">
+        <div class="sf" id="partField2">
+          <label>🎂 Idade — 2º Participante (anos)</label>
+          <input type="number" id="sIdade2" placeholder="Ex: 38" min="18" max="79" oninput="atualizarPrazoHint()">
+          <span class="sf-hint">O sistema usa sempre a maior idade entre todos os participantes</span>
+        </div>
+        <div class="sf" id="partField3" style="display:none">
+          <label>🎂 Idade — 3º Participante (anos)</label>
+          <input type="number" id="sIdade3" placeholder="Ex: 35" min="18" max="79" oninput="atualizarPrazoHint()">
+          <span class="sf-hint">O sistema usa sempre a maior idade entre todos os participantes</span>
+        </div>
+        <div class="sf" id="partField4" style="display:none">
+          <label>🎂 Idade — 4º Participante (anos)</label>
+          <input type="number" id="sIdade4" placeholder="Ex: 30" min="18" max="79" oninput="atualizarPrazoHint()">
+          <span class="sf-hint">O sistema usa sempre a maior idade entre todos os participantes</span>
+        </div>
       </div>
       <div class="sim-section-title">✅ Elegibilidade MCMV</div>
       <div class="sim-checks">
@@ -2530,11 +2550,24 @@ function parseBRL(val){
 
 function toggleDependentes(){ /* removido — campo não utilizado */ }
 
+function atualizarParticipantes(){
+  const n=parseInt(document.getElementById('sNumParticipantes')?.value)||1;
+  for(let i=2;i<=4;i++){
+    const field=document.getElementById('partField'+i);
+    const input=document.getElementById('sIdade'+i);
+    if(field) field.style.display=i<=n?'':'none';
+    if(input&&i>n) input.value='';
+  }
+  atualizarPrazoHint();
+}
+
 function atualizarPrazoHint(){
-  // Coleta ambas as idades e usa a maior
+  // Coleta todas as idades e usa a maior
   const id1=Math.max(0,parseInt(document.getElementById('sIdade1')?.value)||0);
   const id2=Math.max(0,parseInt(document.getElementById('sIdade2')?.value)||0);
-  const idMV=Math.max(id1,id2);
+  const id3=Math.max(0,parseInt(document.getElementById('sIdade3')?.value)||0);
+  const id4=Math.max(0,parseInt(document.getElementById('sIdade4')?.value)||0);
+  const idMV=Math.max(id1,id2,id3,id4);
 
   const hint=document.getElementById('sPrazoHint');
   const infoBox=document.getElementById('sPrazoMaxInfo');
@@ -2545,7 +2578,7 @@ function atualizarPrazoHint(){
 
   // Sem idade válida: estado neutro
   if(idMV<18){
-    if(hint){hint.textContent='O prazo máximo estimado é calculado com base na maior idade entre os proponentes da composição e nas regras da CAIXA ECONÔMICA FEDERAL.';hint.style.color='';}
+    if(hint){hint.textContent='O prazo máximo estimado é calculado com base na maior idade entre os participantes da composição. Informe as idades acima para ver o prazo disponível.';hint.style.color='';}
     if(infoBox)infoBox.style.display='none';
     if(prazoEl)prazoEl.max=420;
     return;
@@ -2553,7 +2586,7 @@ function atualizarPrazoHint(){
 
   // Total de meses disponíveis pela idade até 80 anos e 6 meses
   const totalMaxMeses=Math.floor((80.5-idMV)*12);
-  // A CAIXA ECONÔMICA FEDERAL conta o período de obra no limite de idade.
+  // O banco conta o período de obra no limite de idade.
   // Prazo máximo de amortização = total disponível − prazo de obra, limitado a 420 meses.
   const descontoObra=tipo==='planta'?prazoObra:0;
   const maxAmort=Math.min(420,totalMaxMeses-descontoObra);
@@ -2607,7 +2640,7 @@ function atualizarPrazoHint(){
         `<div style="display:flex;justify-content:space-between"><span>(80,5 − ${idMV}) × 12 = meses disponíveis</span><span style="font-weight:600">${totalMaxMeses} meses</span></div>`+
         linhaObra+
         linhaAmort+
-        `<div style="margin-top:6px;font-size:.75rem;color:var(--text3)">Estimativa baseada em idade inteira. A CAIXA ECONÔMICA FEDERAL usa a data exata de nascimento, podendo variar ±1 mês. Definição final sujeita à análise de crédito.</div>`+
+        `<div style="margin-top:6px;font-size:.75rem;color:var(--text3)">Estimativa baseada em idade inteira. O banco usa a data exata de nascimento, podendo variar ±1 mês. Definição final sujeita à análise de crédito.</div>`+
       `</div>`+ajuste;
     infoBox.style.borderLeftColor=excede?'var(--warning)':'var(--accent)';
     infoBox.style.background=excede?'rgba(245,158,11,.07)':'rgba(16,185,129,.07)';
@@ -2628,7 +2661,9 @@ function simular(){
   const sistema=document.getElementById('sSistema').value;
   const idade1=Math.max(0,parseInt(document.getElementById('sIdade1')?.value)||0);
   const idade2=Math.max(0,parseInt(document.getElementById('sIdade2')?.value)||0);
-  const idadeMaisVelha=Math.max(idade1,idade2);
+  const idade3=Math.max(0,parseInt(document.getElementById('sIdade3')?.value)||0);
+  const idade4=Math.max(0,parseInt(document.getElementById('sIdade4')?.value)||0);
+  const idadeMaisVelha=Math.max(idade1,idade2,idade3,idade4);
   const dependentes=0; // campo removido — não impacta cálculo principal
   const temIdade=idadeMaisVelha>=18;
   const prazoObra=Math.min(60,Math.max(6,parseInt(document.getElementById('sPrazoObra').value)||36));
