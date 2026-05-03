@@ -940,7 +940,13 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
         <label class="sc"><input type="checkbox" id="sTemImovel"> Possui imóvel residencial no mesmo município</label>
         <label class="sc"><input type="checkbox" id="sNomeNeg"> CPF com restrição (SPC/Serasa/Cadmut)</label>
         <label class="sc"><input type="checkbox" id="sMostrarObra" checked> Mostrar tabela estimada da fase de obra</label>
-        <label class="sc"><input type="checkbox" id="sMostrarAmor"> Mostrar tabela estimada de amortização (12 meses)</label>
+        <label class="sc" style="gap:8px">📊 Tabela de amortização:
+          <select id="sMostrarAmor" style="font-size:.82rem;padding:2px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text)">
+            <option value="0">Não mostrar</option>
+            <option value="12">Primeiros 12 meses</option>
+            <option value="full">Tabela completa (todos os meses)</option>
+          </select>
+        </label>
         <label class="sc" style="align-items:center;gap:8px">
           <input type="checkbox" id="sTemDep" onchange="toggleDep()"> Possui dependentes?
           <span id="sDepQtdWrap" style="display:none;align-items:center;gap:6px">
@@ -2682,7 +2688,9 @@ function simular(){
   const temDep=document.getElementById('sTemDep').checked;
   const numDep=temDep?Math.max(1,parseInt(document.getElementById('sDepQtd')?.value)||1):0;
   const mostrarObra=document.getElementById('sMostrarObra').checked;
-  const mostrarAmor=document.getElementById('sMostrarAmor').checked;
+  const amorOpt=document.getElementById('sMostrarAmor').value;
+  const mostrarAmor=amorOpt!=='0';
+  const amorMeses=amorOpt==='full'?prazo:12;
 
   if(!renda||!imovel){alert('Preencha pelo menos a renda familiar e o valor do imóvel.');return;}
   if(renda<500){alert('Renda parece muito baixa. Lembre-se: informe o valor em reais inteiros. Ex: 6000 (sem pontos ou vírgulas).');return;}
@@ -3244,8 +3252,8 @@ function simular(){
 
   if(tipo==='planta'&&mostrarObra){html+=gerarTabelaObra(valorFinanciado,taxaMensal,prazoObra);}
   if(mostrarAmor){
-    if(isMCMV)html+=gerarTabelaAmor(valorFinanciado,taxaMensal,prazo,sistema,mipEstimado,dfiEstimado,'Cenário MCMV — '+taxaAnual+'% a.a.');
-    html+=gerarTabelaAmor(vfSemSub,taxaSBPEMensal,prazo,sistema,mipSBPE,dfiSBPE,'Cenário SBPE — 13,5% a.a. (ref.)');
+    if(isMCMV)html+=gerarTabelaAmor(valorFinanciado,taxaMensal,prazo,sistema,mipEstimado,dfiEstimado,'Cenário MCMV — '+taxaAnual+'% a.a.',amorMeses);
+    html+=gerarTabelaAmor(vfSemSub,taxaSBPEMensal,prazo,sistema,mipSBPE,dfiSBPE,'Cenário SBPE — 13,5% a.a. (ref.)',amorMeses);
   }
 
   // ─── BLOCO DE AÇÕES PÓS-SIMULAÇÃO removido ────────────────────────────────
@@ -3362,7 +3370,7 @@ function gerarTabelaObra(financiado,taxaMensal,prazoObra){
   </div>`;
 }
 
-function gerarTabelaAmor(financiado,taxaMensal,prazo,sistema,mipBase,dfiBase,labelArg=''){
+function gerarTabelaAmor(financiado,taxaMensal,prazo,sistema,mipBase,dfiBase,labelArg='',mesesExibir=12){
   // ── TABELA DE AMORTIZAÇÃO CALIBRADA ─────────────────────────────────────────
   // Calibrado pelo contrato real: financiado R$267.000 / 413 meses / 7,66% a.a.
   // MIP e DFI calculados sobre o VALOR CONTRATADO (fixos), não sobre saldo devedor:
@@ -3381,7 +3389,7 @@ function gerarTabelaAmor(financiado,taxaMensal,prazo,sistema,mipBase,dfiBase,lab
   if(!financiado||financiado<=0)return'';
   let rows='';
   const tarifaAdmin=25;
-  const meses=12;
+  const meses=Math.min(mesesExibir,prazo);
   let saldo=financiado;
   // MIP e DFI recebidos como parâmetro (calibrados pelo contrato real)
   const mipFixo=mipBase; // fixo sobre valor contratado, passado pelo simular()
@@ -3406,7 +3414,7 @@ function gerarTabelaAmor(financiado,taxaMensal,prazo,sistema,mipBase,dfiBase,lab
   const labelStr=labelArg?` — <span style="color:${headerColor}">${labelArg}</span>`:'';
   return `<div style="display:block;margin-top:20px">
     <div style="padding:7px 14px;background:${bgColor};border-radius:7px 7px 0 0;font-size:.8rem;font-weight:700;color:${headerColor};border:1.5px solid ${headerColor};border-bottom:none">
-      📊 Tabela Estimada — Amortização · primeiros 12 meses · ${sistema==='price'?'Tabela Price':'SAC'}${labelStr}
+      📊 Tabela Estimada — Amortização · ${meses===prazo?`todos os ${prazo} meses`:`primeiros ${meses} meses`} · ${sistema==='price'?'Tabela Price':'SAC'}${labelStr}
     </div>
     <div class="tabela-scroll" style="border:1.5px solid ${headerColor};border-top:none;border-radius:0 0 7px 7px"><table class="tabela-est">
       <thead><tr style="--thbg:${headerColor}"><th style="background:${headerColor}">Mês</th><th style="background:${headerColor}">Prestação A+J</th><th style="background:${headerColor}">Amortização</th><th style="background:${headerColor}">Juros</th><th style="background-color:${headerColor}">Seguros (MIP+DFI)</th><th style="background:${headerColor}">Tarifa</th><th style="background:${headerColor}">Encargo Total</th><th style="background:${headerColor}">Saldo Devedor</th></tr></thead>
