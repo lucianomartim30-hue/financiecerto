@@ -3631,8 +3631,20 @@ function toggleChat(){
 // ─────────────────────────────────────────────────────────────────────────────────
 (function(){if(sessionStorage.getItem('lgpd_ok'))return;setTimeout(()=>document.getElementById('lgpd').classList.add('show'),1500);})();
 function lgpdOk(){sessionStorage.setItem('lgpd_ok','1');document.getElementById('lgpd').classList.remove('show');}
-function openModal(){document.getElementById('modal').classList.add('open');}
-function closeModal(){document.getElementById('modal').classList.remove('open');}
+function openModal(){
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+  // Esconde o banner LGPD enquanto o modal está aberto
+  const lgpd=document.getElementById('lgpd');
+  if(lgpd)lgpd.style.zIndex='0';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+  // Restaura z-index do banner LGPD
+  const lgpd=document.getElementById('lgpd');
+  if(lgpd)lgpd.style.zIndex='';
+}
 
 // ─── MOBILE MENU ──────────────────────────────────────────────────────────────
 function toggleMobMenu(){
