@@ -3069,7 +3069,6 @@ function simular(){
       <div class="cenario-footer">SFI: sem limite de valor. Taxas e condições variam significativamente por banco e perfil de crédito.</div>
     </div>`:''}
   </div>
-  <script>switchResTab('${isMCMV?'mcmv':isSFI?'sfi':'conv'}');</script>
 
   ${diagComp?`<div class="diag-auto"><h5>📋 Análise comparativa dos modelos</h5><p>${diagComp}</p></div>`:''}
 
@@ -3248,6 +3247,7 @@ function simular(){
   const el=document.getElementById('resultado');
   el.style.display='block';
   el.innerHTML=html;
+  switchResTab(isMCMV?'mcmv':isSFI?'sfi':'conv');
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
   }catch(err){
     // ── TRATAMENTO DE ERRO — simular() ──────────────────────────────────────
@@ -3721,7 +3721,8 @@ async function handleContatoSubmit(e){
   },{passive:true});
 })();
 
-// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+// ─── SERVICE WORKER ─────────────────
+// ─── SERVICE WORKER ────────────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{ atualizarPrazoHint(); });
 
 if('serviceWorker' in navigator){
