@@ -2173,7 +2173,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 <div id="chat-win">
   <div class="chat-hd">
     <div class="chat-av"><img src="/Avatar-Joao.png" alt="João" onload="this.nextSibling.textContent=''" onerror="this.style.display='none'"><span>J</span></div>
-    <div class="chat-hi"><h4>João · Especialista Imobiliário</h4><p>MCMV · Fase de obra · FGTS · Custos</p><p style="font-size:.7rem;color:rgba(255,255,255,.6);margin-top:1px">Fale com o especialista</p></div>
+    <div class="chat-hi"><h4>João · Especialista Imobiliário</h4><p>MCMV · SBPE · SFI · Financiamentos em geral</p><p style="font-size:.7rem;color:rgba(255,255,255,.6);margin-top:1px">Fale com o especialista</p></div>
     <button class="chat-close" onclick="toggleChat()">✕</button>
   </div>
   <div class="chat-msgs" id="chatMsgs"></div>
@@ -3617,7 +3617,7 @@ function toggleChat(){
   const w=document.getElementById('chat-win');w.classList.toggle('open',chatOpen);
   const lbl=document.getElementById('chat-fab-label');if(lbl)lbl.style.display=chatOpen?'none':'block';
   document.getElementById('cfb').style.display='none';
-  if(chatOpen&&!chatInited){chatInited=true;setTimeout(()=>addMsg('Olá! Sou o João, especialista em financiamento imobiliário. Posso te ajudar com dúvidas sobre MCMV, fase de obra, FGTS, documentação e custos. O que você precisa saber?','bot'),300);}
+  if(chatOpen&&!chatInited){chatInited=true;setTimeout(()=>addMsg('Olá! Sou o João, especialista em financiamentos imobiliários. Em que posso te auxiliar?','bot'),300);}
   if(chatOpen)setTimeout(()=>document.getElementById('chatInput').focus(),400);
 }
 
