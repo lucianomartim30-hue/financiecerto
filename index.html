@@ -667,6 +667,98 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   .nav .nb{display:none}
   .hero-stats{gap:16px}
 }
+
+/* ═══════════════════════════════════════════════════════════
+   REDESIGN PROFISSIONAL — HEADER ESCURO + BARRA DE SEÇÕES
+   ═══════════════════════════════════════════════════════════ */
+:root{--sec-nav-h:44px}
+
+/* Header escuro */
+#hdr{background:rgba(9,30,60,.98);border-bottom:1px solid rgba(255,255,255,.07)}
+.logo{color:#fff}
+.logo-sub{color:rgba(255,255,255,.5)}
+.nb{color:rgba(255,255,255,.68)}
+.nb:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-drop-btn{color:rgba(255,255,255,.68)}
+.nav-drop-btn:hover,.nav-drop.open .nav-drop-btn{background:rgba(255,255,255,.1);color:#fff}
+.nav-drop-menu{background:#0d2247;border-color:rgba(255,255,255,.1);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.nav-drop-item{color:rgba(255,255,255,.72)}
+.nav-drop-item:hover{background:rgba(255,255,255,.1);color:#fff}
+.ham-btn{border-color:rgba(255,255,255,.22)}
+.ham-btn span{background:#fff}
+
+/* Barra de seções (desktop) */
+#sec-nav{
+  position:fixed;top:var(--hh);left:0;right:0;height:var(--sec-nav-h);
+  background:rgba(10,20,45,.96);border-bottom:1px solid rgba(255,255,255,.07);
+  z-index:98;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+#sec-nav::-webkit-scrollbar{display:none}
+.snav-inner{
+  display:flex;align-items:center;gap:2px;padding:0 20px;
+  height:100%;max-width:1200px;margin:0 auto
+}
+.snav-btn{
+  padding:5px 15px;border-radius:20px;border:none;background:transparent;
+  color:rgba(255,255,255,.58);font-size:.76rem;font-weight:600;cursor:pointer;
+  transition:all .2s;white-space:nowrap;letter-spacing:.01em;font-family:var(--font)
+}
+.snav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.snav-btn.snav-act{background:var(--primary);color:#fff;box-shadow:0 2px 10px rgba(26,86,219,.45)}
+.snav-sep{width:1px;height:14px;background:rgba(255,255,255,.12);margin:0 8px;flex-shrink:0}
+
+/* Hero dark */
+#hero{
+  background:linear-gradient(160deg,#091e3c 0%,#0f172a 55%,#071a30 100%);
+  padding:calc(var(--hh) + var(--sec-nav-h) + 60px) 24px 68px;
+  border-bottom:1px solid rgba(255,255,255,.05)
+}
+#hero .hero-badge{
+  background:rgba(255,255,255,.09);color:rgba(255,255,255,.82);
+  border-color:rgba(255,255,255,.15)
+}
+#hero .hero-title{color:#fff}
+#hero .hero-title span{
+  background:linear-gradient(120deg,#38bdf8,#10b981);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:block
+}
+#hero .hero-sub{color:rgba(255,255,255,.68)}
+#hero .btn-s{
+  background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)
+}
+#hero .btn-s:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.5);color:#fff}
+#hero .btn-homer{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(16,185,129,.15);color:#10b981;
+  border:1px solid rgba(16,185,129,.4);padding:13px 26px;border-radius:10px;
+  font-size:.93rem;font-weight:600;transition:all .25s;cursor:pointer;
+  text-decoration:none
+}
+#hero .btn-homer:hover{background:rgba(16,185,129,.28);border-color:#10b981}
+#hero .stat-n{color:#38bdf8}
+#hero .stat-l{color:rgba(255,255,255,.48)}
+#pwaInstallBtn{
+  background:rgba(37,99,235,.75)!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  backdrop-filter:blur(4px)
+}
+#pwaGuide{
+  background:rgba(9,30,60,.92)!important;
+  border-color:rgba(255,255,255,.15)!important;
+  color:rgba(255,255,255,.75)!important
+}
+
+/* Scroll targets ajustados para nova altura total */
+.st{scroll-margin-top:calc(var(--hh) + var(--sec-nav-h) + 20px)}
+
+/* Mobile: esconde barra de seções (bottom-nav já cobre) */
+@media(max-width:768px){
+  #sec-nav{display:none}
+  #hero{padding-top:calc(var(--hh) + 52px)}
+  .st{scroll-margin-top:calc(var(--hh) + 20px)}
+}
 </style>
 </head>
 <body>
@@ -701,6 +793,26 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
     </button>
   </div>
 </header>
+
+<!-- BARRA DE NAVEGAÇÃO POR SEÇÕES (desktop) -->
+<nav id="sec-nav" aria-label="Navegação por seção">
+  <div class="snav-inner">
+    <button class="snav-btn snav-act" id="snav-home" onclick="snavGo('hero','snav-home')">🏠 Início</button>
+    <span class="snav-sep"></span>
+    <button class="snav-btn" id="snav-sim" onclick="snavGo('sim-sec','snav-sim')">🧮 Simulador</button>
+    <button class="snav-btn" id="snav-faixas" onclick="snavGo('faixas-sec','snav-faixas')">📋 Faixas MCMV</button>
+    <button class="snav-btn" id="snav-entenda" onclick="snavGo('entenda-sec','snav-entenda')">📖 Entenda</button>
+    <span class="snav-sep"></span>
+    <button class="snav-btn" id="snav-obra" onclick="snavGo('obra-sec','snav-obra')">🏗️ Fase de Obra</button>
+    <button class="snav-btn" id="snav-siglas" onclick="snavGo('siglas-sec','snav-siglas')">🔤 Siglas</button>
+    <button class="snav-btn" id="snav-custos" onclick="snavGo('custos-sec','snav-custos')">💰 Custos</button>
+    <button class="snav-btn" id="snav-docs" onclick="snavGo('docs-sec','snav-docs')">📄 Documentos</button>
+    <span class="snav-sep"></span>
+    <button class="snav-btn" id="snav-guia" onclick="snavGo('guia-sec','snav-guia')">📚 Guia Completo</button>
+    <button class="snav-btn" id="snav-parc" onclick="snavGo('parceiros-sec','snav-parc')">🤝 Parceiros</button>
+    <button class="snav-btn" id="snav-contato" onclick="snavGo('contato-sec','snav-contato')">✉️ Contato</button>
+  </div>
+</nav>
 
 <div class="mob-overlay" id="mobOverlay" onclick="closeMobMenu()"></div>
 <div class="mob-drawer" id="mobDrawer">
@@ -3635,7 +3747,6 @@ function toggleChat(){
 // ESTADO ATUAL: site não coleta dados pessoais — conformidade LGPD por ausência.
 // Captura de lead e contato são gerenciados pela Órulo.
 // ─────────────────────────────────────────────────────────────────────────────────
-(function(){if(sessionStorage.getItem('lgpd_ok'))return;setTimeout(()=>document.getElementById('lgpd').classList.add('show'),1500);})();
 function lgpdOk(){sessionStorage.setItem('lgpd_ok','1');document.getElementById('lgpd').classList.remove('show');}
 function openModal(){
   document.getElementById('modal').classList.add('open');
