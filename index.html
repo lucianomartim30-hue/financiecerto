@@ -815,7 +815,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 <nav id="bottom-nav" role="navigation" aria-label="Navegação principal">
   <div class="bnav-inner">
     <!-- Início -->
-    <button class="bnav-btn active" id="btab-home" onclick="bnavGo('hero','btab-home')" aria-label="Início">
+    <button class="bnav-btn" id="btab-home" onclick="bnavGo('hero-wrap','btab-home')" aria-label="Início">
       <div class="bnav-ic-wrap"><span class="bnav-ic">🏠</span></div>
       <span class="bnav-lbl">Início</span>
     </button>
@@ -4083,7 +4083,19 @@ function closeMobMenu(){
 }
 function mobGo(id){
   closeMobMenu();
-  setTimeout(()=>ir(id),220);
+  if(document.body.classList.contains('mob-tabs')){
+    const tab=Object.entries(M_TABS).find(([t,ids])=>ids.includes(id))?.[0];
+    setTimeout(()=>{
+      if(tab){
+        showMobTab(tab);
+        document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+        const btn=document.getElementById('btab-'+tab);
+        if(btn)btn.classList.add('active');
+      }
+    },220);
+  } else {
+    setTimeout(()=>ir(id),220);
+  }
 }
 
 // ─── BOTTOM TAB BAR ──────────────────────────────────────────────────────────
@@ -4092,10 +4104,50 @@ function bnavSetActive(tabId){
   const t=document.getElementById(tabId);
   if(t)t.classList.add('active');
 }
+// ── MOBILE TAB MODE ─────────────────────────────────────────────────────────
+// No mobile cada aba mostra só sua seção (sem scroll longo)
+const M_TABS={
+  home  :['hero-wrap'],
+  sim   :['sim-sec','proximo-passo'],
+  faixas:['faixas-sec'],
+  guia  :['entenda-sec','obra-sec','siglas-sec','custos-sec','docs-sec','guia-sec'],
+  mais  :['parceiros-sec','quem-somos-sec','contato-sec']
+};
+const M_ALL_IDS=Object.values(M_TABS).flat();
+
+function isMobile(){return window.innerWidth<=768;}
+
+function showMobTab(tab){
+  M_ALL_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display='none';
+  });
+  (M_TABS[tab]||[]).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display='';
+  });
+  window.scrollTo({top:0,behavior:'auto'});
+}
+
+function initMobileTabs(){
+  if(!isMobile())return;
+  document.body.classList.add('mob-tabs');
+  // Abre direto no simulador
+  showMobTab('sim');
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  const simBtn=document.getElementById('btab-sim');
+  if(simBtn)simBtn.classList.add('active');
+}
+
 function bnavGo(sectionId,tabId){
   bnavSetActive(tabId);
   closeBnavMore();
-  ir(sectionId);
+  if(document.body.classList.contains('mob-tabs')){
+    const tab=tabId.replace('btab-','');
+    showMobTab(tab);
+  } else {
+    ir(sectionId);
+  }
 }
 function toggleBnavMore(){
   const m=document.getElementById('bnavMoreMenu');
@@ -4228,7 +4280,7 @@ function triggerPWAInstall(){
 }
 
 // ── Service Worker ──────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{ atualizarPrazoHint(); });
+document.addEventListener('DOMContentLoaded',()=>{ atualizarPrazoHint(); initMobileTabs(); });
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('sw.js').catch(()=>{});
