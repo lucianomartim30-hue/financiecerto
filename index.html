@@ -118,8 +118,8 @@ input,select,button,textarea{font-family:var(--font)}
 .badge-ok{background:#ECFDF5;color:#047857}
 
 /* MODO DESCOBERTA — toggle e painel */
-.sim-type-toggle{display:flex;border-bottom:2px solid var(--border)}
-.stt-btn{flex:1;padding:16px 20px;border:none;background:var(--bg);color:var(--text2);font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;margin-bottom:-2px;line-height:1.4}
+.sim-type-toggle{display:flex;border-bottom:2px solid var(--border);overflow:hidden}
+.stt-btn{flex:1;padding:16px 20px;border:none;background:var(--bg);color:var(--text2);font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;margin-bottom:-2px;line-height:1.4;outline:none}
 .stt-btn:first-child{border-radius:var(--radius) 0 0 0}
 .stt-btn:last-child{border-radius:0 var(--radius) 0 0}
 .stt-active{background:#fff;color:var(--primary);border-bottom-color:var(--primary)}
@@ -936,7 +936,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
             <label>💰 Renda mensal bruta</label>
             <div class="input-brl">
               <span class="input-brl-prefix">R$</span>
-              <input type="text" inputmode="numeric" id="dRenda" placeholder="5.000" oninput="maskBRL(this)" autocomplete="off">
+              <input type="text" inputmode="numeric" id="dRenda" placeholder="5.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
             </div>
             <span class="sf-hint">Some a renda de todos os participantes do financiamento</span>
           </div>
@@ -944,7 +944,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
             <label>💵 Entrada / Ato</label>
             <div class="input-brl">
               <span class="input-brl-prefix">R$</span>
-              <input type="text" inputmode="numeric" id="dEntrada" placeholder="30.000" oninput="maskBRL(this)" autocomplete="off">
+              <input type="text" inputmode="numeric" id="dEntrada" placeholder="30.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
             </div>
             <span class="sf-hint">Recursos próprios em conta. Deixe 0 se não tiver</span>
           </div>
@@ -952,7 +952,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
             <label>💳 Saldo FGTS disponível</label>
             <div class="input-brl">
               <span class="input-brl-prefix">R$</span>
-              <input type="text" inputmode="numeric" id="dFGTS" placeholder="15.000" oninput="maskBRL(this)" autocomplete="off">
+              <input type="text" inputmode="numeric" id="dFGTS" placeholder="15.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
             </div>
             <span class="sf-hint">Consulte no app FGTS · deixe 0 se não for usar</span>
           </div>
@@ -984,7 +984,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           <label>💰 Renda familiar bruta</label>
           <div class="input-brl">
             <span class="input-brl-prefix">R$</span>
-            <input type="text" inputmode="numeric" id="sRenda" placeholder="6.000" oninput="maskBRL(this)" autocomplete="off">
+            <input type="text" inputmode="numeric" id="sRenda" placeholder="6.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
           </div>
           <span class="sf-hint">Some a renda de todos os participantes · o sistema formata automaticamente</span>
         </div>
@@ -992,7 +992,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           <label>🏠 Valor do imóvel</label>
           <div class="input-brl">
             <span class="input-brl-prefix">R$</span>
-            <input type="text" inputmode="numeric" id="sImovel" placeholder="320.000" oninput="maskBRL(this)" autocomplete="off">
+            <input type="text" inputmode="numeric" id="sImovel" placeholder="320.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
           </div>
           <span class="sf-hint">Valor total negociado do imóvel · o sistema formata automaticamente</span>
         </div>
@@ -1000,7 +1000,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           <label>💳 Saldo FGTS disponível</label>
           <div class="input-brl">
             <span class="input-brl-prefix">R$</span>
-            <input type="text" inputmode="numeric" id="sFGTS" placeholder="30.000" oninput="maskBRL(this)" autocomplete="off">
+            <input type="text" inputmode="numeric" id="sFGTS" placeholder="30.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
           </div>
           <span class="sf-hint">Consulte no app FGTS · deixe 0 se não for usar</span>
         </div>
@@ -1008,7 +1008,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           <label>💵 Entrada própria — exceto FGTS</label>
           <div class="input-brl">
             <span class="input-brl-prefix">R$</span>
-            <input type="text" inputmode="numeric" id="sEntrada" placeholder="20.000" oninput="maskBRL(this)" autocomplete="off">
+            <input type="text" inputmode="numeric" id="sEntrada" placeholder="20.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
           </div>
           <span class="sf-hint">Recursos próprios em conta além do FGTS · o sistema formata automaticamente</span>
         </div>
