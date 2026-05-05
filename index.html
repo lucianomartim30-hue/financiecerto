@@ -159,6 +159,28 @@ input,select,button,textarea{font-family:var(--font)}
 .disc-action-btn:hover{background:var(--primary);color:#fff}
 .disc-action-btn.primary{background:var(--primary);color:#fff}
 .disc-action-btn.primary:hover{background:var(--primary-d)}
+/* BREAKDOWN CARDS */
+.disc-breakdown{margin:20px 0}
+.disc-breakdown-title{font-size:.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.disc-breakdown-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:680px){.disc-breakdown-grid{grid-template-columns:1fr}}
+.disc-bcard{border-radius:10px;border:1.5px solid var(--border);background:#fff;overflow:hidden}
+.disc-bcard.ok{border-color:#10B981}
+.disc-bcard.warn{border-color:#F59E0B}
+.disc-bcard-head{padding:10px 14px;font-size:.85rem;font-weight:700;background:var(--bg);border-bottom:1px solid var(--border);color:var(--text)}
+.disc-bcard.ok .disc-bcard-head{background:#ECFDF5;color:#065F46}
+.disc-bcard.warn .disc-bcard-head{background:#FFFBEB;color:#92400E}
+.disc-bcard-body{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.disc-brow{display:flex;justify-content:space-between;align-items:center;font-size:.81rem;color:var(--text2)}
+.disc-brow span:last-child{font-weight:600;color:var(--text)}
+.disc-brow.neg span:last-child{color:var(--danger)}
+.disc-brow.total{border-top:1px solid var(--border);padding-top:6px;margin-top:2px}
+.disc-brow.total span{font-weight:800;color:var(--text);font-size:.88rem}
+.disc-brow.parcela span:last-child{color:var(--primary);font-weight:800}
+.disc-brow.obra span:last-child{color:var(--warning);font-weight:700}
+.disc-bstatus{font-size:.75rem;font-weight:600;padding:7px 14px;border-top:1px solid var(--border)}
+.disc-bstatus.ok{background:#ECFDF5;color:#047857}
+.disc-bstatus.warn{background:#FFFBEB;color:#92400E}
 .input-brl{position:relative;display:flex;align-items:center}
 .input-brl-prefix{position:absolute;left:12px;font-size:.9rem;font-weight:600;color:var(--text2);pointer-events:none;user-select:none;z-index:1}
 .input-brl input{padding-left:36px!important;width:100%}
@@ -951,26 +973,9 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 
     <!-- PAINEL TRADICIONAL (oculto por padrão) -->
     <div id="sim-trad-panel" style="display:none">
-    <div class="sim-mode-sel">
-      <button class="sim-mode-btn smb-active" id="smbMCMV" onclick="selectSimMode('mcmv')">
-        <span class="smb-ic">🏠</span>
-        <div class="smb-txt">
-          <h4>Minha Casa Minha Vida (MCMV)</h4>
-          <p>Renda até R$ 13.000 · Subsídio de até R$ 55.000 · Faixas 1 a 4 · CAIXA e Banco do Brasil</p>
-        </div>
-      </button>
-      <div class="smb-divider"></div>
-      <button class="sim-mode-btn" id="smbConv" onclick="selectSimMode('conv')">
-        <span class="smb-ic">🏦</span>
-        <div class="smb-txt">
-          <h4>Financiamento Convencional</h4>
-          <p>SBPE · SFI · Todos os bancos · Sem limite de renda · Imóveis de alto padrão</p>
-        </div>
-      </button>
-    </div>
     <div class="sim-hd">
-      <h2>🏦 Simulador Inteligente — MCMV · SBPE · SFI · Todos os Bancos</h2>
-      <p>Estimativas baseadas nas regras do SFH/MCMV (2026) · MCMV via CAIXA e Banco do Brasil · SBPE/SFI disponível em todos os bancos · LTV: SAC 80% / Price 70% · Limite SFH: R$ 2.250.000 · Cálculos feitos localmente no navegador</p>
+      <h2>🏦 Simulador — MCMV · SBPE · SFI · Todos os perfis de renda</h2>
+      <p>O sistema detecta automaticamente a modalidade ideal (MCMV ou SBPE) com base na sua renda e no valor do imóvel. Qualquer perfil de renda pode simular — sem restrições.</p>
     </div>
     <div class="sim-bd">
       <div class="sim-section-title">📋 Dados dos Participantes e do Imóvel</div>
@@ -2673,14 +2678,51 @@ function descobrir(){
   else if(valorMax>=30000){status='⚠ Capacidade limitada';statusCls='disc-warn';statusIc='⚠️';}
   else{status='❌ Capacidade muito baixa';statusCls='disc-err';statusIc='❌';}
 
+  // ── Helpers de breakdown ──
+  // Calcula a conta completa dado um valor de imóvel e cenário
+  function calcBreakdown(valorImovel, subsEst, taxaAnual, prazoMeses, prazoObra){
+    const entradaTotal = Math.min(entrada + fgts + subsEst, valorImovel);
+    const saldo = Math.max(0, valorImovel - entradaTotal);
+    const i = taxaAnual / 100 / 12;
+    const parcela = calcPrice(saldo, i, prazoMeses);
+    const entradaMinPct = taxaAnual <= 8 ? 0.10 : 0.20; // F1/F2=10%, resto=20%
+    const entradaMinVal = valorImovel * entradaMinPct;
+    const entradaOk = (entrada + fgts + subsEst) >= entradaMinVal;
+    const encargaObra = prazoObra > 0 ? saldo * i : 0; // encargo mensal obra (juros s/ saldo)
+    return {valorImovel, saldo, parcela, entradaOk, entradaMinPct, entradaMinVal, encargaObra, prazoObra: prazoObra||0};
+  }
+
   // ── Tipos de imóvel acessíveis ──
-  // Na planta: tende a ter valores similares ao pronto, mas com fase de obra
-  // Pronto novo: mercado primário
-  // Usado: mercado secundário (geralmente mais acessível)
   const tipoPronto={ic:'🏢',label:'Pronto / Novo',ok:valorMax>=80000,range:valorMax>=80000?`Até ${fmt(valorMax)}`:'Fora do alcance atual'};
   const tipoPlanta={ic:'🏗️',label:'Na planta',ok:valorMax>=80000&&isMCMV,range:isMCMV&&valorMax>=80000?`Até ${fmt(maxMCMV)} (MCMV)`:valorMax>=80000?`Até ${fmt(maxSBPE)}`:'Fora do alcance atual'};
   const tipoUsado={ic:'🏠',label:'Usado',ok:valorMax>=60000,range:valorMax>=60000?`Até ${fmt(valorMax*1.05)}`:'Fora do alcance atual'};
-  // Usado pode ter negociação melhor, estimar +5%
+
+  // Breakdowns para a faixa ideal (valorSeguro)
+  const bdPronto = calcBreakdown(valorSeguro, subsidioEst, isMCMV?faixa.taxa:taxaSBPE, prazo, 0);
+  const bdPlanta = calcBreakdown(valorSeguro, subsidioEst, isMCMV?faixa.taxa:taxaSBPE, prazo, 36);
+  const bdUsado  = calcBreakdown(valorSeguro*1.02, 0, isMCMV?faixa.taxa:taxaSBPE, prazo, 0); // usado sem subsídio
+
+  function renderBd(bd, label, ic, showObra){
+    const subsLinha = subsidioEst>0?`<div class="disc-brow neg"><span>(-) Subsídio est. ✦</span><span>${fmt(subsidioEst)}</span></div>`:'';
+    const obraLinha = showObra&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra (~36 meses)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
+    const statusHtml = bd.entradaOk
+      ? `<div class="disc-bstatus ok">✔ Entrada suficiente</div>`
+      : `<div class="disc-bstatus warn">⚠ Entrada mínima: ${fmt(bd.entradaMinVal)} (${(bd.entradaMinPct*100).toFixed(0)}%)</div>`;
+    return `
+    <div class="disc-bcard ${bd.entradaOk?'ok':'warn'}">
+      <div class="disc-bcard-head">${ic} ${label}</div>
+      <div class="disc-bcard-body">
+        <div class="disc-brow base"><span>Faixa ideal</span><span>${fmt(bd.valorImovel)}</span></div>
+        ${entrada>0?`<div class="disc-brow neg"><span>(-) Entrada/Ato</span><span>${fmt(entrada)}</span></div>`:''}
+        ${fgts>0?`<div class="disc-brow neg"><span>(-) FGTS</span><span>${fmt(fgts)}</span></div>`:''}
+        ${subsLinha}
+        <div class="disc-brow total"><span>= A financiar</span><span>${fmt(bd.saldo)}</span></div>
+        <div class="disc-brow parcela"><span>Parcela estimada</span><span>${fmt(bd.parcela)}/mês</span></div>
+        ${obraLinha}
+      </div>
+      ${statusHtml}
+    </div>`;}
+
 
   // ── Diagnóstico ──
   let diag='';
@@ -2734,6 +2776,16 @@ function descobrir(){
           <div class="disc-tipo-range">${tipoUsado.range}</div>
         </div>
       </div>
+    </div>
+
+    <div class="disc-breakdown">
+      <div class="disc-breakdown-title">📊 Como fica a conta — faixa ideal (${fmt(valorSeguro)})</div>
+      <div class="disc-breakdown-grid">
+        ${renderBd(bdPronto,'Pronto / Novo','🏢',false)}
+        ${renderBd(bdPlanta,'Na planta','🏗️',true)}
+        ${renderBd(bdUsado,'Usado','🏠',false)}
+      </div>
+      ${subsidioEst>0?`<p style="font-size:.72rem;color:var(--text3);margin-top:8px">✦ Subsídio estimado sujeito à análise da CAIXA ECONÔMICA FEDERAL. Valor real pode variar.</p>`:''}
     </div>
 
     <div class="disc-diag">
@@ -2859,18 +2911,19 @@ function calcSubsidioEstimado(faixa, renda, imovel, cotista, primeiroImovel, ben
 
 // ─── FORMATAÇÃO DE CAMPOS MONETÁRIOS (padrão brasileiro) ─────────────────────
 function maskBRL(el){
-  // Remove tudo que não é dígito, formata com separador de milhar brasileiro
-  // Preserva posição do cursor ao editar no meio do campo
   const pos=el.selectionStart;
   const oldLen=el.value.length;
-  const digits=el.value.replace(/\D/g,'');
+  // Remove a parte de centavos (,xx) antes de extrair dígitos
+  const raw=el.value.replace(/,\d*$/,'');
+  const digits=raw.replace(/\D/g,'');
   if(!digits){el.value='';return;}
   const num=parseInt(digits,10);
-  const formatted=isNaN(num)?'':num.toLocaleString('pt-BR');
+  const formatted=isNaN(num)?'':(num.toLocaleString('pt-BR')+',00');
   el.value=formatted;
-  // Ajusta cursor: compensa separadores de milhar adicionados/removidos
+  // Cursor fica antes do ",00"
+  const maxPos=Math.max(0,formatted.length-3);
   const diff=formatted.length-oldLen;
-  const newPos=Math.max(0,Math.min(pos+diff,formatted.length));
+  const newPos=Math.max(0,Math.min(pos+diff,maxPos));
   try{el.setSelectionRange(newPos,newPos);}catch(e){}
 }
 function parseBRL(val){
