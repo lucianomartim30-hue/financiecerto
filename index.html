@@ -2632,84 +2632,126 @@ function descobrir(){
   if(renda<500){alert('Renda parece muito baixa. Informe em reais. Ex: 5000');return;}
 
   const totalDisponivel=entrada+fgts;
-  const parcelaMax=renda*0.30; // comprometimento máximo (regra bancária)
-  const parcelaSegura=renda*0.25; // faixa confortável
+  const parcelaMax=renda*0.30; // comprometimento máximo — regra bancária (30% renda bruta)
 
-  // Prazo máximo pela idade (limite 80 anos e 6 meses)
+  // Prazo máximo pela idade (limite 80 anos e 6 meses — regra SFH)
   const prazoMax=idade>=18?Math.min(420,Math.floor((80.5-idade)*12)):420;
   const prazo=Math.max(120,prazoMax);
 
   // Fórmula Price inversa: PV = PMT × [(1+i)^n − 1] / [i × (1+i)^n]
   function pvPrice(pmt,taxaAnual,n){
     const i=taxaAnual/100/12;
+    if(i===0)return pmt*n;
     return pmt*((Math.pow(1+i,n)-1)/(i*Math.pow(1+i,n)));
+  }
+  // Parcela Price: PMT = PV × i(1+i)^n / [(1+i)^n − 1]
+  function pmtPrice(pv,taxaAnual,n){
+    const i=taxaAnual/100/12;
+    if(i===0||n===0)return pv/n;
+    return pv*(i*Math.pow(1+i,n))/(Math.pow(1+i,n)-1);
   }
 
   const faixa=getFaixa(renda);
   const isMCMV=!!faixa;
 
-  // ── Cenário MCMV ──
-  let maxMCMV=0,seguroMCMV=0,subsidioEst=0,taxaUsada=0;
-  if(isMCMV){
-    taxaUsada=faixa.taxa;
-    const finMCMV=pvPrice(parcelaMax,faixa.taxa,prazo);
-    // Subsídio estimado apenas para Faixas 1 e 2
-    if(faixa.n<=2&&cotista&&primeiro){
-      subsidioEst=faixa.n===1?Math.round(faixa.subMax*0.70):Math.round(faixa.subMax*0.55);
-    }
-    maxMCMV=Math.min(finMCMV+totalDisponivel+subsidioEst,faixa.teto);
-    seguroMCMV=maxMCMV*0.87; // faixa segura = 87% do máximo
+  // Taxa SBPE Caixa 2026 (balcão): 11,19% a.a. + TR
+  const taxaSBPE=11.19;
+
+  // ── Subsídio estimado (apenas F1 e F2 com cotista + 1º imóvel) ──
+  let subsidioEst=0;
+  if(isMCMV&&faixa.n<=2&&cotista&&primeiro){
+    subsidioEst=faixa.n===1?Math.round(faixa.subMax*0.70):Math.round(faixa.subMax*0.55);
   }
 
-  // ── Cenário SBPE (sempre calculado para comparação) ──
-  const taxaSBPE=13.0;
+  // ── Cenário MCMV — imóvel novo/na planta ──
+  let valorMaxMCMV=0,valorSeguroMCMV=0;
+  if(isMCMV){
+    const finMCMV=pvPrice(parcelaMax,faixa.taxa,prazo);
+    valorMaxMCMV=Math.min(finMCMV+totalDisponivel+subsidioEst,faixa.teto);
+    valorSeguroMCMV=valorMaxMCMV*0.87;
+  }
+
+  // ── Cenário SBPE — novo, na planta ou usado, sem limite de renda ──
+  // LTV até 80% — banco financia até 80% do valor do imóvel
   const finSBPE=pvPrice(parcelaMax,taxaSBPE,prazo);
-  const maxSBPE=finSBPE+totalDisponivel;
-  const seguroSBPE=maxSBPE*0.87;
+  const valorMaxSBPE=Math.min(finSBPE+totalDisponivel,2250000); // teto SFH
+  const valorSeguroSBPE=valorMaxSBPE*0.87;
 
-  // ── Valor de referência principal ──
-  const valorMax=isMCMV?maxMCMV:maxSBPE;
-  const valorSeguro=isMCMV?seguroMCMV:seguroSBPE;
+  // ── Valor principal de referência ──
+  const valorMax=isMCMV?valorMaxMCMV:valorMaxSBPE;
+  const valorSeguro=isMCMV?valorSeguroMCMV:valorSeguroSBPE;
 
-  // ── Status ──
+  // ── Status de viabilidade ──
   let status,statusCls,statusIc;
-  const comp30=parcelaMax/renda;
   if(valorMax>=60000){status='✔ Perfil viável';statusCls='disc-ok';statusIc='✅';}
   else if(valorMax>=30000){status='⚠ Capacidade limitada';statusCls='disc-warn';statusIc='⚠️';}
   else{status='❌ Capacidade muito baixa';statusCls='disc-err';statusIc='❌';}
 
-  // ── Helpers de breakdown ──
-  // Calcula a conta completa dado um valor de imóvel e cenário
-  function calcBreakdown(valorImovel, subsEst, taxaAnual, prazoMeses, prazoObra){
-    const entradaTotal = Math.min(entrada + fgts + subsEst, valorImovel);
-    const saldo = Math.max(0, valorImovel - entradaTotal);
-    const i = taxaAnual / 100 / 12;
-    const parcela = calcPrice(saldo, i, prazoMeses);
-    const entradaMinPct = taxaAnual <= 8 ? 0.10 : 0.20; // F1/F2=10%, resto=20%
-    const entradaMinVal = valorImovel * entradaMinPct;
-    const entradaOk = (entrada + fgts + subsEst) >= entradaMinVal;
-    const encargaObra = prazoObra > 0 ? saldo * i : 0; // encargo mensal obra (juros s/ saldo)
-    return {valorImovel, saldo, parcela, entradaOk, entradaMinPct, entradaMinVal, encargaObra, prazoObra: prazoObra||0};
+  // ── Breakdown por tipo de imóvel ──
+  // Cada tipo tem entrada mínima, subsídio e restrições diferentes
+  function calcBreakdown(valorImovel,subsEst,taxaAnual,prazoMeses,prazoObra,entradaMinPct){
+    const entradaDisp=entrada+fgts+subsEst;
+    const saldo=Math.max(0,valorImovel-entradaDisp);
+    const parcela=pmtPrice(saldo,taxaAnual,prazoMeses);
+    const entradaMinVal=valorImovel*entradaMinPct;
+    const entradaOk=entradaDisp>=entradaMinVal;
+    const i=taxaAnual/100/12;
+    const encargaObra=prazoObra>0?saldo*i:0;
+    return{valorImovel,saldo,parcela,entradaOk,entradaMinPct,entradaMinVal,encargaObra,prazoObra:prazoObra||0};
   }
 
-  // ── Tipos de imóvel acessíveis ──
-  const tipoPronto={ic:'🏢',label:'Pronto / Novo',ok:valorMax>=80000,range:valorMax>=80000?`Até ${fmt(valorMax)}`:'Fora do alcance atual'};
-  const tipoPlanta={ic:'🏗️',label:'Na planta',ok:valorMax>=80000&&isMCMV,range:isMCMV&&valorMax>=80000?`Até ${fmt(maxMCMV)} (MCMV)`:valorMax>=80000?`Até ${fmt(maxSBPE)}`:'Fora do alcance atual'};
-  const tipoUsado={ic:'🏠',label:'Usado',ok:valorMax>=60000,range:valorMax>=60000?`Até ${fmt(valorMax*1.05)}`:'Fora do alcance atual'};
+  // Pronto/Novo e Na Planta: usam regras MCMV ou SBPE conforme a renda
+  const taxaPN=isMCMV?faixa.taxa:taxaSBPE;
+  const valorPN=isMCMV?valorSeguroMCMV:valorSeguroSBPE;
+  // Entrada mínima: F1 pode ter 5%, F2 10%, demais 20%
+  const entMinPN=isMCMV&&faixa.n===1?0.05:isMCMV&&faixa.n===2?0.10:0.20;
+  const bdPronto=calcBreakdown(valorPN,subsidioEst,taxaPN,prazo,0,entMinPN);
+  const bdPlanta=calcBreakdown(valorPN,subsidioEst,taxaPN,prazo,36,entMinPN);
 
-  // Breakdowns para a faixa ideal (valorSeguro)
-  const bdPronto = calcBreakdown(valorSeguro, subsidioEst, isMCMV?faixa.taxa:taxaSBPE, prazo, 0);
-  const bdPlanta = calcBreakdown(valorSeguro, subsidioEst, isMCMV?faixa.taxa:taxaSBPE, prazo, 36);
-  const bdUsado  = calcBreakdown(valorSeguro*1.02, 0, isMCMV?faixa.taxa:taxaSBPE, prazo, 0); // usado sem subsídio
+  // Usado:
+  // • MCMV: restrição severa em 2026 — entrada mínima 50% (Sul/Sudeste).
+  // • SBPE: imóvel usado custa em média 15% menos que novo — mesmo financiamento, parcela menor.
+  let bdUsado,usadoAlerta='';
+  // Valor de mercado do usado: ~15% abaixo do novo (preço médio de mercado)
+  const valorUsadoRef=isMCMV?valorSeguroMCMV:Math.round(valorSeguroSBPE*0.85);
+  if(isMCMV){
+    bdUsado=calcBreakdown(valorUsadoRef,0,faixa.taxa,prazo,0,0.30);
+    const entMin30=valorUsadoRef*0.30;
+    const entMin50=valorUsadoRef*0.50;
+    usadoAlerta=`⚠️ <strong>MCMV para imóvel usado exige entrada mínima de 30% a 50%</strong> dependendo da faixa e região (regra 2026). Para este valor, a entrada estimada fica entre <strong>${fmt(entMin30)}</strong> e <strong>${fmt(entMin50)}</strong>. Para usados com menor entrada, o caminho mais indicado é o <strong>SBPE</strong> — disponível quando a renda superar R$ 13.000/mês.`;
+  } else {
+    // SBPE usado: valor de referência 15% abaixo do novo, sem subsídio, LTV 80%
+    bdUsado=calcBreakdown(valorUsadoRef,0,taxaSBPE,prazo,0,0.20);
+  }
 
-  function renderBd(bd, label, ic, showObra){
-    const subsLinha = subsidioEst>0?`<div class="disc-brow neg"><span>(-) Subsídio est. ✦</span><span>${fmt(subsidioEst)}</span></div>`:'';
-    const obraLinha = showObra&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra (~36 meses)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
-    const statusHtml = bd.entradaOk
-      ? `<div class="disc-bstatus ok">✔ Entrada suficiente</div>`
-      : `<div class="disc-bstatus warn">⚠ Entrada mínima: ${fmt(bd.entradaMinVal)} (${(bd.entradaMinPct*100).toFixed(0)}%)</div>`;
+  // ── Cards de tipo de imóvel ──
+  // Na planta: preço de lançamento tipicamente 15-25% abaixo do pronto (mesmo orçamento = imóvel de valor maior)
+  // Usado: mercado ~15% abaixo do novo em média
+  const usadoOk=!isMCMV?valorMax>=60000:(entrada+fgts)>=valorSeguroMCMV*0.30;
+  const valorPlantaEntrega=Math.round(valorMax*1.20); // valor de entrega estimado
+  const valorUsadoMercado=Math.round(valorMax*0.85);  // preço médio de mercado para usado
+
+  const tipoPronto={ic:'🏢',label:'Pronto / Novo',ok:valorMax>=60000,
+    range:valorMax>=60000?`Até ${fmt(valorMax)}`:'Fora do alcance atual',
+    sub:'Preço cheio de mercado'};
+  const tipoPlanta={ic:'🏗️',label:'Na planta',ok:valorMax>=60000,
+    range:valorMax>=60000?`Lançamentos até ${fmt(valorMax)}`:'Fora do alcance atual',
+    sub:valorMax>=60000?`Val. na entrega: ~${fmt(valorPlantaEntrega)}`:'Sem alcance'};
+  const tipoUsado={ic:'🏠',label:'Usado',ok:usadoOk,
+    range:usadoOk&&!isMCMV?`Até ${fmt(valorUsadoMercado)}`:usadoOk?`Até ${fmt(valorMax)}`:(isMCMV?'Entrada mín. 50% (MCMV)':'Fora do alcance atual'),
+    sub:usadoOk&&!isMCMV?'~15% mais barato que o novo':isMCMV?'Entrada 30%-50% (MCMV 2026)':'' };
+
+  // ── Renderização dos cards de breakdown ──
+  function renderBd(bd,label,ic,showObra,alertaTxt){
+    const subsLinha=subsidioEst>0&&!alertaTxt?`<div class="disc-brow neg"><span>(-) Subsídio est. ✦</span><span>${fmt(subsidioEst)}</span></div>`:'';
+    const obraLinha=showObra&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra (~36 meses)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
+    const statusHtml=alertaTxt
+      ?`<div class="disc-bstatus warn" style="font-size:.74rem;line-height:1.45">${alertaTxt}</div>`
+      :bd.entradaOk
+        ?`<div class="disc-bstatus ok">✔ Entrada suficiente</div>`
+        :`<div class="disc-bstatus warn">⚠ Entrada mínima: ${fmt(bd.entradaMinVal)} (${(bd.entradaMinPct*100).toFixed(0)}%)</div>`;
     return `
-    <div class="disc-bcard ${bd.entradaOk?'ok':'warn'}">
+    <div class="disc-bcard ${alertaTxt?'warn':bd.entradaOk?'ok':'warn'}">
       <div class="disc-bcard-head">${ic} ${label}</div>
       <div class="disc-bcard-body">
         <div class="disc-brow base"><span>Faixa ideal</span><span>${fmt(bd.valorImovel)}</span></div>
@@ -2723,21 +2765,20 @@ function descobrir(){
       ${statusHtml}
     </div>`;}
 
-
-  // ── Diagnóstico ──
+  // ── Diagnóstico personalizado ──
   let diag='';
   if(isMCMV){
     diag=`Com renda de <strong>${fmt(renda)}/mês</strong>, você se enquadra no <strong>MCMV ${faixa.l}</strong> (taxa ${faixa.taxa}% a.a. + TR). `;
-    if(subsidioEst>0) diag+=`Existe estimativa de subsídio de até <strong>${fmt(subsidioEst)}</strong>, que reduz o valor a financiar. `;
-    diag+=`Com a entrada disponível de <strong>${fmt(totalDisponivel)}</strong> e prazo de <strong>${prazo} meses</strong>, sua faixa de busca ideal fica entre <strong>${fmt(valorSeguro)}</strong> e <strong>${fmt(valorMax)}</strong>. `;
-    if(valorMax>=faixa.teto*0.95) diag+=`Você está próximo do teto do MCMV ${faixa.l} (${fmt(faixa.teto)}) — considere verificar também o SBPE para imóveis acima desse valor.`;
+    if(subsidioEst>0)diag+=`Existe estimativa de subsídio de até <strong>${fmt(subsidioEst)}</strong> — valor que o governo abate do seu financiamento e não precisa ser devolvido. `;
+    diag+=`Com entrada de <strong>${fmt(totalDisponivel)}</strong> e prazo de <strong>${prazo} meses</strong>, sua faixa ideal fica entre <strong>${fmt(valorSeguro)}</strong> e <strong>${fmt(valorMax)}</strong>. `;
+    if(valorMax>=faixa.teto*0.95)diag+=`Você está próximo do teto do MCMV ${faixa.l} (${fmt(faixa.teto)}). `;
+    diag+=`Para <strong>imóveis usados</strong>, o MCMV exige entrada mínima de 50% nas regiões Sul e Sudeste em 2026 — nesse caso, o <strong>SBPE</strong> (financiamento convencional) é o caminho mais indicado.`;
   } else {
-    diag=`Com renda de <strong>${fmt(renda)}/mês</strong>, seu perfil é <strong>SBPE / SFI</strong> (financiamento convencional, taxa estimada ~13% a.a.). `;
-    diag+=`Com entrada de <strong>${fmt(totalDisponivel)}</strong> e prazo de <strong>${prazo} meses</strong>, a faixa de busca ideal é entre <strong>${fmt(valorSeguro)}</strong> e <strong>${fmt(maxSBPE)}</strong>. `;
-    diag+=`Imóveis acima de R$ 2.250.000 seguem pelo SFI (taxas de mercado sem TR).`;
+    diag=`Com renda de <strong>${fmt(renda)}/mês</strong>, seu perfil é <strong>SBPE / SFH</strong> — financiamento convencional, taxa ~${taxaSBPE}% a.a. + TR (Caixa 2026). `;
+    diag+=`Com entrada de <strong>${fmt(totalDisponivel)}</strong> e prazo de <strong>${prazo} meses</strong>, a faixa de busca fica entre <strong>${fmt(valorSeguro)}</strong> e <strong>${fmt(valorMaxSBPE)}</strong>.`;
   }
 
-  // ── Renderizar resultado ──
+  // ── Renderiza resultado completo ──
   const el=document.getElementById('resultado-disc');
   el.style.display='block';
   el.innerHTML=`
@@ -2751,7 +2792,7 @@ function descobrir(){
     </div>
 
     <div class="disc-kpi">
-      <div class="kpi${isMCMV?' hl':''}"><div class="kpi-l">Modalidade</div><div class="kpi-v">${isMCMV?faixa.l+' MCMV':'SBPE'}</div><div class="kpi-s">${isMCMV?faixa.taxa+'% a.a. + TR':'~13% a.a. (mercado)'}</div></div>
+      <div class="kpi${isMCMV?' hl':''}"><div class="kpi-l">Modalidade</div><div class="kpi-v">${isMCMV?faixa.l+' MCMV':'SBPE / SFH'}</div><div class="kpi-s">${isMCMV?faixa.taxa+'% a.a. + TR':taxaSBPE+'% a.a. + TR (Caixa)'}</div></div>
       <div class="kpi"><div class="kpi-l">Parcela máxima</div><div class="kpi-v">${fmt(parcelaMax)}</div><div class="kpi-s">30% da renda (limite bancário)</div></div>
       <div class="kpi"><div class="kpi-l">Prazo disponível</div><div class="kpi-v">${prazo} meses</div><div class="kpi-s">${(prazo/12).toFixed(0)} anos · ${idade>=18?'baseado na sua idade':'prazo máximo'}</div></div>
       ${subsidioEst>0?`<div class="kpi hl"><div class="kpi-l">Subsídio estimado</div><div class="kpi-v">${fmt(subsidioEst)}</div><div class="kpi-s">Sujeito à análise da CAIXA</div></div>`:''}
@@ -2764,16 +2805,19 @@ function descobrir(){
           <div class="disc-tipo-ic">${tipoPronto.ic}</div>
           <span class="disc-tipo-label">${tipoPronto.label}</span>
           <div class="disc-tipo-range">${tipoPronto.range}</div>
+          ${tipoPronto.sub?`<div style="font-size:.7rem;color:var(--text3);margin-top:3px">${tipoPronto.sub}</div>`:''}
         </div>
         <div class="disc-tipo ${tipoPlanta.ok?'ok':'out'}">
           <div class="disc-tipo-ic">${tipoPlanta.ic}</div>
           <span class="disc-tipo-label">${tipoPlanta.label}</span>
           <div class="disc-tipo-range">${tipoPlanta.range}</div>
+          ${tipoPlanta.sub?`<div style="font-size:.7rem;color:var(--text3);margin-top:3px">${tipoPlanta.sub}</div>`:''}
         </div>
         <div class="disc-tipo ${tipoUsado.ok?'ok':'out'}">
           <div class="disc-tipo-ic">${tipoUsado.ic}</div>
           <span class="disc-tipo-label">${tipoUsado.label}</span>
           <div class="disc-tipo-range">${tipoUsado.range}</div>
+          ${tipoUsado.sub?`<div style="font-size:.7rem;color:var(--text3);margin-top:3px">${tipoUsado.sub}</div>`:''}
         </div>
       </div>
     </div>
@@ -2781,11 +2825,11 @@ function descobrir(){
     <div class="disc-breakdown">
       <div class="disc-breakdown-title">📊 Como fica a conta — faixa ideal (${fmt(valorSeguro)})</div>
       <div class="disc-breakdown-grid">
-        ${renderBd(bdPronto,'Pronto / Novo','🏢',false)}
-        ${renderBd(bdPlanta,'Na planta','🏗️',true)}
-        ${renderBd(bdUsado,'Usado','🏠',false)}
+        ${renderBd(bdPronto,'Pronto / Novo','🏢',false,'')}
+        ${renderBd(bdPlanta,'Na planta','🏗️',true,'')}
+        ${renderBd(bdUsado,'Usado','🏠',false,isMCMV?usadoAlerta:'')}
       </div>
-      ${subsidioEst>0?`<p style="font-size:.72rem;color:var(--text3);margin-top:8px">✦ Subsídio estimado sujeito à análise da CAIXA ECONÔMICA FEDERAL. Valor real pode variar.</p>`:''}
+      ${subsidioEst>0?`<p style="font-size:.72rem;color:var(--text3);margin-top:8px">✦ Subsídio estimado sujeito à análise da CAIXA ECONÔMICA FEDERAL. Valor real pode variar conforme renda, localização e histórico.</p>`:''}
     </div>
 
     <div class="disc-diag">
