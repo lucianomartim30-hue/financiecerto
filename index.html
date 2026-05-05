@@ -117,6 +117,49 @@ input,select,button,textarea{font-family:var(--font)}
 .badge-atencao{background:#FFFBEB;color:#B45309}
 .badge-ok{background:#ECFDF5;color:#047857}
 
+/* MODO DESCOBERTA — toggle e painel */
+.sim-type-toggle{display:flex;border-bottom:2px solid var(--border)}
+.stt-btn{flex:1;padding:16px 20px;border:none;background:var(--bg);color:var(--text2);font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;margin-bottom:-2px;line-height:1.4}
+.stt-btn:first-child{border-radius:var(--radius) 0 0 0}
+.stt-btn:last-child{border-radius:0 var(--radius) 0 0}
+.stt-active{background:#fff;color:var(--primary);border-bottom-color:var(--primary)}
+.stt-btn:hover:not(.stt-active){background:var(--bg-card2);color:var(--text)}
+.disc-hd{background:linear-gradient(135deg,#1A56DB 0%,#0E9F6E 100%);padding:28px 36px;color:#fff}
+.disc-hd h2{font-size:1.3rem;font-weight:800;margin-bottom:5px}
+.disc-hd p{opacity:.85;font-size:.88rem;line-height:1.6}
+.disc-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;border:none;border-radius:8px;font-size:.97rem;font-weight:700;cursor:pointer;transition:all .25s;letter-spacing:.02em}
+.disc-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(26,86,219,.4)}
+.disc-result{margin-top:28px;padding-top:28px;border-top:1px solid var(--border)}
+.disc-range{text-align:center;background:linear-gradient(135deg,#EEF4FF,#ECFDF5);border:2px solid var(--primary);border-radius:14px;padding:30px 24px;margin-bottom:20px}
+.disc-range-eyebrow{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:10px}
+.disc-range-val{font-size:2rem;font-weight:900;color:var(--primary);margin-bottom:4px;line-height:1.1}
+.disc-range-ideal{font-size:1.1rem;font-weight:700;color:var(--accent);margin-bottom:6px}
+.disc-range-sub{font-size:.85rem;color:var(--text2);line-height:1.5}
+.disc-status{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:20px;font-size:.82rem;font-weight:700;margin-top:12px}
+.disc-ok{background:#ECFDF5;color:#047857;border:1.5px solid #6EE7B7}
+.disc-warn{background:#FFFBEB;color:#92400E;border:1.5px solid #FCD34D}
+.disc-err{background:#FEF2F2;color:#991B1B;border:1.5px solid #FCA5A5}
+.disc-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.disc-tipos{margin:20px 0}
+.disc-tipos-title{font-size:.8rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.disc-tipos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:540px){.disc-tipos-grid{grid-template-columns:1fr}}
+.disc-tipo{border-radius:10px;padding:14px 12px;border:1.5px solid;text-align:center}
+.disc-tipo.ok{border-color:#10B981;background:#ECFDF5}
+.disc-tipo.warn{border-color:#F59E0B;background:#FFFBEB}
+.disc-tipo.out{border-color:var(--border);background:var(--bg);opacity:.55}
+.disc-tipo-ic{font-size:1.4rem;margin-bottom:5px}
+.disc-tipo-label{font-size:.82rem;font-weight:700;color:var(--text);display:block;margin-bottom:2px}
+.disc-tipo-range{font-size:.78rem;color:var(--text2)}
+.disc-diag{background:var(--bg-card2);border-radius:8px;padding:18px;border:1px solid var(--border);margin-top:16px}
+.disc-diag-title{font-size:.75rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.disc-diag p{font-size:.9rem;color:var(--text);line-height:1.75}
+.disc-action{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.disc-action-btn{flex:1;min-width:180px;padding:12px 18px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;border:1.5px solid var(--primary);color:var(--primary);background:var(--primary-light)}
+.disc-action-btn:hover{background:var(--primary);color:#fff}
+.disc-action-btn.primary{background:var(--primary);color:#fff}
+.disc-action-btn.primary:hover{background:var(--primary-d)}
+
 /* FAIXAS */
 .faixas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:28px 0}
 .fc{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:22px;transition:all .2s;cursor:default}
@@ -844,11 +887,58 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 
 <section class="sec st" id="sim-sec">
   <div class="sec-c">
-    <span class="stag">🧮 Simulador Consultor</span>
-    <h2 class="stitle">Analise sua Viabilidade com Precisão</h2>
-    <p class="sdesc">Preencha todos os campos para uma análise completa: faixa, parcela estimada, fase de obra, comparação SAC vs Price e diagnóstico de risco.</p>
+    <span class="stag">🎯 Simulador Inteligente</span>
+    <h2 class="stitle">Descubra o que você pode comprar</h2>
+    <p class="sdesc">Não sabe o valor do imóvel? Informe sua renda e disponibilidade — o sistema descobre sua faixa de compra ideal. Se já tem um imóvel em mente, use o modo de simulação tradicional.</p>
   </div>
   <div id="sim-wrap">
+    <!-- TOGGLE MODO -->
+    <div class="sim-type-toggle">
+      <button class="stt-btn stt-active" id="sttDisc" onclick="toggleSimMode('disc')">🎯 Não sei o valor — descobrir meu poder de compra</button>
+      <button class="stt-btn" id="sttTrad" onclick="toggleSimMode('trad')">🔍 Já tenho um imóvel em mente</button>
+    </div>
+
+    <!-- PAINEL DESCOBERTA (padrão) -->
+    <div id="sim-disc-panel">
+      <div class="disc-hd">
+        <h2>🎯 Quanto posso comprar?</h2>
+        <p>Informe sua renda e o que tem disponível. O sistema calcula sua faixa de compra e qual modalidade de financiamento é ideal para você — sem precisar saber o valor do imóvel.</p>
+      </div>
+      <div class="sim-bd">
+        <div class="sim-section-title">📋 Seus dados financeiros</div>
+        <div class="sim-grid">
+          <div class="sf">
+            <label>💰 Renda mensal bruta (R$)</label>
+            <input type="text" inputmode="numeric" id="dRenda" placeholder="Ex: 5.000" oninput="maskBRL(this)" autocomplete="off">
+            <span class="sf-hint">Some a renda de todos os participantes do financiamento</span>
+          </div>
+          <div class="sf">
+            <label>💵 Entrada disponível — exceto FGTS (R$)</label>
+            <input type="text" inputmode="numeric" id="dEntrada" placeholder="Ex: 30.000" oninput="maskBRL(this)" autocomplete="off">
+            <span class="sf-hint">Recursos próprios em conta. Deixe 0 se não tiver</span>
+          </div>
+          <div class="sf">
+            <label>💳 Saldo FGTS disponível (R$)</label>
+            <input type="text" inputmode="numeric" id="dFGTS" placeholder="Ex: 15.000" oninput="maskBRL(this)" autocomplete="off">
+            <span class="sf-hint">Consulte no app FGTS · deixe 0 se não for usar</span>
+          </div>
+          <div class="sf">
+            <label>🎂 Sua idade (anos)</label>
+            <input type="number" id="dIdade" placeholder="Ex: 35" min="18" max="79" autocomplete="off">
+            <span class="sf-hint">Determina o prazo máximo disponível de financiamento</span>
+          </div>
+        </div>
+        <div class="sim-checks" style="margin-bottom:20px">
+          <label class="sc"><input type="checkbox" id="dCotista" checked> Cotista FGTS há 3+ anos</label>
+          <label class="sc"><input type="checkbox" id="dPrimeiro" checked> Primeiro imóvel financiado</label>
+        </div>
+        <button class="disc-btn" onclick="descobrir()">🎯 Descobrir minha faixa de compra</button>
+        <div id="resultado-disc" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- PAINEL TRADICIONAL (oculto por padrão) -->
+    <div id="sim-trad-panel" style="display:none">
     <div class="sim-mode-sel">
       <button class="sim-mode-btn smb-active" id="smbMCMV" onclick="selectSimMode('mcmv')">
         <span class="smb-ic">🏠</span>
@@ -1017,7 +1107,8 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
       <button class="sim-btn" onclick="simular()">🔍 Analisar minha viabilidade</button>
       <div id="resultado"></div>
     </div>
-  </div>
+  </div><!-- /sim-trad-panel -->
+  </div><!-- /sim-wrap -->
 </section>
 
 <section class="next-step-sec" id="proximo-passo">
@@ -2484,6 +2575,157 @@ function calcCET_DecliningMIP(pv, taxaMensal, n, mipCoeff, dfiFixo, taFixo){
 }
 
 // ─── SELETOR DE MODO DO SIMULADOR ────────────────────────────────────────────
+// ── TOGGLE MODO SIMULADOR (Descoberta ↔ Tradicional) ─────────────────────────
+function toggleSimMode(mode){
+  const disc=document.getElementById('sim-disc-panel');
+  const trad=document.getElementById('sim-trad-panel');
+  const btnD=document.getElementById('sttDisc');
+  const btnT=document.getElementById('sttTrad');
+  if(mode==='disc'){
+    disc.style.display='';trad.style.display='none';
+    btnD.classList.add('stt-active');btnT.classList.remove('stt-active');
+  }else{
+    disc.style.display='none';trad.style.display='';
+    btnT.classList.add('stt-active');btnD.classList.remove('stt-active');
+  }
+}
+
+// ── MODO DESCOBERTA — cálculo reverso ────────────────────────────────────────
+function descobrir(){
+  const renda=parseBRL(document.getElementById('dRenda').value);
+  const entrada=parseBRL(document.getElementById('dEntrada').value);
+  const fgts=parseBRL(document.getElementById('dFGTS').value);
+  const idade=parseInt(document.getElementById('dIdade').value)||0;
+  const cotista=document.getElementById('dCotista').checked;
+  const primeiro=document.getElementById('dPrimeiro').checked;
+
+  if(!renda){alert('Informe sua renda mensal para continuar.');return;}
+  if(renda<500){alert('Renda parece muito baixa. Informe em reais. Ex: 5000');return;}
+
+  const totalDisponivel=entrada+fgts;
+  const parcelaMax=renda*0.30; // comprometimento máximo (regra bancária)
+  const parcelaSegura=renda*0.25; // faixa confortável
+
+  // Prazo máximo pela idade (limite 80 anos e 6 meses)
+  const prazoMax=idade>=18?Math.min(420,Math.floor((80.5-idade)*12)):420;
+  const prazo=Math.max(120,prazoMax);
+
+  // Fórmula Price inversa: PV = PMT × [(1+i)^n − 1] / [i × (1+i)^n]
+  function pvPrice(pmt,taxaAnual,n){
+    const i=taxaAnual/100/12;
+    return pmt*((Math.pow(1+i,n)-1)/(i*Math.pow(1+i,n)));
+  }
+
+  const faixa=getFaixa(renda);
+  const isMCMV=!!faixa;
+
+  // ── Cenário MCMV ──
+  let maxMCMV=0,seguroMCMV=0,subsidioEst=0,taxaUsada=0;
+  if(isMCMV){
+    taxaUsada=faixa.taxa;
+    const finMCMV=pvPrice(parcelaMax,faixa.taxa,prazo);
+    // Subsídio estimado apenas para Faixas 1 e 2
+    if(faixa.n<=2&&cotista&&primeiro){
+      subsidioEst=faixa.n===1?Math.round(faixa.subMax*0.70):Math.round(faixa.subMax*0.55);
+    }
+    maxMCMV=Math.min(finMCMV+totalDisponivel+subsidioEst,faixa.teto);
+    seguroMCMV=maxMCMV*0.87; // faixa segura = 87% do máximo
+  }
+
+  // ── Cenário SBPE (sempre calculado para comparação) ──
+  const taxaSBPE=13.0;
+  const finSBPE=pvPrice(parcelaMax,taxaSBPE,prazo);
+  const maxSBPE=finSBPE+totalDisponivel;
+  const seguroSBPE=maxSBPE*0.87;
+
+  // ── Valor de referência principal ──
+  const valorMax=isMCMV?maxMCMV:maxSBPE;
+  const valorSeguro=isMCMV?seguroMCMV:seguroSBPE;
+
+  // ── Status ──
+  let status,statusCls,statusIc;
+  const comp30=parcelaMax/renda;
+  if(valorMax>=60000){status='✔ Perfil viável';statusCls='disc-ok';statusIc='✅';}
+  else if(valorMax>=30000){status='⚠ Capacidade limitada';statusCls='disc-warn';statusIc='⚠️';}
+  else{status='❌ Capacidade muito baixa';statusCls='disc-err';statusIc='❌';}
+
+  // ── Tipos de imóvel acessíveis ──
+  // Na planta: tende a ter valores similares ao pronto, mas com fase de obra
+  // Pronto novo: mercado primário
+  // Usado: mercado secundário (geralmente mais acessível)
+  const tipoPronto={ic:'🏢',label:'Pronto / Novo',ok:valorMax>=80000,range:valorMax>=80000?`Até ${fmt(valorMax)}`:'Fora do alcance atual'};
+  const tipoPlanta={ic:'🏗️',label:'Na planta',ok:valorMax>=80000&&isMCMV,range:isMCMV&&valorMax>=80000?`Até ${fmt(maxMCMV)} (MCMV)`:valorMax>=80000?`Até ${fmt(maxSBPE)}`:'Fora do alcance atual'};
+  const tipoUsado={ic:'🏠',label:'Usado',ok:valorMax>=60000,range:valorMax>=60000?`Até ${fmt(valorMax*1.05)}`:'Fora do alcance atual'};
+  // Usado pode ter negociação melhor, estimar +5%
+
+  // ── Diagnóstico ──
+  let diag='';
+  if(isMCMV){
+    diag=`Com renda de <strong>${fmt(renda)}/mês</strong>, você se enquadra no <strong>MCMV ${faixa.l}</strong> (taxa ${faixa.taxa}% a.a. + TR). `;
+    if(subsidioEst>0) diag+=`Existe estimativa de subsídio de até <strong>${fmt(subsidioEst)}</strong>, que reduz o valor a financiar. `;
+    diag+=`Com a entrada disponível de <strong>${fmt(totalDisponivel)}</strong> e prazo de <strong>${prazo} meses</strong>, sua faixa de busca ideal fica entre <strong>${fmt(valorSeguro)}</strong> e <strong>${fmt(valorMax)}</strong>. `;
+    if(valorMax>=faixa.teto*0.95) diag+=`Você está próximo do teto do MCMV ${faixa.l} (${fmt(faixa.teto)}) — considere verificar também o SBPE para imóveis acima desse valor.`;
+  } else {
+    diag=`Com renda de <strong>${fmt(renda)}/mês</strong>, seu perfil é <strong>SBPE / SFI</strong> (financiamento convencional, taxa estimada ~13% a.a.). `;
+    diag+=`Com entrada de <strong>${fmt(totalDisponivel)}</strong> e prazo de <strong>${prazo} meses</strong>, a faixa de busca ideal é entre <strong>${fmt(valorSeguro)}</strong> e <strong>${fmt(maxSBPE)}</strong>. `;
+    diag+=`Imóveis acima de R$ 2.250.000 seguem pelo SFI (taxas de mercado sem TR).`;
+  }
+
+  // ── Renderizar resultado ──
+  const el=document.getElementById('resultado-disc');
+  el.style.display='block';
+  el.innerHTML=`
+  <div class="disc-result">
+    <div class="disc-range">
+      <div class="disc-range-eyebrow">💡 Sua faixa de compra estimada</div>
+      <div class="disc-range-val">${fmt(valorSeguro)} — ${fmt(valorMax)}</div>
+      <div class="disc-range-ideal">Faixa ideal: até ${fmt(valorSeguro)}</div>
+      <div class="disc-range-sub">Máximo possível: ${fmt(valorMax)} · Parcela máxima estimada: ${fmt(parcelaMax)}/mês (30% da renda)</div>
+      <div class="disc-status ${statusCls}">${statusIc} ${status}</div>
+    </div>
+
+    <div class="disc-kpi">
+      <div class="kpi${isMCMV?' hl':''}"><div class="kpi-l">Modalidade</div><div class="kpi-v">${isMCMV?faixa.l+' MCMV':'SBPE'}</div><div class="kpi-s">${isMCMV?faixa.taxa+'% a.a. + TR':'~13% a.a. (mercado)'}</div></div>
+      <div class="kpi"><div class="kpi-l">Parcela máxima</div><div class="kpi-v">${fmt(parcelaMax)}</div><div class="kpi-s">30% da renda (limite bancário)</div></div>
+      <div class="kpi"><div class="kpi-l">Prazo disponível</div><div class="kpi-v">${prazo} meses</div><div class="kpi-s">${(prazo/12).toFixed(0)} anos · ${idade>=18?'baseado na sua idade':'prazo máximo'}</div></div>
+      ${subsidioEst>0?`<div class="kpi hl"><div class="kpi-l">Subsídio estimado</div><div class="kpi-v">${fmt(subsidioEst)}</div><div class="kpi-s">Sujeito à análise da CAIXA</div></div>`:''}
+    </div>
+
+    <div class="disc-tipos">
+      <div class="disc-tipos-title">🏘️ Que tipo de imóvel você pode buscar?</div>
+      <div class="disc-tipos-grid">
+        <div class="disc-tipo ${tipoPronto.ok?'ok':'out'}">
+          <div class="disc-tipo-ic">${tipoPronto.ic}</div>
+          <span class="disc-tipo-label">${tipoPronto.label}</span>
+          <div class="disc-tipo-range">${tipoPronto.range}</div>
+        </div>
+        <div class="disc-tipo ${tipoPlanta.ok?'ok':'out'}">
+          <div class="disc-tipo-ic">${tipoPlanta.ic}</div>
+          <span class="disc-tipo-label">${tipoPlanta.label}</span>
+          <div class="disc-tipo-range">${tipoPlanta.range}</div>
+        </div>
+        <div class="disc-tipo ${tipoUsado.ok?'ok':'out'}">
+          <div class="disc-tipo-ic">${tipoUsado.ic}</div>
+          <span class="disc-tipo-label">${tipoUsado.label}</span>
+          <div class="disc-tipo-range">${tipoUsado.range}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc-diag">
+      <div class="disc-diag-title">📋 Diagnóstico do seu perfil</div>
+      <p>${diag}</p>
+      <p style="margin-top:10px;font-size:.8rem;color:var(--text3)">⚠️ Estimativa educativa baseada nas regras gerais do SFH/MCMV 2026. O valor real depende da análise de crédito do banco, score, histórico financeiro e condições do imóvel.</p>
+    </div>
+
+    <div class="disc-action">
+      <button class="disc-action-btn primary" onclick="toggleSimMode('trad');ir('sim-sec')">🔍 Simular com um imóvel específico</button>
+      <a class="disc-action-btn" href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" style="text-decoration:none">🏘️ Ver imóveis compatíveis</a>
+    </div>
+  </div>`;
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
 function selectSimMode(mode){
   document.getElementById('smbMCMV').classList.toggle('smb-active',mode==='mcmv');
   document.getElementById('smbConv').classList.toggle('smb-active',mode==='conv');
