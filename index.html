@@ -185,6 +185,34 @@ input,select,button,textarea{font-family:var(--font)}
 .input-brl-prefix{position:absolute;left:12px;font-size:.9rem;font-weight:600;color:var(--text2);pointer-events:none;user-select:none;z-index:1}
 .input-brl input{padding-left:36px!important;width:100%}
 
+/* TIPO SELECTOR — escolha antes de simular */
+.tipo-sel-wrap{margin:0 0 18px}
+.tipo-sel-label{font-size:.75rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.tipo-sel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:480px){.tipo-sel-grid{grid-template-columns:1fr 1fr;gap:7px}}
+.tipo-sel-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px 11px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;transition:all .18s;position:relative;user-select:none;text-align:center}
+.tipo-sel-card:hover{border-color:var(--primary);background:var(--primary-light)}
+.tipo-sel-card.ts-active{border-color:var(--primary);background:var(--primary-light);box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+.tipo-sel-card.ts-active .ts-label{color:var(--primary);font-weight:700}
+.ts-ic{font-size:1.45rem;line-height:1;margin-bottom:2px}
+.ts-label{font-size:.81rem;font-weight:600;color:var(--text)}
+.ts-desc{font-size:.68rem;color:var(--text2);line-height:1.4;margin-top:1px}
+.ts-badge{position:absolute;top:5px;right:7px;width:17px;height:17px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:transparent;transition:all .15s}
+.tipo-sel-card.ts-active .ts-badge{background:var(--primary);border-color:var(--primary);color:#fff;content:'✓'}
+
+/* Grid de resultado adaptativo por nº de tipos selecionados */
+.disc-breakdown-grid.bk-1{grid-template-columns:1fr;max-width:440px;margin-left:auto;margin-right:auto}
+.disc-breakdown-grid.bk-2{grid-template-columns:repeat(2,1fr)}
+.disc-breakdown-grid.bk-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:640px){
+  .disc-breakdown-grid.bk-2,.disc-breakdown-grid.bk-3{grid-template-columns:1fr}
+}
+/* Card único: layout horizontal para maior legibilidade */
+.disc-breakdown-grid.bk-1 .disc-bcard-body{gap:8px}
+.disc-breakdown-grid.bk-1 .disc-bcard-head{font-size:.95rem;padding:13px 18px}
+.disc-breakdown-grid.bk-1 .disc-brow{font-size:.88rem}
+.disc-breakdown-grid.bk-1 .disc-brow.parcela span:last-child{font-size:1.1rem}
+
 /* FAIXAS */
 .faixas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:28px 0}
 .fc{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:22px;transition:all .2s;cursor:default}
@@ -996,6 +1024,31 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
         <div class="sim-checks" style="margin-bottom:20px">
           <label class="sc"><input type="checkbox" id="dCotista" checked> Cotista FGTS há 3+ anos</label>
           <label class="sc"><input type="checkbox" id="dPrimeiro" checked> Primeiro imóvel financiado</label>
+        </div>
+        <!-- Seletor de tipo de imóvel -->
+        <div class="tipo-sel-wrap">
+          <div class="tipo-sel-label">🏘️ Qual tipo de imóvel você quer analisar?</div>
+          <div class="tipo-sel-grid">
+            <label class="tipo-sel-card ts-active" id="tsc-pronto" onclick="toggleTipo('pronto',this)">
+              <span class="ts-badge" id="tck-pronto">✓</span>
+              <span class="ts-ic">🏢</span>
+              <span class="ts-label">Pronto / Novo</span>
+              <span class="ts-desc">Chaves imediatas · preço certo</span>
+            </label>
+            <label class="tipo-sel-card" id="tsc-planta" onclick="toggleTipo('planta',this)">
+              <span class="ts-badge" id="tck-planta"></span>
+              <span class="ts-ic">🏗️</span>
+              <span class="ts-label">Na planta</span>
+              <span class="ts-desc">Lançamento · entrega futura</span>
+            </label>
+            <label class="tipo-sel-card" id="tsc-usado" onclick="toggleTipo('usado',this)">
+              <span class="ts-badge" id="tck-usado"></span>
+              <span class="ts-ic">🏠</span>
+              <span class="ts-label">Usado</span>
+              <span class="ts-desc">Negociação direta · entrada maior</span>
+            </label>
+          </div>
+          <p style="font-size:.72rem;color:var(--text3);margin-top:8px">Selecione 1 para ver resultado completo · 2 ou 3 para comparar lado a lado</p>
         </div>
         <button class="disc-btn" onclick="descobrir()">🎯 Descobrir minha faixa de compra</button>
         <div id="resultado-disc" style="display:none"></div>
@@ -2634,6 +2687,23 @@ function calcCET_DecliningMIP(pv, taxaMensal, n, mipCoeff, dfiFixo, taFixo){
   return (Math.pow(1+(lo+hi)/2,12)-1)*100;
 }
 
+// ── Seletor de tipo de imóvel (descobrir) ────────────────────────────────────
+// Estado dos tipos selecionados
+const _tipoState={pronto:true,planta:false,usado:false};
+function toggleTipo(tipo,el){
+  const ativo=el.classList.contains('ts-active');
+  const outrosAtivos=Object.keys(_tipoState).filter(t=>t!==tipo&&_tipoState[t]);
+  // Impede deselecionar o último
+  if(ativo&&outrosAtivos.length===0)return;
+  _tipoState[tipo]=!ativo;
+  el.classList.toggle('ts-active',_tipoState[tipo]);
+  const badge=document.getElementById('tck-'+tipo);
+  if(badge)badge.textContent=_tipoState[tipo]?'✓':'';
+}
+function getTiposSelecionados(){
+  return Object.keys(_tipoState).filter(t=>_tipoState[t]);
+}
+
 // ─── SELETOR DE MODO DO SIMULADOR ────────────────────────────────────────────
 // ── TOGGLE MODO SIMULADOR (Descoberta ↔ Tradicional) ─────────────────────────
 function toggleSimMode(mode){
@@ -2737,62 +2807,68 @@ function descobrir(){
     return{valorImovel,saldo,parcela,entradaOk,entradaMinPct,entradaMinVal,encargaObra,prazoObra:prazoObra||0};
   }
 
-  // Pronto/Novo e Na Planta: usam regras MCMV ou SBPE conforme a renda
+  // ── Tipos selecionados pelo usuário ──────────────────────────────────────────
+  const tiposSel=getTiposSelecionados(); // ['pronto','planta','usado'] ou subconjunto
+  const numTipos=tiposSel.length;
+
+  // ── Regras financeiras por tipo ───────────────────────────────────────────────
   const taxaPN=isMCMV?faixa.taxa:taxaSBPE;
   const valorPN=isMCMV?valorSeguroMCMV:valorSeguroSBPE;
-  // Entrada mínima: F1 pode ter 5%, F2 10%, demais 20%
   const entMinPN=isMCMV&&faixa.n===1?0.05:isMCMV&&faixa.n===2?0.10:0.20;
-  const bdPronto=calcBreakdown(valorPN,subsidioEst,taxaPN,prazo,0,entMinPN);
-  const bdPlanta=calcBreakdown(valorPN,subsidioEst,taxaPN,prazo,36,entMinPN);
 
-  // Usado:
-  // • MCMV: restrição severa em 2026 — entrada mínima 50% (Sul/Sudeste).
-  // • SBPE: imóvel usado custa em média 15% menos que novo — mesmo financiamento, parcela menor.
-  let bdUsado,usadoAlerta='';
-  // Valor de mercado do usado: ~15% abaixo do novo (preço médio de mercado)
-  const valorUsadoRef=isMCMV?valorSeguroMCMV:Math.round(valorSeguroSBPE*0.85);
+  // Valor de mercado do usado: ~15% abaixo do novo
+  const valorUsadoRef=isMCMV?Math.round(valorSeguroMCMV*0.90):Math.round(valorSeguroSBPE*0.85);
+  let usadoAlerta='';
   if(isMCMV){
-    bdUsado=calcBreakdown(valorUsadoRef,0,faixa.taxa,prazo,0,0.30);
-    const entMin30=valorUsadoRef*0.30;
-    const entMin50=valorUsadoRef*0.50;
-    usadoAlerta=`⚠️ <strong>MCMV para imóvel usado exige entrada mínima de 30% a 50%</strong> dependendo da faixa e região (regra 2026). Para este valor, a entrada estimada fica entre <strong>${fmt(entMin30)}</strong> e <strong>${fmt(entMin50)}</strong>. Para usados com menor entrada, o caminho mais indicado é o <strong>SBPE</strong> — disponível quando a renda superar R$ 13.000/mês.`;
-  } else {
-    // SBPE usado: valor de referência 15% abaixo do novo, sem subsídio, LTV 80%
-    bdUsado=calcBreakdown(valorUsadoRef,0,taxaSBPE,prazo,0,0.20);
+    const entMin30=valorUsadoRef*0.30; const entMin50=valorUsadoRef*0.50;
+    usadoAlerta=`⚠️ <strong>MCMV — imóvel usado exige entrada de 30% a 50%</strong> (regra 2026). Entrada estimada entre <strong>${fmt(entMin30)}</strong> e <strong>${fmt(entMin50)}</strong>. Para entrada menor, o caminho mais indicado é o <strong>SBPE</strong>.`;
   }
 
-  // ── Cards de tipo de imóvel ──
-  // Na planta: preço de lançamento tipicamente 15-25% abaixo do pronto (mesmo orçamento = imóvel de valor maior)
-  // Usado: mercado ~15% abaixo do novo em média
-  const usadoOk=!isMCMV?valorMax>=60000:(entrada+fgts)>=valorSeguroMCMV*0.30;
-  const valorPlantaEntrega=Math.round(valorMax*1.20); // valor de entrega estimado
-  const valorUsadoMercado=Math.round(valorMax*0.85);  // preço médio de mercado para usado
+  // Compute apenas os tipos necessários
+  const bds={};
+  if(tiposSel.includes('pronto')) bds.pronto=calcBreakdown(valorPN,subsidioEst,taxaPN,prazo,0,entMinPN);
+  if(tiposSel.includes('planta')) bds.planta=calcBreakdown(valorPN,subsidioEst,taxaPN,prazo,36,entMinPN);
+  if(tiposSel.includes('usado'))  bds.usado=calcBreakdown(valorUsadoRef,isMCMV?0:0,isMCMV?faixa.taxa:taxaSBPE,prazo,0,isMCMV?0.30:0.20);
 
-  const tipoPronto={ic:'🏢',label:'Pronto / Novo',ok:valorMax>=60000,
-    range:valorMax>=60000?`Até ${fmt(valorMax)}`:'Fora do alcance atual',
-    sub:'Preço cheio de mercado'};
-  const tipoPlanta={ic:'🏗️',label:'Na planta',ok:valorMax>=60000,
-    range:valorMax>=60000?`Lançamentos até ${fmt(valorMax)}`:'Fora do alcance atual',
-    sub:valorMax>=60000?`Val. na entrega: ~${fmt(valorPlantaEntrega)}`:'Sem alcance'};
-  const tipoUsado={ic:'🏠',label:'Usado',ok:usadoOk,
-    range:usadoOk&&!isMCMV?`Até ${fmt(valorUsadoMercado)}`:usadoOk?`Até ${fmt(valorMax)}`:(isMCMV?'Entrada mín. 50% (MCMV)':'Fora do alcance atual'),
-    sub:usadoOk&&!isMCMV?'~15% mais barato que o novo':isMCMV?'Entrada 30%-50% (MCMV 2026)':'' };
+  // ── Contexto específico por tipo (exibido abaixo do card) ────────────────────
+  const ctxInfo={
+    pronto:'✅ Financiamento imediato · sem fase de obra · análise bancária padrão · chaves na assinatura do contrato.',
+    planta:`🏗️ Fase de obra: encargos mensais crescentes sobre o saldo liberado, sem amortizar capital. Após entrega, parcela normal. Valor de lançamento = ${fmt(valorPN)} → valor estimado na entrega: <strong>~${fmt(Math.round(valorPN*1.20))}</strong> (+20% valorização estimada).`,
+    usado:isMCMV
+      ?`⚠️ MCMV para imóvel usado exige entrada de 30%–50% (Sul/Sudeste, 2026). Banco exige laudo de vistoria e o imóvel não pode ter pendências judiciais ou ônus. Considere o SBPE se a entrada for menor.`
+      :`🏠 Imóvel usado tipicamente 10–15% mais barato que o novo. Banco fará vistoria e a avaliação pode ficar abaixo do preço pedido — você paga a diferença. ITBI incide sobre o valor venal ou de transação (o maior).`
+  };
 
-  // ── Renderização dos cards de breakdown ──
-  function renderBd(bd,label,ic,showObra,alertaTxt){
+  // ── Diagnóstico contextual por tipo selecionado ───────────────────────────────
+  const diagBase=isMCMV
+    ?`Renda de <strong>${fmt(renda)}/mês</strong> → <strong>MCMV ${faixa.l}</strong> (${faixa.taxa}% a.a. + TR)${subsidioEst>0?` · subsídio estimado de <strong>${fmt(subsidioEst)}</strong>`:''}. Prazo: <strong>${prazo} meses</strong>.`
+    :`Renda de <strong>${fmt(renda)}/mês</strong> → <strong>SBPE / SFH</strong> (${taxaSBPE}% a.a. + TR, Caixa 2026). Prazo: <strong>${prazo} meses</strong>.`;
+
+  // Diagnóstico adicional por tipo
+  const diagTipoTexto={
+    pronto:'Imóvel pronto é o caminho com <strong>menor risco operacional</strong>: o que você vê é o que financía, sem surpresas de obra ou INCC. Aprovação bancária em 30–60 dias.',
+    planta:'Comprar na planta pode custar <strong>10–20% menos no lançamento</strong>, mas exige planejamento para a fase de obra (juros evolutivos + aluguel). Confirme a construtora credenciada junto à Caixa.',
+    usado:isMCMV?'MCMV para imóvel usado exige entrada maior e é mais restrito. Avalie se vale buscar dentro do teto do MCMV.':'Imóvel usado oferece <strong>oportunidade de negociação</strong> e entrega imediata. O banco fará avaliação — negocie o preço com margem para eventual discrepância de laudo.'
+  };
+  const diagTipo=tiposSel.map(t=>diagTipoTexto[t]).join('<br><br>');
+
+  // ── Renderização dos cards de breakdown ──────────────────────────────────────
+  function renderBd(bd,label,ic,tipo){
+    const alertaTxt=tipo==='usado'&&isMCMV?usadoAlerta:'';
     const subsLinha=subsidioEst>0&&!alertaTxt?`<div class="disc-brow neg"><span>(-) Subsídio est. ✦</span><span>${fmt(subsidioEst)}</span></div>`:'';
-    const obraLinha=showObra&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra (~36 meses)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
+    const obraLinha=tipo==='planta'&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra (~36m)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
     const statusHtml=alertaTxt
-      ?`<div class="disc-bstatus warn" style="font-size:.74rem;line-height:1.45">${alertaTxt}</div>`
+      ?`<div class="disc-bstatus warn" style="font-size:.73rem;line-height:1.45;padding:8px 14px">${alertaTxt}</div>`
       :bd.entradaOk
-        ?`<div class="disc-bstatus ok">✔ Entrada suficiente</div>`
-        :`<div class="disc-bstatus warn">⚠ Entrada mínima: ${fmt(bd.entradaMinVal)} (${(bd.entradaMinPct*100).toFixed(0)}%)</div>`;
+        ?`<div class="disc-bstatus ok">✔ Entrada suficiente para este imóvel</div>`
+        :`<div class="disc-bstatus warn">⚠ Entrada mínima: ${fmt(bd.entradaMinVal)} (${(bd.entradaMinPct*100).toFixed(0)}% do imóvel)</div>`;
+    const ctxHtml=numTipos===1&&ctxInfo[tipo]?`<div style="font-size:.76rem;color:var(--text2);padding:10px 14px;border-top:1px solid var(--border);line-height:1.55;background:var(--bg)">${ctxInfo[tipo]}</div>`:'';
     return `
     <div class="disc-bcard ${alertaTxt?'warn':bd.entradaOk?'ok':'warn'}">
       <div class="disc-bcard-head">${ic} ${label}</div>
       <div class="disc-bcard-body">
-        <div class="disc-brow base"><span>Faixa ideal</span><span>${fmt(bd.valorImovel)}</span></div>
-        ${entrada>0?`<div class="disc-brow neg"><span>(-) Entrada/Ato</span><span>${fmt(entrada)}</span></div>`:''}
+        <div class="disc-brow base"><span>${tipo==='usado'?'Imóvel usado (est.)':'Faixa ideal'}</span><span>${fmt(bd.valorImovel)}</span></div>
+        ${entrada>0?`<div class="disc-brow neg"><span>(-) Entrada / ato</span><span>${fmt(entrada)}</span></div>`:''}
         ${fgts>0?`<div class="disc-brow neg"><span>(-) FGTS</span><span>${fmt(fgts)}</span></div>`:''}
         ${subsLinha}
         <div class="disc-brow total"><span>= A financiar</span><span>${fmt(bd.saldo)}</span></div>
@@ -2800,20 +2876,25 @@ function descobrir(){
         ${obraLinha}
       </div>
       ${statusHtml}
+      ${ctxHtml}
     </div>`;}
 
-  // ── Diagnóstico personalizado ──
-  let diag='';
-  if(isMCMV){
-    diag=`Com renda de <strong>${fmt(renda)}/mês</strong>, você se enquadra no <strong>MCMV ${faixa.l}</strong> (taxa ${faixa.taxa}% a.a. + TR). `;
-    if(subsidioEst>0)diag+=`Existe estimativa de subsídio de até <strong>${fmt(subsidioEst)}</strong> — valor que o governo abate do seu financiamento e não precisa ser devolvido. `;
-    diag+=`Com entrada de <strong>${fmt(totalDisponivel)}</strong> e prazo de <strong>${prazo} meses</strong>, sua faixa ideal fica entre <strong>${fmt(valorSeguro)}</strong> e <strong>${fmt(valorMax)}</strong>. `;
-    if(valorMax>=faixa.teto*0.95)diag+=`Você está próximo do teto do MCMV ${faixa.l} (${fmt(faixa.teto)}). `;
-    diag+=`Para <strong>imóveis usados</strong>, o MCMV exige entrada mínima de 50% nas regiões Sul e Sudeste em 2026 — nesse caso, o <strong>SBPE</strong> (financiamento convencional) é o caminho mais indicado.`;
-  } else {
-    diag=`Com renda de <strong>${fmt(renda)}/mês</strong>, seu perfil é <strong>SBPE / SFH</strong> — financiamento convencional, taxa ~${taxaSBPE}% a.a. + TR (Caixa 2026). `;
-    diag+=`Com entrada de <strong>${fmt(totalDisponivel)}</strong> e prazo de <strong>${prazo} meses</strong>, a faixa de busca fica entre <strong>${fmt(valorSeguro)}</strong> e <strong>${fmt(valorMaxSBPE)}</strong>.`;
-  }
+  // Título contextual do bloco de resultado
+  const titulos={
+    1:{pronto:'📊 Como fica a conta — Imóvel Pronto / Novo',planta:'📊 Como fica a conta — Imóvel na Planta',usado:'📊 Como fica a conta — Imóvel Usado'},
+    2:'📊 Comparação — '+tiposSel.map(t=>({pronto:'Pronto',planta:'Na planta',usado:'Usado'}[t])).join(' vs '),
+    3:'📊 Comparação completa — Pronto · Na planta · Usado'
+  };
+  const tituloBd=numTipos===1?titulos[1][tiposSel[0]]:titulos[numTipos]||'📊 Comparação';
+
+  // Monta grid HTML apenas com tipos selecionados
+  const gridCards=tiposSel.map(t=>{
+    const meta={pronto:['Pronto / Novo','🏢'],planta:['Na planta','🏗️'],usado:['Usado','🏠']};
+    return renderBd(bds[t],meta[t][0],meta[t][1],t);
+  }).join('');
+
+  // ── Diagnóstico personalizado ──────────────────────────────────────────────
+  const diag=`${diagBase}<br><br>${diagTipo}`;
 
   // ── Renderiza resultado completo ──
   const el=document.getElementById('resultado-disc');
@@ -2824,7 +2905,7 @@ function descobrir(){
       <div class="disc-range-eyebrow">💡 Sua faixa de compra estimada</div>
       <div class="disc-range-val">${fmt(valorSeguro)} — ${fmt(valorMax)}</div>
       <div class="disc-range-ideal">Faixa ideal: até ${fmt(valorSeguro)}</div>
-      <div class="disc-range-sub">Máximo possível: ${fmt(valorMax)} · Parcela máxima estimada: ${fmt(parcelaMax)}/mês (30% da renda)</div>
+      <div class="disc-range-sub">Máximo possível: ${fmt(valorMax)} · Parcela máxima: ${fmt(parcelaMax)}/mês (30% da renda)</div>
       <div class="disc-status ${statusCls}">${statusIc} ${status}</div>
     </div>
 
@@ -2835,38 +2916,12 @@ function descobrir(){
       ${subsidioEst>0?`<div class="kpi hl"><div class="kpi-l">Subsídio estimado</div><div class="kpi-v">${fmt(subsidioEst)}</div><div class="kpi-s">Sujeito à análise da CAIXA</div></div>`:''}
     </div>
 
-    <div class="disc-tipos">
-      <div class="disc-tipos-title">🏘️ Que tipo de imóvel você pode buscar?</div>
-      <div class="disc-tipos-grid">
-        <div class="disc-tipo ${tipoPronto.ok?'ok':'out'}">
-          <div class="disc-tipo-ic">${tipoPronto.ic}</div>
-          <span class="disc-tipo-label">${tipoPronto.label}</span>
-          <div class="disc-tipo-range">${tipoPronto.range}</div>
-          ${tipoPronto.sub?`<div style="font-size:.7rem;color:var(--text3);margin-top:3px">${tipoPronto.sub}</div>`:''}
-        </div>
-        <div class="disc-tipo ${tipoPlanta.ok?'ok':'out'}">
-          <div class="disc-tipo-ic">${tipoPlanta.ic}</div>
-          <span class="disc-tipo-label">${tipoPlanta.label}</span>
-          <div class="disc-tipo-range">${tipoPlanta.range}</div>
-          ${tipoPlanta.sub?`<div style="font-size:.7rem;color:var(--text3);margin-top:3px">${tipoPlanta.sub}</div>`:''}
-        </div>
-        <div class="disc-tipo ${tipoUsado.ok?'ok':'out'}">
-          <div class="disc-tipo-ic">${tipoUsado.ic}</div>
-          <span class="disc-tipo-label">${tipoUsado.label}</span>
-          <div class="disc-tipo-range">${tipoUsado.range}</div>
-          ${tipoUsado.sub?`<div style="font-size:.7rem;color:var(--text3);margin-top:3px">${tipoUsado.sub}</div>`:''}
-        </div>
-      </div>
-    </div>
-
     <div class="disc-breakdown">
-      <div class="disc-breakdown-title">📊 Como fica a conta — faixa ideal (${fmt(valorSeguro)})</div>
-      <div class="disc-breakdown-grid">
-        ${renderBd(bdPronto,'Pronto / Novo','🏢',false,'')}
-        ${renderBd(bdPlanta,'Na planta','🏗️',true,'')}
-        ${renderBd(bdUsado,'Usado','🏠',false,isMCMV?usadoAlerta:'')}
+      <div class="disc-breakdown-title">${tituloBd}</div>
+      <div class="disc-breakdown-grid bk-${numTipos}">
+        ${gridCards}
       </div>
-      ${subsidioEst>0?`<p style="font-size:.72rem;color:var(--text3);margin-top:8px">✦ Subsídio estimado sujeito à análise da CAIXA ECONÔMICA FEDERAL. Valor real pode variar conforme renda, localização e histórico.</p>`:''}
+      ${subsidioEst>0?`<p style="font-size:.72rem;color:var(--text3);margin-top:8px">✦ Subsídio estimado sujeito à análise da CAIXA. Valor real pode variar conforme renda, localização e histórico.</p>`:''}
     </div>
 
     <div class="disc-diag">
