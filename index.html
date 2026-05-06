@@ -625,6 +625,16 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 .bnav-more-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;background:transparent;color:var(--text);font-size:.88rem;font-weight:500;cursor:pointer;border-radius:8px;text-align:left}
 .bnav-more-item:hover{background:var(--bg-card2)}
 .bnav-more-item .bmi-ic{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0}
+/* MOBILE APP BAR (modelo A) */
+#mob-app-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:#1A56DB}
+#mob-app-bar-inner{padding:calc(10px + env(safe-area-inset-top)) 16px 10px}
+.mob-app-logo{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mob-app-logo-name{color:#fff;font-size:.97rem;font-weight:700;letter-spacing:-.01em}
+.mob-app-logo-sub{color:rgba(255,255,255,.6);font-size:.68rem}
+.stt-mob{display:flex;background:rgba(0,0,0,.18);border-radius:8px;overflow:hidden}
+.stt-mob-btn{flex:1;padding:7px 4px;font-size:.73rem;color:rgba(255,255,255,.75);border:none;background:transparent;cursor:pointer;font-weight:500;transition:all .2s}
+.stt-mob-btn.stt-mob-active{background:rgba(255,255,255,.22);color:#fff;font-weight:700}
+
 @media(max-width:768px){
   #bottom-nav{display:block}
   body{padding-bottom:62px}
@@ -632,6 +642,13 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   #lgpd{bottom:62px;left:8px;right:8px;border-radius:12px 12px 0 0;font-size:.78rem}
   #lgpd.show~*,body:has(#lgpd.show){padding-bottom:150px}
   .nav{display:none}
+  /* App bar visível, header desktop oculto */
+  #mob-app-bar{display:block}
+  #hdr{display:none}
+  /* Remove aba Início — simulador é a tela inicial */
+  #btab-home{display:none}
+  /* Espaço para o app bar fixo */
+  body.mob-tabs{padding-top:88px}
 }
 
 /* MOBILE DRAWER */
@@ -756,6 +773,20 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 </style>
 </head>
 <body>
+
+<!-- MOBILE APP BAR — visível apenas no mobile -->
+<div id="mob-app-bar">
+  <div id="mob-app-bar-inner">
+    <div class="mob-app-logo">
+      <span class="mob-app-logo-name">🏠 FinancieCerto</span>
+      <span class="mob-app-logo-sub">MCMV · SBPE · 2026</span>
+    </div>
+    <div class="stt-mob">
+      <button id="sttMobDisc" class="stt-mob-btn stt-mob-active" onclick="toggleSimMode('disc')">🎯 Descobrir minha faixa</button>
+      <button id="sttMobTrad" class="stt-mob-btn" onclick="toggleSimMode('trad')">🔍 Tenho um imóvel</button>
+    </div>
+  </div>
+</div>
 
 <header id="hdr">
   <div class="hdr-i">
@@ -2610,12 +2641,18 @@ function toggleSimMode(mode){
   const trad=document.getElementById('sim-trad-panel');
   const btnD=document.getElementById('sttDisc');
   const btnT=document.getElementById('sttTrad');
+  // Sincroniza botões do app bar mobile
+  const mD=document.getElementById('sttMobDisc');
+  const mT=document.getElementById('sttMobTrad');
   if(mode==='disc'){
     disc.style.display='';trad.style.display='none';
     btnD.classList.add('stt-active');btnT.classList.remove('stt-active');
+    if(mD){mD.classList.add('stt-mob-active');mT.classList.remove('stt-mob-active');}
   }else{
     disc.style.display='none';trad.style.display='';
     btnT.classList.add('stt-active');btnD.classList.remove('stt-active');
+    if(mT){mT.classList.add('stt-mob-active');mD.classList.remove('stt-mob-active');}
+
   }
 }
 
@@ -4132,6 +4169,9 @@ function showMobTab(tab){
 function initMobileTabs(){
   if(!isMobile())return;
   document.body.classList.add('mob-tabs');
+  // Esconde o toggle interno do simulador (fica no app bar)
+  const sttWrap=document.querySelector('.sim-type-toggle');
+  if(sttWrap)sttWrap.style.display='none';
   // Abre direto no simulador
   showMobTab('sim');
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
