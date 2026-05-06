@@ -1979,7 +1979,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           <thead><tr><th>Critério</th><th>MCMV (F1–F4)</th><th>Financiamento Convencional (SBPE/SFI)</th></tr></thead>
           <tbody>
             <tr><td class="lc">Renda máxima</td><td>Até R$ 13.000/mês</td><td>Sem limite</td></tr>
-            <tr><td class="lc">Taxa de juros</td><td><span class="tg tg-g">4% a 10,5% a.a. + TR</span></td><td><span class="tg tg-y">SBPE: ~10,5%–13,5%+TR · SFI: ~12%–14% s/ TR</span></td></tr>
+            <tr><td class="lc">Taxa de juros</td><td><span class="tg tg-g">4% a 10,5% a.a. + TR</span></td><td><span class="tg tg-y">SBPE: ~10,5%–12%+TR (Caixa 2026: 11,19%) · SFI: ~12%–14% s/ TR</span></td></tr>
             <tr><td class="lc">Subsídio</td><td><span class="tg tg-g">Sim — Faixas 1 e 2</span></td><td><span class="tg tg-r">Não</span></td></tr>
             <tr><td class="lc">Tipo de imóvel</td><td>Pronto ou na planta</td><td>Pronto ou na planta</td></tr>
             <tr><td class="lc">Valor máximo</td><td>Até R$ 600.000 (varia por UF e faixa — F1/F2: R$275k, F3: R$400k, F4: R$600k)</td><td>SFH até R$ 2.250.000 · SFI acima disso (sem limite)</td></tr>
@@ -3160,7 +3160,9 @@ function simular(){
   const tetoMCMV=faixa?faixa.teto:0; // abril/2026: F1/F2=275k, F3=400k, F4=600k
   const isMCMV=faixa!==null&&imovel<=tetoMCMV;
   const tr=0.001679; // TR referência abril/2026 (BACEN)
-  const taxaAnual=isMCMV?faixa.taxa:13.0;
+  // SFH/SBPE: Caixa 2026 balcão = 11,19% a.a. · SFI imóveis acima de R$2,25M = ~12,5% a.a. est.
+  const sfhLimitEarly=2250000; // usado aqui para definir a taxa antes do bloco SFI
+  const taxaAnual=isMCMV?faixa.taxa:imovel>sfhLimitEarly?12.5:11.19;
   // ── CALIBRAÇÃO MATEMÁTICA ────────────────────────────────────────────────────
   // Referência: contrato SFH real (SIOPI) — 7,66% a.a. / 413 meses / R$267.000
   // A TR NÃO é somada à taxa mensal do cálculo da prestação (PMT).
@@ -3169,7 +3171,8 @@ function simular(){
   // Fonte: taxa efetiva mensal contratual = 0,6383% = 7,66%/12 → A+J = R$ 1.837,03
   // ────────────────────────────────────────────────────────────────────────────
   const taxaMensal=taxaAnual/100/12;          // taxa nominal mensal (SEM TR)
-  const taxaSBPEMensal=13.5/100/12;           // referência SBPE mercado 2026 (SEM TR)
+  const taxaSBPEAnual=11.19;                  // Caixa 2026 balcão (fonte: simulador.caixa.gov.br · maio/2026)
+  const taxaSBPEMensal=taxaSBPEAnual/100/12;  // taxa nominal mensal SBPE (SEM TR)
 
   // ── COMPOSIÇÃO FINANCEIRA (NÚCLEO DO CÁLCULO) ───────────────────────────────
   // Para SBPE + na planta: FGTS exige habite-se e matrícula individualizada
@@ -3237,7 +3240,7 @@ function simular(){
   const encSemSub=ajSemSub+(vfSemSub*segurosCoeff)+tarifaAdmin;
   const compSemSub=(encSemSub/renda)*100;
 
-  // ── CENÁRIO SBPE (sem subsídio, taxa referência 13,5% a.a. + TR) ──────────
+  // ── CENÁRIO SBPE (sem subsídio, taxa Caixa 2026: 11,19% a.a. + TR) ─────────
   // vfSemSub já calculado acima: imovel − fgts − entrada (sem subsídio)
   const parcelaSBPE_AJ=calcPrice(vfSemSub,taxaSBPEMensal,prazo);
   const parcelaSBPE_SAC1=calcSAC1(vfSemSub,taxaSBPEMensal,prazo);
@@ -3363,12 +3366,16 @@ function simular(){
   const fmtCET=v=>v!=null&&isFinite(v)?fmtN(v,2)+'% a.a.':'—';
 
   // ── FAIXA DE TAXA ESTIMADA POR PERFIL (SBPE) ─────────────────────────────────
+  // Base: taxa Caixa balcão 2026 (11,19%). Ajuste fino por perfil de risco.
+  // Lógica baseada em: LTV (entrada), comprometimento de renda, histórico FGTS.
   let txAdj=0;
-  if(percEntradaSemSub>=30)txAdj-=0.5;else if(percEntradaSemSub>=20)txAdj-=0.25;
-  if(comprometimento<=20)txAdj-=0.25;else if(comprometimento>28)txAdj+=0.5;
-  if(cotista)txAdj-=0.1;
-  const txMin=Math.max(9.99,11.5+txAdj-0.5).toFixed(2);
-  const txMax=Math.min(14.5,11.5+txAdj+0.5).toFixed(2);
+  if(percEntradaSemSub>=40)txAdj-=0.7;else if(percEntradaSemSub>=30)txAdj-=0.5;else if(percEntradaSemSub>=20)txAdj-=0.25;
+  if(comprometimento<=15)txAdj-=0.4;else if(comprometimento<=20)txAdj-=0.2;else if(comprometimento>28)txAdj+=0.4;
+  if(cotista)txAdj-=0.15;
+  if(!primeiroImovel)txAdj+=0.1; // segundo imóvel: ligeiro aumento de taxa (menor subsídio)
+  const txBase=taxaSBPEAnual; // 11.19 — Caixa balcão
+  const txMin=Math.max(9.5,txBase+txAdj-0.4).toFixed(2);
+  const txMax=Math.min(12.5,txBase+txAdj+0.5).toFixed(2); // teto de mercado SBPE 2026
 
   // ── BANCOS: taxas de referência SBPE/SFH 2026 ────────────────────────────────
   const bancosRef=[
@@ -3383,7 +3390,7 @@ function simular(){
   let planoA='',planoB='',planoC='';
   if(isMCMV&&comprometimento<=30&&bloqueios.length===0){
     planoA='Com renda de '+fmt(renda)+'/mês e imóvel de '+fmt(imovel)+', o <strong>MCMV ('+faixa.l+')</strong> é o caminho com melhor custo-benefício. A taxa de '+taxaAnual+'% a.a. + TR é menor que o SBPE (ref. '+txMin+'%–'+txMax+'% a.a.)'+(subsidioEstimado>0?', e o subsídio estimado de <strong>'+fmt(subsidioEstimado)+'</strong> reduz o saldo a financiar':'')+' — encargo estimado de <strong>'+fmt(totalParcelaPrice)+'</strong>/mês.';
-    planoB='Caso a análise final da CAIXA ECONÔMICA FEDERAL não confirme o enquadramento no MCMV — por avaliação do imóvel, renda composta ou limite municipal — o <strong>SBPE</strong> é a alternativa. Encargo estimado: <strong>'+fmt(totalSBPE_Price)+'</strong>/mês (ref. 13,5% a.a. + TR). Diferença em relação ao MCMV: <strong>+'+fmt(Math.abs(totalSBPE_Price-totalParcelaPrice))+'/mês</strong>.';
+    planoB='Caso a análise final da CAIXA ECONÔMICA FEDERAL não confirme o enquadramento no MCMV — por avaliação do imóvel, renda composta ou limite municipal — o <strong>SBPE</strong> é a alternativa. Encargo estimado: <strong>'+fmt(totalSBPE_Price)+'</strong>/mês ('+taxaSBPEAnual+'% a.a. + TR, Caixa 2026). Diferença em relação ao MCMV: <strong>+'+fmt(Math.abs(totalSBPE_Price-totalParcelaPrice))+'/mês</strong>.';
   }else if(isMCMV&&comprometimento>30){
     planoA='A parcela estimada compromete <strong>'+fmtN(comprometimento,1)+'%</strong> da renda — acima do limite de 30% da CAIXA ECONÔMICA FEDERAL. Para viabilizar o <strong>MCMV ('+faixa.l+')</strong>: aumente a entrada, use mais FGTS, componha renda com outro proponente ou reduza o valor do imóvel.';
     planoB='Compor a renda com outro proponente pode reduzir o percentual de comprometimento abaixo de 30%, viabilizando a aprovação. Outra alternativa: imóvel de menor valor dentro do teto do MCMV.';
@@ -3415,13 +3422,13 @@ function simular(){
   // ── DIAGNÓSTICO MCMV vs SBPE ──────────────────────────────────────────────────
   let diagComp='';
   if(isMCMV&&economiaMensalMCMV>0){
-    diagComp=`Com base na sua renda de ${fmt(renda)}/mês e imóvel de ${fmt(imovel)}, o <strong>MCMV (${faixa.l})</strong> tende a ser mais vantajoso. A taxa reduzida de ${taxaAnual}% a.a.${subsidioEstimado>0?' e o subsídio estimado de '+fmt(subsidioEstimado):''} geram uma economia estimada de <strong>${fmt(economiaMensalMCMV)}/mês</strong> em relação ao SBPE (13,5% a.a.) — representando aproximadamente <strong>${fmt(economiaTotalMCMV)}</strong> ao longo do prazo contratado. O SBPE pode ser alternativa caso o imóvel ultrapasse o teto do programa ou a renda supere R$ 13.000/mês.`;
+    diagComp=`Com base na sua renda de ${fmt(renda)}/mês e imóvel de ${fmt(imovel)}, o <strong>MCMV (${faixa.l})</strong> tende a ser mais vantajoso. A taxa reduzida de ${taxaAnual}% a.a.${subsidioEstimado>0?' e o subsídio estimado de '+fmt(subsidioEstimado):''} geram uma economia estimada de <strong>${fmt(economiaMensalMCMV)}/mês</strong> em relação ao SBPE (${taxaSBPEAnual}% a.a. Caixa 2026) — representando aproximadamente <strong>${fmt(economiaTotalMCMV)}</strong> ao longo do prazo contratado. O SBPE pode ser alternativa caso o imóvel ultrapasse o teto do programa ou a renda supere R$ 13.000/mês.`;
   }else if(isMCMV&&comprometimento<=30){
-    diagComp=`Seu perfil se enquadra no <strong>MCMV (${faixa.l})</strong> com taxa de ${taxaAnual}% a.a. + TR. ${subsidioEstimado>0?'O subsídio reduz o saldo financiado e a parcela.':''} O SBPE tem taxa maior (13,5% a.a. de referência), resultando em encargo maior para o mesmo imóvel.`;
+    diagComp=`Seu perfil se enquadra no <strong>MCMV (${faixa.l})</strong> com taxa de ${taxaAnual}% a.a. + TR. ${subsidioEstimado>0?'O subsídio reduz o saldo financiado e a parcela.':''} O SBPE tem taxa de referência de ${taxaSBPEAnual}% a.a. (Caixa 2026) — resultando em encargo maior para o mesmo imóvel financiado.`;
   }else if(!isMCMV&&faixa===null){
-    diagComp='Renda acima de R$ 13.000/mês — financiamento via <strong>SBPE</strong>. Compare o CET entre CAIXA ECONÔMICA FEDERAL, Bradesco, Itaú e Santander. A diferença entre bancos pode representar R$ 400–800/mês para o mesmo valor financiado.';
+    diagComp=`Renda acima de R$ 13.000/mês — financiamento via <strong>SBPE</strong>. Taxa de referência Caixa 2026: ${taxaSBPEAnual}% a.a. + TR. Compare o CET entre CAIXA ECONÔMICA FEDERAL, Bradesco, Itaú e Santander — a diferença pode ser R$ 200–500/mês para o mesmo valor financiado.`;
   }else if(!isMCMV){
-    diagComp=`Imóvel de ${fmt(imovel)} acima do teto do MCMV para a ${faixa.l} (${fmt(tetoMCMV)}). Financiamento via <strong>SBPE</strong> com taxa de mercado (referência 13,5% a.a.). Considere imóveis dentro do teto para acessar os benefícios do MCMV.`;
+    diagComp=`Imóvel de ${fmt(imovel)} acima do teto do MCMV para a ${faixa.l} (${fmt(tetoMCMV)}). Financiamento via <strong>SBPE</strong> — taxa de referência Caixa 2026: ${taxaSBPEAnual}% a.a. + TR. Considere imóveis dentro do teto para acessar as condições do MCMV.`;
   }
 
   // ── HTML — 5 BLOCOS ───────────────────────────────────────────────────────────
@@ -3432,7 +3439,7 @@ function simular(){
     <div class="sim-bloco-title">📊 Bloco 1 — Resultado principal</div>
 
   <div class="res-kpi">
-    <div class="kpi hl"><div class="kpi-l">Modalidade indicada</div><div class="kpi-v">${isMCMV?faixa.l+' MCMV':isSFI?'SFI':'SBPE'}</div><div class="kpi-s">${isMCMV?taxaAnual+'% a.a. + TR':isSFI?taxaSFIAnual+'% a.a. (est. SFI)':'Financiamento bancário'}</div></div>
+    <div class="kpi hl"><div class="kpi-l">Modalidade indicada</div><div class="kpi-v">${isMCMV?faixa.l+' MCMV':isSFI?'SFI':'SBPE / SFH'}</div><div class="kpi-s">${isMCMV?taxaAnual+'% a.a. + TR':isSFI?taxaSFIAnual+'% a.a. est. (sem TR)':taxaSBPEAnual+'% a.a. + TR (Caixa 2026)'}</div></div>
     <div class="kpi"><div class="kpi-l">Encargo total estimado</div><div class="kpi-v">${fmt(totalParcela)}/mês</div><div class="kpi-s">${sistema==='price'?'Tabela Price':'SAC — 1ª parcela'}</div></div>
     <div class="kpi"><div class="kpi-l">Comprometimento de renda</div><div class="kpi-v" style="color:${comprometimento>30?'var(--danger)':comprometimento>25?'var(--warning)':'var(--accent)'}">${fmtN(comprometimento,1)}%</div><div class="kpi-s">Limite recomendado: 30%</div></div>
     <div class="kpi ${isMCMV&&subsidioEstimado>0?'hl':''}"><div class="kpi-l">Subsídio estimado</div><div class="kpi-v">${isMCMV&&subsidioEstimado>0?fmt(subsidioEstimado):'R$ 0,00'}</div><div class="kpi-s">${isMCMV&&subsidioEstimado>0?'Sujeito à análise da CAIXA ECONÔMICA FEDERAL':'Não aplicável a este perfil'}</div></div>
@@ -3534,11 +3541,11 @@ function simular(){
     <div class="cenario-card cenario-sbpe" id="cenCard_conv">
       <div class="cenario-hd">
         <h4>🏦 SBPE — Financiamento bancário</h4>
-        <p>13,5% a.a. + TR (ref. 2026) · Sem subsídio</p>
+        <p>${taxaSBPEAnual}% a.a. + TR (Caixa 2026) · Sem subsídio</p>
       </div>
       <div class="cenario-bd">
         <div class="cenario-row"><span>Sistema</span><span>Livre (qualquer banco)</span></div>
-        <div class="cenario-row"><span>Taxa nominal (ref.)</span><span>13,5% a.a. + TR</span></div>
+        <div class="cenario-row"><span>Taxa nominal (Caixa 2026)</span><span>${taxaSBPEAnual}% a.a. + TR</span></div>
         <div class="cenario-row"><span>Subsídio</span><span style="color:var(--text3)">Sem subsídio</span></div>
         <div class="cenario-row"><span>Valor financiado</span><span>${fmt(vfSemSub)}</span></div>
         <div class="cenario-row"><span>A) Parcela A+J (taxa nominal)</span><span style="font-weight:600">${fmt(parcelaSBPE_AJ)}/mês</span></div>
@@ -3595,7 +3602,7 @@ function simular(){
         <tr>
           <td>Taxa de juros</td>
           <td>${isMCMV?taxaAnual+'% a.a. + TR':'<span style="color:var(--text3)">N/A</span>'}</td>
-          <td>13,5% a.a. + TR (ref.)</td>
+          <td>${taxaSBPEAnual}% a.a. + TR (Caixa 2026)</td>
           ${isSFI?`<td>${taxaSFIAnual}% a.a. est. (sem TR)</td>`:''}
           <td>${isMCMV?'<span class="vwin vwin-m">MCMV</span>':'<span class="vwin vwin-e">—</span>'}</td>
         </tr>
@@ -3712,7 +3719,7 @@ function simular(){
   if(tipo==='planta'&&mostrarObra){html+=gerarTabelaObra(valorFinanciado,taxaMensal,prazoObra);}
   if(mostrarAmor){
     if(isMCMV)html+=gerarTabelaAmor(valorFinanciado,taxaMensal,prazo,sistema,mipEstimado,dfiEstimado,'Cenário MCMV — '+taxaAnual+'% a.a.',amorMeses);
-    html+=gerarTabelaAmor(vfSemSub,taxaSBPEMensal,prazo,sistema,mipSBPE,dfiSBPE,'Cenário SBPE — 13,5% a.a. (ref.)',amorMeses);
+    html+=gerarTabelaAmor(vfSemSub,taxaSBPEMensal,prazo,sistema,mipSBPE,dfiSBPE,'Cenário SBPE — '+taxaSBPEAnual+'% a.a. (Caixa 2026)',amorMeses);
   }
 
   // ─── BLOCO DE AÇÕES PÓS-SIMULAÇÃO removido ────────────────────────────────
