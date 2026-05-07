@@ -1,7 +1,7 @@
 // Service Worker — FinancieCerto
-// Estratégia: cache individual por asset (falha parcial não bloqueia o resto)
-// Cache-first para app shell; stale-while-revalidate para fontes externas
-const CACHE = 'financiecerto-v1';
+// Estratégia: network-first para index.html (garante atualizações imediatas)
+// cache-first para assets estáticos; stale-while-revalidate para fontes externas
+const CACHE = 'financiecerto-v3';
 
 // Assets essenciais do app shell (single-file HTML — tudo inline)
 const SHELL = ['/index.html', '/manifest.json', '/'];
@@ -48,19 +48,19 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
 
-  // App shell: cache-first (garante offline)
+  // App shell: network-first (garante que atualizações aparecem imediatamente)
+  // Fallback para cache apenas se sem conexão
   if (url.pathname === '/' || url.pathname.endsWith('index.html') || url.pathname.endsWith('manifest.json')) {
     e.respondWith(
-      caches.match(e.request).then(cached => {
-        const networkFetch = fetch(e.request).then(resp => {
-          if (resp && resp.ok) {
-            const clone = resp.clone();
-            caches.open(CACHE).then(c => c.put(e.request, clone));
-          }
-          return resp;
-        }).catch(() => cached); // sem rede → retorna cache
-        return cached || networkFetch;
-      })
+      fetch(e.request).then(resp => {
+        if (resp && resp.ok) {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return resp;
+      }).catch(() =>
+        caches.match(e.request).then(cached => cached || new Response('Sem conexão', { status: 503 }))
+      )
     );
     return;
   }
