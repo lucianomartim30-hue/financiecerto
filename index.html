@@ -168,9 +168,11 @@ input,select,button,textarea{font-family:var(--font)}
 .disc-bcard{border-radius:10px;border:1.5px solid var(--border);background:#fff;overflow:hidden}
 .disc-bcard.ok{border-color:#10B981}
 .disc-bcard.warn{border-color:#F59E0B}
+.disc-bcard.err{border-color:#EF4444}
 .disc-bcard-head{padding:10px 14px;font-size:.85rem;font-weight:700;background:var(--bg);border-bottom:1px solid var(--border);color:var(--text)}
 .disc-bcard.ok .disc-bcard-head{background:#ECFDF5;color:#065F46}
 .disc-bcard.warn .disc-bcard-head{background:#FFFBEB;color:#92400E}
+.disc-bcard.err .disc-bcard-head{background:#FEF2F2;color:#991B1B}
 .disc-bcard-body{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
 .disc-brow{display:flex;justify-content:space-between;align-items:center;font-size:.81rem;color:var(--text2)}
 .disc-brow span:last-child{font-weight:600;color:var(--text)}
@@ -178,10 +180,13 @@ input,select,button,textarea{font-family:var(--font)}
 .disc-brow.total{border-top:1px solid var(--border);padding-top:6px;margin-top:2px}
 .disc-brow.total span{font-weight:800;color:var(--text);font-size:.88rem}
 .disc-brow.parcela span:last-child{color:var(--primary);font-weight:800}
+.disc-brow.parcela.inviavel span:last-child{color:var(--text3);text-decoration:line-through;font-weight:400}
 .disc-brow.obra span:last-child{color:var(--warning);font-weight:700}
+.disc-brow.subsinfo{opacity:.6;font-style:italic}
 .disc-bstatus{font-size:.75rem;font-weight:600;padding:7px 14px;border-top:1px solid var(--border)}
 .disc-bstatus.ok{background:#ECFDF5;color:#047857}
 .disc-bstatus.warn{background:#FFFBEB;color:#92400E}
+.disc-bstatus.err{background:#FEF2F2;color:#991B1B;font-weight:400}
 .input-brl{position:relative;display:flex;align-items:center}
 .input-brl-prefix{position:absolute;left:12px;font-size:.9rem;font-weight:600;color:var(--text2);pointer-events:none;user-select:none;z-index:1}
 .input-brl input{padding-left:36px!important;width:100%}
@@ -2743,7 +2748,9 @@ function descobrir(){
   const parcelaMax=renda*0.30; // comprometimento máximo — regra bancária (30% renda bruta)
 
   // Prazo máximo pela idade (limite 80 anos e 6 meses — regra SFH)
-  const prazoMax=idade>=18?Math.min(420,Math.floor((80.5-idade)*12)):420;
+  const prazoMaxIdade=idade>=18?Math.floor((80.5-idade)*12):Infinity;
+  const prazoMax=Math.min(420,prazoMaxIdade);
+  const limitadoPorIdade=idade>=18&&prazoMaxIdade<420; // só é "por idade" se a idade for o fator limitante
   const prazo=Math.max(120,prazoMax);
 
   // Fórmula Price inversa: PV = PMT × [(1+i)^n − 1] / [i × (1+i)^n]
@@ -2855,17 +2862,50 @@ function descobrir(){
 
   // ── Renderização dos cards de breakdown ──────────────────────────────────────
   function renderBd(bd,label,ic,tipo){
-    const alertaTxt=tipo==='usado'&&isMCMV?usadoAlerta:'';
-    const subsLinha=subsidioEst>0&&!alertaTxt?`<div class="disc-brow neg"><span>(-) Subsídio est. ✦</span><span>${fmt(subsidioEst)}</span></div>`:'';
+    // Fix 3: MCMV usado sem entrada suficiente = inviável (não apenas aviso)
+    const usadoMCMVInviavel=tipo==='usado'&&isMCMV&&!bd.entradaOk;
+
+    // Fix 4: linha de subsídio — explica ausência para imóvel usado MCMV
+    let subsLinha='';
+    if(subsidioEst>0){
+      if(tipo==='usado'&&isMCMV){
+        subsLinha=`<div class="disc-brow subsinfo"><span>↳ Subsídio não se aplica a imóvel usado</span><span>—</span></div>`;
+      }else{
+        subsLinha=`<div class="disc-brow neg"><span>(-) Subsídio est. ✦</span><span>${fmt(subsidioEst)}</span></div>`;
+      }
+    }
+
     const obraLinha=tipo==='planta'&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra (~36m)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
-    const statusHtml=alertaTxt
-      ?`<div class="disc-bstatus warn" style="font-size:.73rem;line-height:1.45;padding:8px 14px">${alertaTxt}</div>`
-      :bd.entradaOk
-        ?`<div class="disc-bstatus ok">✔ Entrada suficiente para este imóvel</div>`
-        :`<div class="disc-bstatus warn">⚠ Entrada mínima: ${fmt(bd.entradaMinVal)} (${(bd.entradaMinPct*100).toFixed(0)}% do imóvel)</div>`;
+
+    // Fix 1: custo duplo na planta — encargo obra média (~55% do máximo progressivo) + aluguel
+    let obraAlerta='';
+    if(tipo==='planta'&&bd.encargaObra>0){
+      const encObraMedia=Math.round(bd.encargaObra*0.55);
+      const comprObraPct=(encObraMedia/renda*100).toFixed(1);
+      obraAlerta=`⚠️ <strong>Custo duplo durante a obra (~36 meses):</strong> Além da parcela após as chaves, você pagará juros evolutivos com média estimada de <strong>~${fmt(encObraMedia)}/mês</strong> (${comprObraPct}% da renda). Some isso ao seu aluguel atual — o comprometimento real durante a obra pode ultrapassar os 30%.`;
+    }
+
+    // Parcela riscada se inviável
+    const parcelaClass=usadoMCMVInviavel?'disc-brow parcela inviavel':'disc-brow parcela';
+
+    // Status final
+    let statusHtml;
+    if(usadoMCMVInviavel){
+      const faltaEntrada=bd.entradaMinVal-(entrada+fgts);
+      statusHtml=`<div class="disc-bstatus err" style="font-size:.73rem;line-height:1.5;padding:8px 14px">❌ <strong>Inviável — entrada insuficiente.</strong> MCMV usado exige mínimo de ${(bd.entradaMinPct*100).toFixed(0)}% do valor do imóvel: <strong>${fmt(bd.entradaMinVal)}</strong>. Você tem ${fmt(entrada+fgts)} · faltam ~${fmt(Math.round(faltaEntrada))}. Alternativa recomendada: financiamento pelo <strong>SBPE</strong>.</div>`;
+    }else if(!bd.entradaOk){
+      const extra=obraAlerta?`<br>${obraAlerta}`:'';
+      statusHtml=`<div class="disc-bstatus warn" style="font-size:.73rem;line-height:1.45;padding:8px 14px">⚠ Entrada mínima: ${fmt(bd.entradaMinVal)} (${(bd.entradaMinPct*100).toFixed(0)}% do imóvel)${extra}</div>`;
+    }else if(obraAlerta){
+      statusHtml=`<div class="disc-bstatus warn" style="font-size:.73rem;line-height:1.45;padding:8px 14px">${obraAlerta}</div>`;
+    }else{
+      statusHtml=`<div class="disc-bstatus ok">✔ Entrada suficiente para este imóvel</div>`;
+    }
+
+    const cardClass=usadoMCMVInviavel?'err':obraAlerta?'warn':bd.entradaOk?'ok':'warn';
     const ctxHtml=numTipos===1&&ctxInfo[tipo]?`<div style="font-size:.76rem;color:var(--text2);padding:10px 14px;border-top:1px solid var(--border);line-height:1.55;background:var(--bg)">${ctxInfo[tipo]}</div>`:'';
     return `
-    <div class="disc-bcard ${alertaTxt?'warn':bd.entradaOk?'ok':'warn'}">
+    <div class="disc-bcard ${cardClass}">
       <div class="disc-bcard-head">${ic} ${label}</div>
       <div class="disc-bcard-body">
         <div class="disc-brow base"><span>${tipo==='usado'?'Imóvel usado (est.)':'Faixa ideal'}</span><span>${fmt(bd.valorImovel)}</span></div>
@@ -2873,7 +2913,7 @@ function descobrir(){
         ${fgts>0?`<div class="disc-brow neg"><span>(-) FGTS</span><span>${fmt(fgts)}</span></div>`:''}
         ${subsLinha}
         <div class="disc-brow total"><span>= A financiar</span><span>${fmt(bd.saldo)}</span></div>
-        <div class="disc-brow parcela"><span>Parcela estimada</span><span>${fmt(bd.parcela)}/mês</span></div>
+        <div class="${parcelaClass}"><span>Parcela estimada</span><span>${fmt(bd.parcela)}/mês</span></div>
         ${obraLinha}
       </div>
       ${statusHtml}
@@ -2913,7 +2953,7 @@ function descobrir(){
     <div class="disc-kpi">
       <div class="kpi${isMCMV?' hl':''}"><div class="kpi-l">Modalidade</div><div class="kpi-v">${isMCMV?faixa.l+' MCMV':'SBPE / SFH'}</div><div class="kpi-s">${isMCMV?faixa.taxa+'% a.a. + TR':taxaSBPE+'% a.a. + TR (Caixa)'}</div></div>
       <div class="kpi"><div class="kpi-l">Parcela máxima</div><div class="kpi-v">${fmt(parcelaMax)}</div><div class="kpi-s">30% da renda (limite bancário)</div></div>
-      <div class="kpi"><div class="kpi-l">Prazo disponível</div><div class="kpi-v">${prazo} meses</div><div class="kpi-s">${(prazo/12).toFixed(0)} anos · ${idade>=18?'baseado na sua idade':'prazo máximo'}</div></div>
+      <div class="kpi"><div class="kpi-l">Prazo disponível</div><div class="kpi-v">${prazo} meses</div><div class="kpi-s">${(prazo/12).toFixed(0)} anos · ${limitadoPorIdade?'limitado pela sua idade':'prazo máximo do produto'}</div></div>
       ${subsidioEst>0?`<div class="kpi hl"><div class="kpi-l">Subsídio estimado</div><div class="kpi-v">${fmt(subsidioEst)}</div><div class="kpi-s">Sujeito à análise da CAIXA</div></div>`:''}
     </div>
 
