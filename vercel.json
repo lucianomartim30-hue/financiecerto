@@ -2,18 +2,16 @@
   "version": 2,
   "name": "financiecerto",
   "builds": [
-    { "src": "api/chat.js",   "use": "@vercel/node"   },
+    { "src": "api/chat.js",   "use": "@vercel/node" },
+    { "src": "api/orulo.js",  "use": "@vercel/node" },
     { "src": "index.html",    "use": "@vercel/static" },
     { "src": "*.png",         "use": "@vercel/static" },
     { "src": "manifest.json", "use": "@vercel/static" },
     { "src": "sw.js",         "use": "@vercel/static" }
   ],
   "routes": [
-    {
-      "src": "/api/chat",
-      "dest": "/api/chat.js",
-      "methods": ["POST", "OPTIONS"]
-    },
+    { "src": "/api/chat",     "dest": "/api/chat.js",   "methods": ["POST", "OPTIONS"] },
+    { "src": "/api/orulo",    "dest": "/api/orulo.js",  "methods": ["GET",  "OPTIONS"] },
     { "handle": "filesystem" },
     { "src": "/SFI",  "status": 301, "headers": { "Location": "https://financiecerto.com.br/" } },
     { "src": "/MCMV", "status": 301, "headers": { "Location": "https://financiecerto.com.br/" } },
