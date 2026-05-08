@@ -113,7 +113,8 @@ function normalizeBuilding(b) {
     city,
     state,
     photo,
-    orulo_url:    b.orulo_url   || b.sharing_url || `${ORULO_BASE}/buildings/${b.id}`,
+    sharing_url:  b.sharing_url  || null,
+    orulo_url:    b.sharing_url || b.orulo_url || `${ORULO_BASE}/buildings/${b.id}`,
     status:       b.status      || '',
     updated_at:   b.updated_at  || null
   };
