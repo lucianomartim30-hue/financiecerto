@@ -3017,10 +3017,31 @@ function descobrir(){
 
     <div class="disc-action">
       <button class="disc-action-btn primary" onclick="toggleSimMode('trad');ir('sim-sec')">🔍 Simular com um imóvel específico</button>
-      <a class="disc-action-btn" href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" style="text-decoration:none">🏘️ Ver imóveis compatíveis</a>
+      <button class="disc-action-btn" onclick="document.getElementById('orulo-disc-sec').scrollIntoView({behavior:'smooth',block:'start'})">🏘️ Ver imóveis compatíveis</button>
     </div>
+  </div>
+  <div id="orulo-disc-sec" style="margin-top:28px">
+    <div class="orulo-sec-header">
+      <div>
+        <div class="orulo-sec-title">🏘️ Empreendimentos compatíveis com seu perfil</div>
+        <div class="orulo-sec-sub" id="orulo-disc-sub">Carregando empreendimentos em São Paulo…</div>
+      </div>
+      <span class="orulo-filter-tag" id="orulo-disc-tag">📋 ${isMCMV?faixa.l+' MCMV':'SBPE'} · até R\u00a0${Math.round(valorSeguro).toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="orulo-grid" id="orulo-disc-grid"></div>
+    <button class="orulo-load-more" id="orulo-disc-load-more" style="display:none" onclick="oruloDiscLoadMore()">Carregar mais empreendimentos →</button>
+    <p style="font-size:.72rem;color:var(--text3);margin-top:12px;text-align:center">Empreendimentos via <strong>API Órulo</strong> · São Paulo · Clique em "▶ Simular neste imóvel" para usar o valor no simulador</p>
   </div>`;
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  // Busca empreendimentos compatíveis para o modo descobrir
+  const oruloDiscMax = Math.round(valorSeguro * 1.1);
+  setTimeout(() => {
+    _oruloDiscState.maxPrice = oruloDiscMax;
+    _oruloDiscState.isMCMV   = isMCMV;
+    _oruloDiscState.page     = 1;
+    fetchOruloDiscBuildings(oruloDiscMax, isMCMV, 1);
+  }, 80);
 }
 
 function selectSimMode(mode){
@@ -4615,6 +4636,102 @@ function oruloSimular(preco, nome){
   toast.textContent = '✅ ' + (nome||'Imóvel') + ' selecionado';
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(), 2800);
+}
+
+
+// ── Órulo: modo DESCOBRIR (faixa de compra) ───────────────────────────────
+let _oruloDiscState = { page:1, maxPrice:0, isMCMV:false, loading:false, pages:1, total:0 };
+
+async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
+  const grid = document.getElementById('orulo-disc-grid');
+  const sub  = document.getElementById('orulo-disc-sub');
+  const btn  = document.getElementById('orulo-disc-load-more');
+  if(!grid) return;
+
+  _oruloDiscState.loading = true;
+  if(btn) btn.disabled = true;
+
+  if(page===1){
+    grid.innerHTML = oruloSkeletons(6);
+    if(sub) sub.textContent = 'Buscando empreendimentos compatíveis…';
+  } else {
+    grid.insertAdjacentHTML('beforeend', oruloSkeletons(3));
+  }
+
+  try{
+    const params = new URLSearchParams({ page: String(page), city: 'São Paulo', state: 'SP' });
+    if(maxPrice > 0) params.set('max_price', String(maxPrice));
+    const resp = await fetch('/api/orulo?' + params.toString());
+    if(!resp.ok) throw new Error('API ' + resp.status);
+    const data = await resp.json();
+    const buildings = data.buildings || [];
+
+    _oruloDiscState.total = data.total || buildings.length;
+    _oruloDiscState.pages = data.pages || 1;
+    _oruloDiscState.page  = page;
+
+    grid.querySelectorAll('.orulo-skel-card').forEach(c=>c.remove());
+
+    if(buildings.length === 0 && page === 1){
+      grid.innerHTML = '<div class="orulo-empty">Nenhum empreendimento encontrado para este perfil no momento. <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener">Ver catálogo completo →</a></div>';
+      if(sub) sub.textContent = 'Sem resultados';
+      if(btn) btn.style.display = 'none';
+    } else {
+      grid.insertAdjacentHTML('beforeend', buildings.map(b => {
+        const precoMin = b.min_price ? 'A partir de <strong>R '+Number(b.min_price).toLocaleString('pt-BR')+'</strong>' : '';
+        const precoMax = b.max_price && b.max_price !== b.min_price ? ' – R '+Number(b.max_price).toLocaleString('pt-BR') : '';
+        const quartos = b.bedrooms_min
+          ? (b.bedrooms_max && b.bedrooms_max>b.bedrooms_min
+              ? `${b.bedrooms_min}–${b.bedrooms_max} quartos`
+              : `${b.bedrooms_min} quarto${b.bedrooms_min>1?'s':''}`)
+          : '';
+        const loc = [b.neighborhood, b.city].filter(Boolean).join(' · ');
+        const imgHtml = b.photo
+          ? `<img class="orulo-card-img" src="${b.photo}" alt="${b.name.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=orulo-card-img-ph>🏢</div>'">`
+          : '<div class="orulo-card-img-ph">🏢</div>';
+        const nameSafe = b.name.replace(/'/g,"&#39;");
+        return `<div class="orulo-card">
+          ${imgHtml}
+          <div class="orulo-card-body">
+            <div class="orulo-card-top">
+              <div class="orulo-card-name">${b.name}</div>
+              ${oruloBadge(b.status)}
+            </div>
+            ${b.developer?`<div class="orulo-card-dev">🏢 ${b.developer}</div>`:''}
+            ${loc?`<div class="orulo-card-loc">📍 ${loc}</div>`:''}
+            ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
+            ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
+            <div class="orulo-card-actions">
+              <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0},'${nameSafe}')">▶ Simular neste imóvel</button>
+              <a class="orulo-ext-link" href="${b.orulo_url}" target="_blank" rel="noopener" title="Ver na Órulo">🔗 Ver</a>
+            </div>
+          </div>
+        </div>`;
+      }).join(''));
+
+      const shown = grid.querySelectorAll('.orulo-card').length;
+      if(sub) sub.textContent = `${shown} de ${_oruloDiscState.total} empreendimentos · São Paulo`;
+      if(btn){
+        btn.style.display = page < _oruloDiscState.pages ? 'block' : 'none';
+        btn.disabled = false;
+      }
+    }
+  } catch(err){
+    console.warn('[Órulo Disc]', err.message);
+    grid.querySelectorAll('.orulo-skel-card').forEach(c=>c.remove());
+    if(grid.children.length === 0){
+      grid.innerHTML = `<div class="orulo-empty">Não foi possível carregar os empreendimentos. <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener">Ver catálogo Órulo →</a></div>`;
+    }
+    if(sub) sub.textContent = 'Erro ao carregar';
+    if(btn) btn.style.display = 'none';
+  } finally {
+    _oruloDiscState.loading = false;
+  }
+}
+
+function oruloDiscLoadMore(){
+  if(_oruloDiscState.loading) return;
+  fetchOruloDiscBuildings(_oruloDiscState.maxPrice, _oruloDiscState.isMCMV, _oruloDiscState.page + 1);
 }
 
 </script>
