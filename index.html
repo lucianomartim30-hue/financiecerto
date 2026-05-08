@@ -815,24 +815,27 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 .orulo-sec-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:3px}
 .orulo-sec-sub{font-size:.78rem;color:var(--text3)}
 .orulo-filter-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;background:var(--primary-light);border:1px solid var(--primary-muted);border-radius:20px;font-size:.75rem;font-weight:600;color:var(--primary)}
-.orulo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
-.orulo-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s,border-color .2s}
-.orulo-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.1);transform:translateY(-3px);border-color:var(--primary-muted)}
-.orulo-card-img{width:100%;height:155px;object-fit:cover;background:var(--bg);display:block}
-.orulo-card-img-ph{width:100%;height:155px;background:linear-gradient(135deg,#EEF2FF 0%,#DBEAFE 100%);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--text3)}
-.orulo-card-body{padding:15px 16px;flex:1;display:flex;flex-direction:column;gap:7px}
-.orulo-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
-.orulo-card-name{font-size:.9rem;font-weight:700;color:var(--text);line-height:1.3;flex:1}
-.orulo-card-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
-.orulo-badge-lancamento{background:#EEF2FF;color:#1A56DB}
-.orulo-badge-obras{background:#FFFBEB;color:#92400E}
-.orulo-badge-pronto{background:#ECFDF5;color:#065F46}
-.orulo-badge-default{background:var(--bg);color:var(--text3);border:1px solid var(--border)}
-.orulo-card-dev{font-size:.74rem;color:var(--text3);font-weight:500}
-.orulo-card-loc{font-size:.78rem;color:var(--text2);display:flex;align-items:center;gap:4px}
-.orulo-card-price{font-size:1.05rem;font-weight:800;color:var(--primary)}
-.orulo-card-details{font-size:.76rem;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
-.orulo-card-actions{display:flex;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+.orulo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+.orulo-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .25s,transform .25s;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.orulo-card:hover{box-shadow:0 12px 36px rgba(0,0,0,.12);transform:translateY(-4px)}
+.orulo-card-img-wrap{position:relative;overflow:hidden}
+.orulo-card-img{width:100%;height:190px;object-fit:cover;background:var(--bg);display:block;transition:transform .35s}
+.orulo-card:hover .orulo-card-img{transform:scale(1.04)}
+.orulo-card-img-ph{width:100%;height:190px;background:linear-gradient(135deg,#EEF2FF 0%,#DBEAFE 100%);display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--text3)}
+.orulo-card-badge-wrap{position:absolute;top:12px;left:12px}
+.orulo-card-body{padding:18px 18px 16px;flex:1;display:flex;flex-direction:column;gap:6px}
+.orulo-card-name{font-size:.95rem;font-weight:800;color:var(--text);line-height:1.35}
+.orulo-card-dev{font-size:.75rem;color:var(--text3);font-weight:500;margin-top:-2px}
+.orulo-card-loc{font-size:.8rem;color:var(--text2);display:flex;align-items:center;gap:5px;margin-top:2px}
+.orulo-card-price{font-size:1.2rem;font-weight:900;color:var(--primary);margin-top:6px;letter-spacing:-.01em}
+.orulo-card-price span{font-size:.78rem;font-weight:500;color:var(--text3)}
+.orulo-card-details{font-size:.78rem;color:var(--text3);display:flex;gap:14px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border);margin-top:4px}
+.orulo-card-actions{display:flex;gap:8px;margin-top:auto;padding-top:12px}
+.orulo-card-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.orulo-badge-lancamento{background:#1A56DB;color:#fff}
+.orulo-badge-obras{background:#D97706;color:#fff}
+.orulo-badge-pronto{background:#059669;color:#fff}
+.orulo-badge-default{background:rgba(0,0,0,.45);color:#fff}
 .orulo-sim-btn{flex:1;padding:9px 10px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;transition:background .2s;text-align:center;line-height:1.2}
 .orulo-sim-btn:hover{background:#1e40af}
 .orulo-ext-link{padding:9px 11px;background:var(--bg);color:var(--text2);border:1.5px solid var(--border);border-radius:8px;font-size:.78rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .2s;white-space:nowrap}
@@ -904,10 +907,10 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   .imovel-similares-grid{grid-template-columns:1fr 1fr}
 }
 /* Cards — novos botões */
-.orulo-card-btn-visit{flex:1;padding:9px 10px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:.76rem;font-weight:700;cursor:pointer;transition:background .2s;text-align:center}
-.orulo-card-btn-visit:hover{background:#1da851}
-.orulo-card-btn-consult{flex:1;padding:9px 10px;background:#fff;color:#25D366;border:2px solid #25D366;border-radius:8px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center}
-.orulo-card-btn-consult:hover{background:#f0fdf4}
+.orulo-card-btn-visit{flex:1;padding:10px;background:#25D366;color:#fff;border:none;border-radius:9px;font-size:.78rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none}
+.orulo-card-btn-visit:hover{background:#1da851;transform:translateY(-1px)}
+.orulo-card-btn-consult{flex:1;padding:10px;background:#fff;color:#128C7E;border:1.5px solid #25D366;border-radius:9px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none}
+.orulo-card-btn-consult:hover{background:#f0fdf4;transform:translateY(-1px)}
 </style>
 </head>
 <body>
@@ -4633,28 +4636,26 @@ async function fetchOruloBuildings(maxPrice, isMCMV, page){
           ? `<img class="orulo-card-img" src="${b.photo}" alt="${b.name.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=orulo-card-img-ph>🏢</div>'">`
           : '<div class="orulo-card-img-ph">🏢</div>';
         const nameSafe = b.name.replace(/'/g,"&#39;");
-        _oruloBuildings[b.id] = b;
+                _oruloBuildings[b.id] = b;
+        const precoLabel = b.min_price ? '<span style="font-size:.75rem;font-weight:500;color:var(--text3)">a partir de</span> R\u00a0'+Number(b.min_price).toLocaleString('pt-BR') : '';
         return `
         <div class="orulo-card">
-          <a href="${b.orulo_url}" target="_blank" rel="noopener" style="display:block;text-decoration:none">${imgHtml}</a>
+          <div class="orulo-card-img-wrap">
+            ${imgHtml}
+            ${b.status?`<div class="orulo-card-badge-wrap">${oruloBadge(b.status)}</div>`:''}
+          </div>
           <div class="orulo-card-body">
-            <div class="orulo-card-top">
-              <a href="${b.orulo_url}" target="_blank" rel="noopener" style="text-decoration:none;flex:1">
-                <div class="orulo-card-name">${b.name}</div>
-              </a>
-              ${oruloBadge(b.status)}
-            </div>
-            ${b.developer?`<div class="orulo-card-dev">🏢 ${b.developer}</div>`:''}
+            <div class="orulo-card-name">${b.name}</div>
+            ${b.developer?`<div class="orulo-card-dev">${b.developer}</div>`:''}
             ${loc?`<div class="orulo-card-loc">📍 ${loc}</div>`:''}
-            ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
+            ${precoLabel?`<div class="orulo-card-price">${precoLabel}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
-
             <div class="orulo-card-actions">
               <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
-              <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Consultor</a>
+              <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Falar</a>
             </div>
           </div>
-        </div>`;
+        </div>`;;
       }).join(''));
 
       const shown = grid.querySelectorAll('.orulo-card').length;
@@ -4754,27 +4755,26 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
           ? `<img class="orulo-card-img" src="${b.photo}" alt="${b.name.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=orulo-card-img-ph>🏢</div>'">`
           : '<div class="orulo-card-img-ph">🏢</div>';
         const nameSafe = b.name.replace(/'/g,"&#39;");
-        _oruloBuildings[b.id] = b;
-        return `<div class="orulo-card">
-          <a href="${b.orulo_url}" target="_blank" rel="noopener" style="display:block;text-decoration:none">${imgHtml}</a>
+                _oruloBuildings[b.id] = b;
+        const precoLabel = b.min_price ? '<span style="font-size:.75rem;font-weight:500;color:var(--text3)">a partir de</span> R\u00a0'+Number(b.min_price).toLocaleString('pt-BR') : '';
+        return `
+        <div class="orulo-card">
+          <div class="orulo-card-img-wrap">
+            ${imgHtml}
+            ${b.status?`<div class="orulo-card-badge-wrap">${oruloBadge(b.status)}</div>`:''}
+          </div>
           <div class="orulo-card-body">
-            <div class="orulo-card-top">
-              <a href="${b.orulo_url}" target="_blank" rel="noopener" style="text-decoration:none;flex:1">
-                <div class="orulo-card-name">${b.name}</div>
-              </a>
-              ${oruloBadge(b.status)}
-            </div>
-            ${b.developer?`<div class="orulo-card-dev">🏢 ${b.developer}</div>`:''}
+            <div class="orulo-card-name">${b.name}</div>
+            ${b.developer?`<div class="orulo-card-dev">${b.developer}</div>`:''}
             ${loc?`<div class="orulo-card-loc">📍 ${loc}</div>`:''}
-            ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
+            ${precoLabel?`<div class="orulo-card-price">${precoLabel}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
-
             <div class="orulo-card-actions">
               <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
-              <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Consultor</a>
+              <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Falar</a>
             </div>
           </div>
-        </div>`;
+        </div>`;;
       }).join(''));
 
       const shown = grid.querySelectorAll('.orulo-card').length;
