@@ -4648,9 +4648,7 @@ async function fetchOruloBuildings(maxPrice, isMCMV, page){
             ${loc?`<div class="orulo-card-loc">📍 ${loc}</div>`:''}
             ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
-            <a href="${b.orulo_url}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;font-weight:600;color:var(--text2);text-decoration:none;margin-bottom:8px;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
-              🔍 Ver detalhes completos →
-            </a>
+
             <div class="orulo-card-actions">
               <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
               <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Consultor</a>
@@ -4770,9 +4768,7 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
             ${loc?`<div class="orulo-card-loc">📍 ${loc}</div>`:''}
             ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
-            <a href="${b.orulo_url}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;font-weight:600;color:var(--text2);text-decoration:none;margin-bottom:8px;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
-              🔍 Ver detalhes completos →
-            </a>
+
             <div class="orulo-card-actions">
               <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
               <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Consultor</a>
