@@ -871,6 +871,43 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 .orulo-modal-sim{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:.92rem;font-weight:700;cursor:pointer;transition:background .2s}
 .orulo-modal-sim:hover{background:var(--primary-d)}
 @media(max-width:560px){#orulo-modal-box{border-radius:14px;max-height:95vh}.orulo-modal-img,.orulo-modal-img-ph{height:180px;border-radius:14px 14px 0 0}.orulo-modal-body{padding:18px 20px}}
+
+/* ── Página de detalhe do imóvel ─────────────────────────────────────────── */
+#imovel-page{position:fixed;inset:0;background:var(--bg);z-index:400;overflow-y:auto;display:none;flex-direction:column}
+#imovel-page.open{display:flex}
+.imovel-hero{position:relative;width:100%;height:360px;background:linear-gradient(135deg,#EEF2FF,#DBEAFE);flex-shrink:0}
+.imovel-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.imovel-hero-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:5rem}
+.imovel-back{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:7px;padding:9px 16px;background:rgba(255,255,255,.92);border:none;border-radius:24px;font-size:.83rem;font-weight:700;color:var(--text);cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.15);backdrop-filter:blur(6px);transition:background .2s;z-index:10}
+.imovel-back:hover{background:#fff}
+.imovel-badge-abs{position:absolute;top:16px;right:16px}
+.imovel-content{max-width:760px;margin:0 auto;padding:32px 24px 80px;width:100%}
+.imovel-name{font-size:clamp(1.4rem,3vw,2rem);font-weight:900;color:var(--text);line-height:1.2;margin-bottom:6px}
+.imovel-dev{font-size:.88rem;color:var(--text3);margin-bottom:20px}
+.imovel-price{font-size:1.6rem;font-weight:900;color:var(--primary);margin-bottom:24px}
+.imovel-details-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:28px}
+.imovel-detail-item{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.imovel-detail-label{font-size:.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.imovel-detail-val{font-size:.95rem;font-weight:600;color:var(--text)}
+.imovel-actions{display:flex;flex-direction:column;gap:10px;margin-bottom:36px}
+.imovel-btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:.97rem;font-weight:700;cursor:pointer;text-decoration:none;transition:background .2s}
+.imovel-btn-wa:hover{background:#1da851}
+.imovel-btn-wa2{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;background:#fff;color:#25D366;border:2px solid #25D366;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
+.imovel-btn-wa2:hover{background:#f0fdf4}
+.imovel-btn-sim{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s}
+.imovel-btn-sim:hover{background:var(--primary-d)}
+.imovel-similares-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:16px}
+.imovel-similares-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+@media(max-width:600px){
+  .imovel-hero{height:240px}
+  .imovel-details-grid{grid-template-columns:1fr 1fr}
+  .imovel-similares-grid{grid-template-columns:1fr 1fr}
+}
+/* Cards — novos botões */
+.orulo-card-btn-visit{flex:1;padding:9px 10px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:.76rem;font-weight:700;cursor:pointer;transition:background .2s;text-align:center}
+.orulo-card-btn-visit:hover{background:#1da851}
+.orulo-card-btn-consult{flex:1;padding:9px 10px;background:#fff;color:#25D366;border:2px solid #25D366;border-radius:8px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center}
+.orulo-card-btn-consult:hover{background:#f0fdf4}
 </style>
 </head>
 <body>
@@ -4596,12 +4633,13 @@ async function fetchOruloBuildings(maxPrice, isMCMV, page){
           ? `<img class="orulo-card-img" src="${b.photo}" alt="${b.name.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=orulo-card-img-ph>🏢</div>'">`
           : '<div class="orulo-card-img-ph">🏢</div>';
         const nameSafe = b.name.replace(/'/g,"&#39;");
+        _oruloBuildings[b.id] = b;
         return `
         <div class="orulo-card">
-          ${imgHtml}
+          <div style="cursor:pointer" onclick="imovelAbrir('${b.id}')">${imgHtml}</div>
           <div class="orulo-card-body">
             <div class="orulo-card-top">
-              <div class="orulo-card-name">${b.name}</div>
+              <div class="orulo-card-name" style="cursor:pointer" onclick="imovelAbrir('${b.id}')">${b.name}</div>
               ${oruloBadge(b.status)}
             </div>
             ${b.developer?`<div class="orulo-card-dev">🏢 ${b.developer}</div>`:''}
@@ -4609,7 +4647,8 @@ async function fetchOruloBuildings(maxPrice, isMCMV, page){
             ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
             <div class="orulo-card-actions">
-              <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0},'${nameSafe}')">▶ Simular neste imóvel</button>
+              <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
+              <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Consultor</a>
             </div>
           </div>
         </div>`;
@@ -4714,10 +4753,10 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
         const nameSafe = b.name.replace(/'/g,"&#39;");
         _oruloBuildings[b.id] = b;
         return `<div class="orulo-card">
-          <div style="cursor:pointer" onclick="oruloAbrirModal('${b.id}')">${imgHtml}</div>
+          <div style="cursor:pointer" onclick="imovelAbrir('${b.id}')">${imgHtml}</div>
           <div class="orulo-card-body">
             <div class="orulo-card-top">
-              <div class="orulo-card-name">${b.name}</div>
+              <div class="orulo-card-name" style="cursor:pointer" onclick="imovelAbrir('${b.id}')">${b.name}</div>
               ${oruloBadge(b.status)}
             </div>
             ${b.developer?`<div class="orulo-card-dev">🏢 ${b.developer}</div>`:''}
@@ -4725,8 +4764,8 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
             ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
             <div class="orulo-card-actions">
-              <button class="orulo-sim-btn" style="background:var(--bg);color:var(--primary);border:1.5px solid var(--primary)" onclick="oruloAbrirModal('${b.id}')">👁 Ver imóvel</button>
-              <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0},'${nameSafe}')">▶ Simular</button>
+              <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
+              <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Consultor</a>
             </div>
           </div>
         </div>`;
@@ -4803,6 +4842,144 @@ function oruloFecharModal(){
 
 document.addEventListener('keydown', e => { if(e.key==='Escape') oruloFecharModal(); });
 
+
+// ── Página de detalhe do imóvel (/imovel/{id}) ───────────────────────────────
+function imovelAbrir(id){
+  const b = _oruloBuildings[id];
+  if(!b) return;
+
+  // Hero image
+  const hero = document.getElementById('imovel-hero');
+  const ph   = hero.querySelector('.imovel-hero-ph') || hero;
+  if(b.photo){
+    hero.innerHTML = `
+      <img src="${b.photo}" alt="${b.name.replace(/"/g,'&quot;')}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentNode.innerHTML='<div class=imovel-hero-ph>🏢</div>'">
+      <button class="imovel-back" onclick="imovelFechar()">← Voltar</button>
+      <div class="imovel-badge-abs" id="imovel-badge-abs">${oruloBadge(b.status)}</div>`;
+  } else {
+    hero.innerHTML = `
+      <div class="imovel-hero-ph">🏢</div>
+      <button class="imovel-back" onclick="imovelFechar()">← Voltar</button>
+      <div class="imovel-badge-abs" id="imovel-badge-abs">${oruloBadge(b.status)}</div>`;
+  }
+
+  // Textos principais
+  document.getElementById('imovel-det-name').textContent  = b.name;
+  document.getElementById('imovel-det-dev').textContent   = b.developer ? '🏢 ' + b.developer : '';
+
+  // Preço
+  const prEl = document.getElementById('imovel-det-price');
+  if(b.min_price){
+    const pMin = 'A partir de R ' + Number(b.min_price).toLocaleString('pt-BR');
+    const pMax = b.max_price && b.max_price !== b.min_price
+      ? ' – R ' + Number(b.max_price).toLocaleString('pt-BR') : '';
+    prEl.textContent = pMin + pMax;
+  } else { prEl.textContent = 'Consultar preço'; }
+
+  // Grid de detalhes
+  const detGrid = document.getElementById('imovel-det-grid');
+  const items = [];
+  const loc = [b.neighborhood, b.city].filter(Boolean).join(', ');
+  if(loc)          items.push(['📍 Localização', loc]);
+  if(b.state)      items.push(['🗺️ Estado', b.state]);
+  if(b.bedrooms_min){
+    const q = b.bedrooms_max && b.bedrooms_max > b.bedrooms_min
+      ? b.bedrooms_min + '–' + b.bedrooms_max + ' quartos'
+      : b.bedrooms_min + ' quarto' + (b.bedrooms_min > 1 ? 's' : '');
+    items.push(['🛏 Dormitórios', q]);
+  }
+  if(b.status)     items.push(['📋 Status', b.status]);
+  if(b.min_price)  items.push(['💰 Preço mín.', 'R ' + Number(b.min_price).toLocaleString('pt-BR')]);
+  if(b.max_price && b.max_price !== b.min_price)
+                   items.push(['💰 Preço máx.', 'R ' + Number(b.max_price).toLocaleString('pt-BR')]);
+  detGrid.innerHTML = items.map(([label, val]) =>
+    `<div class="imovel-detail-item"><div class="imovel-detail-label">${label}</div><div class="imovel-detail-val">${val}</div></div>`
+  ).join('');
+
+  // WhatsApp
+  const waMsgVisita = encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *' + b.name + '* que vi no FinancieCerto.');
+  const waMsgInfo   = encodeURIComponent('Olá Luciano! Vi o imóvel *' + b.name + '* no FinancieCerto e gostaria de mais informações.');
+  const waBase = 'https://wa.me/5511933661403?text=';
+  document.getElementById('imovel-wa-visita').href = waBase + waMsgVisita;
+  document.getElementById('imovel-wa-info').href   = waBase + waMsgInfo;
+
+  // Botão simular
+  document.getElementById('imovel-btn-sim').onclick = function(){
+    imovelFechar();
+    oruloSimular(b.min_price || 0, b.name);
+  };
+
+  // Imóveis similares
+  const similSec  = document.getElementById('imovel-similares-sec');
+  const similGrid = document.getElementById('imovel-similares-grid');
+  const similares = Object.values(_oruloBuildings)
+    .filter(x => x.id !== b.id)
+    .slice(0, 4);
+  if(similares.length > 0){
+    similGrid.innerHTML = similares.map(s => {
+      const sImg   = s.photo ? `<img style="width:100%;height:120px;object-fit:cover;border-radius:10px 10px 0 0;display:block" src="${s.photo}" alt="${s.name.replace(/"/g,'&quot;')}" loading="lazy">` : '<div style="width:100%;height:120px;background:linear-gradient(135deg,#EEF2FF,#DBEAFE);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:2rem">🏢</div>';
+      const sPrice = s.min_price ? 'R ' + Number(s.min_price).toLocaleString('pt-BR') : 'Consultar';
+      return `<div style="background:var(--bg-card);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer" onclick="imovelAbrir('${s.id}')">
+        ${sImg}
+        <div style="padding:10px 12px">
+          <div style="font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3">${s.name}</div>
+          <div style="font-size:.8rem;font-weight:800;color:var(--primary)">${sPrice}</div>
+        </div>
+      </div>`;
+    }).join('');
+    similSec.style.display = 'block';
+  } else {
+    similSec.style.display = 'none';
+  }
+
+  // Abre a tela e muda URL
+  const page = document.getElementById('imovel-page');
+  page.classList.add('open');
+  page.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+  history.pushState({ imovelId: id }, b.name, '/imovel/' + id);
+  document.title = b.name + ' — FinancieCerto';
+}
+
+function imovelFechar(){
+  document.getElementById('imovel-page').classList.remove('open');
+  document.body.style.overflow = '';
+  if(location.pathname.startsWith('/imovel/')){
+    history.back();
+  }
+  document.title = 'Simulador de Financiamento Imobiliário | MCMV e SBPE 2026 – FinancieCerto';
+}
+
+// Botão voltar do browser
+window.addEventListener('popstate', function(e){
+  const page = document.getElementById('imovel-page');
+  if(e.state && e.state.imovelId){
+    // Navegou para frente em outro imóvel via popstate — não deve ocorrer mas tratar
+  } else {
+    page.classList.remove('open');
+    document.body.style.overflow = '';
+    document.title = 'Simulador de Financiamento Imobiliário | MCMV e SBPE 2026 – FinancieCerto';
+  }
+});
+
+// Ao carregar direto em /imovel/{id} — tenta abrir quando buildings carregarem
+(function(){
+  const m = location.pathname.match(/^\/imovel\/(.+)$/);
+  if(!m) return;
+  const targetId = m[1];
+  // Aguarda os buildings serem carregados e abre o modal
+  let attempts = 0;
+  const tryOpen = setInterval(function(){
+    attempts++;
+    if(_oruloBuildings[targetId]){
+      clearInterval(tryOpen);
+      imovelAbrir(targetId);
+    } else if(attempts > 40){ // 4 segundos
+      clearInterval(tryOpen);
+    }
+  }, 100);
+})();
+
 </script>
 
 <!-- Modal de imóvel Órulo -->
@@ -4826,6 +5003,38 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') oruloFecharModa
           ▶ Simular financiamento deste imóvel
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Página de detalhe do imóvel -->
+<div id="imovel-page" role="dialog" aria-modal="true">
+  <div class="imovel-hero" id="imovel-hero">
+    <div class="imovel-hero-ph">🏢</div>
+    <button class="imovel-back" onclick="imovelFechar()">← Voltar</button>
+    <div class="imovel-badge-abs" id="imovel-badge-abs"></div>
+  </div>
+  <div class="imovel-content">
+    <div class="imovel-name"  id="imovel-det-name"></div>
+    <div class="imovel-dev"   id="imovel-det-dev"></div>
+    <div class="imovel-price" id="imovel-det-price"></div>
+    <div class="imovel-details-grid" id="imovel-det-grid"></div>
+    <div class="imovel-actions">
+      <a class="imovel-btn-wa" id="imovel-wa-visita" href="#" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        📅 Agendar visita
+      </a>
+      <a class="imovel-btn-wa2" id="imovel-wa-info" href="#" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        💬 Falar com o consultor
+      </a>
+      <button class="imovel-btn-sim" id="imovel-btn-sim">
+        🧮 Simular financiamento deste imóvel
+      </button>
+    </div>
+    <div id="imovel-similares-sec" style="display:none">
+      <div class="imovel-similares-title">🏘️ Imóveis similares</div>
+      <div class="imovel-similares-grid" id="imovel-similares-grid"></div>
     </div>
   </div>
 </div>
