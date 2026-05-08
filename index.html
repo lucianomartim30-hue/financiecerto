@@ -808,6 +808,46 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   .nav .nb{display:none}
   .hero-stats{gap:16px}
 }
+
+/* ── Órulo property cards ─────────────────────────────────────────────────── */
+#orulo-imoveis-sec{margin-top:28px}
+.orulo-sec-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.orulo-sec-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:3px}
+.orulo-sec-sub{font-size:.78rem;color:var(--text3)}
+.orulo-filter-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;background:var(--primary-light);border:1px solid var(--primary-muted);border-radius:20px;font-size:.75rem;font-weight:600;color:var(--primary)}
+.orulo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
+.orulo-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s,border-color .2s}
+.orulo-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.1);transform:translateY(-3px);border-color:var(--primary-muted)}
+.orulo-card-img{width:100%;height:155px;object-fit:cover;background:var(--bg);display:block}
+.orulo-card-img-ph{width:100%;height:155px;background:linear-gradient(135deg,#EEF2FF 0%,#DBEAFE 100%);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--text3)}
+.orulo-card-body{padding:15px 16px;flex:1;display:flex;flex-direction:column;gap:7px}
+.orulo-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.orulo-card-name{font-size:.9rem;font-weight:700;color:var(--text);line-height:1.3;flex:1}
+.orulo-card-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+.orulo-badge-lancamento{background:#EEF2FF;color:#1A56DB}
+.orulo-badge-obras{background:#FFFBEB;color:#92400E}
+.orulo-badge-pronto{background:#ECFDF5;color:#065F46}
+.orulo-badge-default{background:var(--bg);color:var(--text3);border:1px solid var(--border)}
+.orulo-card-dev{font-size:.74rem;color:var(--text3);font-weight:500}
+.orulo-card-loc{font-size:.78rem;color:var(--text2);display:flex;align-items:center;gap:4px}
+.orulo-card-price{font-size:1.05rem;font-weight:800;color:var(--primary)}
+.orulo-card-details{font-size:.76rem;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
+.orulo-card-actions{display:flex;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+.orulo-sim-btn{flex:1;padding:9px 10px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;transition:background .2s;text-align:center;line-height:1.2}
+.orulo-sim-btn:hover{background:#1e40af}
+.orulo-ext-link{padding:9px 11px;background:var(--bg);color:var(--text2);border:1.5px solid var(--border);border-radius:8px;font-size:.78rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .2s;white-space:nowrap}
+.orulo-ext-link:hover{border-color:var(--primary);color:var(--primary)}
+.orulo-skel-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden}
+.orulo-skel-img{width:100%;height:155px;background:var(--bg)}
+.orulo-skel-body{padding:15px 16px;display:flex;flex-direction:column;gap:10px}
+.orulo-skel-line{height:12px;border-radius:6px;background:var(--bg)}
+.orulo-skel-line.w-70{width:70%}.orulo-skel-line.w-50{width:50%}.orulo-skel-line.w-40{width:40%}
+.orulo-shimmer .orulo-skel-img,.orulo-shimmer .orulo-skel-line{background:linear-gradient(90deg,var(--bg) 25%,#e2e8f0 50%,var(--bg) 75%);background-size:200% 100%;animation:orulo-shimmer 1.5s infinite}
+@keyframes orulo-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.orulo-load-more{width:100%;margin-top:18px;padding:12px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:10px;font-size:.86rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s}
+.orulo-load-more:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.orulo-empty{padding:28px;text-align:center;background:var(--bg);border:1.5px dashed var(--border);border-radius:12px;font-size:.86rem;color:var(--text3)}
+@media(max-width:600px){.orulo-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -3825,33 +3865,34 @@ function simular(){
   // ─── BLOCO DE AÇÕES PÓS-SIMULAÇÃO removido ────────────────────────────────
 
 
-  // ─── TRANSIÇÃO PARA BUSCA DE EMPREENDIMENTOS ─────────────────────────────────
-  const oruloUrl='https://www.orulo.com.br/a/lucianomartimimoveis';
-  const oruloCtxLabel=isMCMV?('📋 Enquadramento: MCMV '+faixa.l):isSFI?'📋 Enquadramento: SFI (imóvel acima do teto SFH)':'📋 Enquadramento: SBPE (mercado convencional)';
-  const oruloCtxDesc=isMCMV?('Com base na simulação, o financiamento seria enquadrado no MCMV '+faixa.l+'. Use os filtros disponíveis no catálogo para refinar pela faixa de valor e região.'):isSFI?'Imóvel acima do teto SFH — financiamento via SFI. Explore opções no catálogo e refine pela faixa de valor.':'Financiamento via SBPE (mercado convencional). Explore o catálogo e aplique os filtros disponíveis para refinar sua busca.';
-  const btnBase='display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:9px;font-size:.88rem;font-weight:600;text-decoration:none;transition:all .2s;cursor:pointer;white-space:nowrap';
-  const btnPrimary=btnBase+';background:linear-gradient(135deg,#059669,#047857);color:#fff;box-shadow:0 4px 12px rgba(5,150,105,.28)';
-  const btnSec=btnBase+';background:#fff;color:var(--primary);border:1.5px solid var(--primary-muted)';
-  html+=`
-  <div class="sim-orulo-bridge">
-    <p style="font-size:.85rem;color:var(--text2);line-height:1.6;margin:0">Depois de entender seu perfil financeiro, você pode pesquisar empreendimentos disponíveis. Quando encontrar um imóvel de interesse, o contato do corretor especialista estará disponível para dar continuidade ao atendimento.</p>
-  </div>
-  <div style="background:linear-gradient(135deg,#059669,#047857);border-radius:14px;padding:28px 26px;margin-top:14px;color:#fff">
-    <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
-      <div style="flex:1;min-width:220px">
-        <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);margin-bottom:6px">🏘️ Próximo passo</div>
-        <div style="font-size:1.1rem;font-weight:800;margin-bottom:6px">Agora busque o imóvel certo para o seu perfil.</div>
-        <p style="font-size:.86rem;color:rgba(255,255,255,.85);line-height:1.6;margin:0 0 18px"><strong style="color:#fff">${oruloCtxLabel}</strong><br>${oruloCtxDesc}</p>
-        <div style="display:flex;flex-wrap:wrap;gap:10px">
-          ${isMCMV?`<a href="${oruloUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:#fff;color:#059669;border-radius:9px;font-size:.9rem;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.15)">🏠 Ver empreendimentos MCMV →</a>`:`<a href="${oruloUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:#fff;color:#059669;border-radius:9px;font-size:.9rem;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.15)">🏢 Ver empreendimentos SBPE →</a>`}
-          <a href="${oruloUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:9px;font-size:.88rem;font-weight:600;text-decoration:none">🏗️ Na planta</a>
-          <a href="${oruloUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:9px;font-size:.88rem;font-weight:600;text-decoration:none">🔑 Prontos para morar</a>
-          ${isSFI?`<a href="${oruloUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:9px;font-size:.88rem;font-weight:600;text-decoration:none">⭐ Opções premium</a>`:''}
-        </div>
+  // ─── EMPREENDIMENTOS COMPATÍVEIS (API Órulo) ─────────────────────────────────
+  // Faixa de preço para busca: do mínimo viável ao valor do imóvel + 20%
+  const oruloMaxPrice = Math.round(isMCMV ? Math.min(tetoMCMV, imovel * 1.15) : imovel * 1.2);
+  const oruloModLabel = isMCMV ? ('MCMV ' + faixa.l) : isSFI ? 'SFI' : 'SBPE';
+
+  html += `
+  <div id="orulo-imoveis-sec">
+    <div class="orulo-sec-header">
+      <div>
+        <div class="orulo-sec-title">🏘️ Empreendimentos compatíveis com seu perfil</div>
+        <div class="orulo-sec-sub" id="orulo-sec-sub">Carregando empreendimentos em São Paulo…</div>
       </div>
+      <span class="orulo-filter-tag">📋 ${oruloModLabel} · até R\u00a0${oruloMaxPrice.toLocaleString('pt-BR')}</span>
     </div>
-    <p style="font-size:.74rem;color:rgba(255,255,255,.55);margin:16px 0 0;border-top:1px solid rgba(255,255,255,.15);padding-top:12px">Todos os links levam ao catálogo da Órulo — plataforma com empreendimentos em São Paulo · Sem filtro automático aplicado — a busca é feita por você dentro da plataforma.</p>
+    <div class="orulo-grid" id="orulo-grid"></div>
+    <button class="orulo-load-more" id="orulo-load-more" style="display:none" onclick="oruloLoadMore()">Carregar mais empreendimentos →</button>
+    <p style="font-size:.72rem;color:var(--text3);margin-top:12px;text-align:center">
+      Empreendimentos via <strong>API Órulo</strong> · São Paulo · Clique em "▶ Simular neste imóvel" para usar o valor do imóvel no simulador
+    </p>
   </div>`;
+
+  // Dispara busca após renderização do HTML
+  setTimeout(() => {
+    _oruloState.maxPrice = ${oruloMaxPrice};
+    _oruloState.isMCMV   = ${isMCMV};
+    _oruloState.page     = 1;
+    fetchOruloBuildings(${oruloMaxPrice}, ${isMCMV}, 1);
+  }, 80);
 
   const el=document.getElementById('resultado');
   el.style.display='block';
@@ -4433,6 +4474,196 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   });
 }
+
+// ── Órulo: busca e renderização de empreendimentos ────────────────────────
+let _oruloState = { page:1, maxPrice:0, isMCMV:false, loading:false, total:0, pages:1 };
+
+function oruloSkeletons(n){
+  return Array.from({length:n},()=>`
+    <div class="orulo-skel-card orulo-shimmer">
+      <div class="orulo-skel-img"></div>
+      <div class="orulo-skel-body">
+        <div class="orulo-skel-line w-70"></div>
+        <div class="orulo-skel-line w-50"></div>
+        <div class="orulo-skel-line w-40"></div>
+      </div>
+    </div>`).join('');
+}
+
+function oruloBadge(status){
+  const s=(status||'').toLowerCase().replace(/\s+/g,'_');
+  if(s.includes('lança')||s.includes('lancamento')||s==='lancamento')
+    return '<span class="orulo-card-badge orulo-badge-lancamento">🆕 Lançamento</span>';
+  if(s.includes('obra')||s.includes('construc')||s.includes('em_obras'))
+    return '<span class="orulo-card-badge orulo-badge-obras">🏗️ Em obras</span>';
+  if(s.includes('pronto')||s.includes('entregue')||s.includes('ready'))
+    return '<span class="orulo-card-badge orulo-badge-pronto">✅ Pronto</span>';
+  return status?`<span class="orulo-card-badge orulo-badge-default">${status}</span>`:'';
+}
+
+function oruloRenderCards(buildings, append){
+  const grid = document.getElementById('orulo-grid');
+  if(!grid) return;
+  const cards = buildings.map(b => {
+    const precoMin = b.min_price ? 'A partir de <strong>R$ '+Number(b.min_price).toLocaleString('pt-BR')+'</strong>' : '';
+    const precoMax = b.max_price && b.max_price !== b.min_price ? ' – R$ '+Number(b.max_price).toLocaleString('pt-BR') : '';
+    const quartos = b.bedrooms_min
+      ? (b.bedrooms_max && b.bedrooms_max>b.bedrooms_min
+          ? `${b.bedrooms_min}–${b.bedrooms_max} quartos`
+          : `${b.bedrooms_min} quarto${b.bedrooms_min>1?'s':''}`)
+      : '';
+    const loc = [b.neighborhood, b.city].filter(Boolean).join(' · ');
+    const imgHtml = b.photo
+      ? `<img class="orulo-card-img" src="${b.photo}" alt="${b.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\"orulo-card-img-ph\">🏢</div>'">`
+      : '<div class="orulo-card-img-ph">🏢</div>';
+    return `
+    <div class="orulo-card">
+      ${imgHtml}
+      <div class="orulo-card-body">
+        <div class="orulo-card-top">
+          <div class="orulo-card-name">${b.name}</div>
+          ${oruloBadge(b.status)}
+        </div>
+        ${b.developer?`<div class="orulo-card-dev">🏢 ${b.developer}</div>`:''}
+        ${loc?`<div class="orulo-card-loc">📍 ${loc}</div>`:''}
+        ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
+        ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
+        <div class="orulo-card-actions">
+          <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0}, '${b.name.replace(/'/g,'\'+'\'')}')">
+            ▶ Simular neste imóvel
+          </button>
+          <a class="orulo-ext-link" href="${b.orulo_url}" target="_blank" rel="noopener" title="Ver na Órulo">🔗</a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  if(append){
+    grid.innerHTML = grid.innerHTML.replace(/<div[^>]*orulo-skel/g,'<REMOVED') + cards;
+    // Remove skeleton cards cleanly
+    const skelCards = grid.querySelectorAll('.orulo-skel-card');
+    skelCards.forEach(c=>c.remove());
+    grid.insertAdjacentHTML('beforeend', cards);
+  } else {
+    grid.innerHTML = cards;
+  }
+}
+
+async function fetchOruloBuildings(maxPrice, isMCMV, page){
+  const grid = document.getElementById('orulo-grid');
+  const sub  = document.getElementById('orulo-sec-sub');
+  const btn  = document.getElementById('orulo-load-more');
+  if(!grid) return;
+
+  _oruloState.loading = true;
+  if(btn) btn.disabled = true;
+
+  // Show skeletons on first page
+  if(page===1){
+    grid.innerHTML = oruloSkeletons(6);
+    if(sub) sub.textContent = 'Buscando empreendimentos compatíveis…';
+  } else {
+    grid.insertAdjacentHTML('beforeend', oruloSkeletons(3));
+  }
+
+  try{
+    const params = new URLSearchParams({ page: String(page), city: 'São Paulo', state: 'SP' });
+    if(maxPrice > 0) params.set('max_price', String(maxPrice));
+    const resp = await fetch('/api/orulo?' + params.toString());
+    if(!resp.ok) throw new Error('API ' + resp.status);
+    const data = await resp.json();
+    const buildings = data.buildings || [];
+
+    _oruloState.total = data.total || buildings.length;
+    _oruloState.pages = data.pages || 1;
+    _oruloState.page  = page;
+
+    // Remove skeletons
+    grid.querySelectorAll('.orulo-skel-card').forEach(c=>c.remove());
+
+    if(buildings.length === 0 && page === 1){
+      grid.innerHTML = '<div class="orulo-empty">Nenhum empreendimento encontrado para este perfil no momento.</div>';
+      if(sub) sub.textContent = 'Sem resultados';
+      if(btn) btn.style.display = 'none';
+    } else {
+      grid.insertAdjacentHTML('beforeend', buildings.map(b => {
+        const precoMin = b.min_price ? 'A partir de <strong>R\u00a0'+Number(b.min_price).toLocaleString('pt-BR')+'</strong>' : '';
+        const precoMax = b.max_price && b.max_price !== b.min_price ? '\u00a0– R\u00a0'+Number(b.max_price).toLocaleString('pt-BR') : '';
+        const quartos = b.bedrooms_min
+          ? (b.bedrooms_max && b.bedrooms_max>b.bedrooms_min
+              ? `${b.bedrooms_min}–${b.bedrooms_max} quartos`
+              : `${b.bedrooms_min} quarto${b.bedrooms_min>1?'s':''}`)
+          : '';
+        const loc = [b.neighborhood, b.city].filter(Boolean).join(' · ');
+        const imgHtml = b.photo
+          ? `<img class="orulo-card-img" src="${b.photo}" alt="${b.name.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=orulo-card-img-ph>🏢</div>'">`
+          : '<div class="orulo-card-img-ph">🏢</div>';
+        const nameSafe = b.name.replace(/'/g,"&#39;");
+        return `
+        <div class="orulo-card">
+          ${imgHtml}
+          <div class="orulo-card-body">
+            <div class="orulo-card-top">
+              <div class="orulo-card-name">${b.name}</div>
+              ${oruloBadge(b.status)}
+            </div>
+            ${b.developer?`<div class="orulo-card-dev">🏢 ${b.developer}</div>`:''}
+            ${loc?`<div class="orulo-card-loc">📍 ${loc}</div>`:''}
+            ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
+            ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
+            <div class="orulo-card-actions">
+              <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0},'${nameSafe}')">▶ Simular neste imóvel</button>
+              <a class="orulo-ext-link" href="${b.orulo_url}" target="_blank" rel="noopener" title="Ver na Órulo">🔗 Ver</a>
+            </div>
+          </div>
+        </div>`;
+      }).join(''));
+
+      const shown = grid.querySelectorAll('.orulo-card').length;
+      if(sub) sub.textContent = `${shown} de ${_oruloState.total} empreendimentos · São Paulo`;
+      if(btn){
+        btn.style.display = page < _oruloState.pages ? 'block' : 'none';
+        btn.disabled = false;
+      }
+    }
+  } catch(err){
+    console.warn('[Órulo]', err.message);
+    grid.querySelectorAll('.orulo-skel-card').forEach(c=>c.remove());
+    if(grid.children.length === 0){
+      grid.innerHTML = `<div class="orulo-empty">Não foi possível carregar os empreendimentos agora. <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener">Ver catálogo Órulo →</a></div>`;
+    }
+    if(sub) sub.textContent = 'Erro ao carregar empreendimentos';
+    if(btn) btn.style.display = 'none';
+  } finally {
+    _oruloState.loading = false;
+  }
+}
+
+function oruloLoadMore(){
+  if(_oruloState.loading) return;
+  fetchOruloBuildings(_oruloState.maxPrice, _oruloState.isMCMV, _oruloState.page + 1);
+}
+
+function oruloSimular(preco, nome){
+  // Preenche o campo de valor do imóvel no simulador com o preço selecionado
+  const input = document.getElementById('sImovel');
+  if(input && preco > 0){
+    // Formata como BRL sem símbolo para o campo mascarado
+    input.value = Number(preco).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    // Dispara evento de input para atualizar máscara/hints
+    input.dispatchEvent(new Event('input', {bubbles:true}));
+  }
+  // Rola ao simulador
+  const simSec = document.getElementById('simulador') || document.getElementById('sim-wrap');
+  if(simSec) simSec.scrollIntoView({behavior:'smooth', block:'start'});
+  // Toast de confirmação
+  const toast = document.createElement('div');
+  toast.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#0A1628;color:#fff;padding:11px 22px;border-radius:24px;font-size:.83rem;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.25);white-space:nowrap';
+  toast.textContent = '✅ ' + (nome||'Imóvel') + ' selecionado';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(), 2800);
+}
+
 </script>
 </body>
 </html>
