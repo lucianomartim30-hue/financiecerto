@@ -848,6 +848,29 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 .orulo-load-more:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
 .orulo-empty{padding:28px;text-align:center;background:var(--bg);border:1.5px dashed var(--border);border-radius:12px;font-size:.86rem;color:var(--text3)}
 @media(max-width:600px){.orulo-grid{grid-template-columns:1fr}}
+
+/* ── Modal de imóvel Órulo ────────────────────────────────────────────────── */
+#orulo-modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.55);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+#orulo-modal-overlay.open{display:flex}
+#orulo-modal-box{background:var(--bg-card);border-radius:18px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22);display:flex;flex-direction:column}
+.orulo-modal-img{width:100%;height:220px;object-fit:cover;border-radius:18px 18px 0 0;display:block}
+.orulo-modal-img-ph{width:100%;height:220px;background:linear-gradient(135deg,#EEF2FF,#DBEAFE);display:flex;align-items:center;justify-content:center;font-size:3.5rem;border-radius:18px 18px 0 0}
+.orulo-modal-body{padding:24px 26px}
+.orulo-modal-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:background .2s}
+.orulo-modal-close:hover{background:#fff}
+.orulo-modal-header{position:relative}
+.orulo-modal-name{font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:5px;line-height:1.3}
+.orulo-modal-dev{font-size:.8rem;color:var(--text3);margin-bottom:14px}
+.orulo-modal-info{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.orulo-modal-row{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--text2)}
+.orulo-modal-row strong{color:var(--text);font-weight:700}
+.orulo-modal-price{font-size:1.25rem;font-weight:900;color:var(--primary);margin-bottom:18px}
+.orulo-modal-actions{display:flex;flex-direction:column;gap:10px}
+.orulo-modal-wa{display:flex;align-items:center;justify-content:center;gap:9px;padding:14px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;transition:background .2s}
+.orulo-modal-wa:hover{background:#1da851}
+.orulo-modal-sim{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:.92rem;font-weight:700;cursor:pointer;transition:background .2s}
+.orulo-modal-sim:hover{background:var(--primary-d)}
+@media(max-width:560px){#orulo-modal-box{border-radius:14px;max-height:95vh}.orulo-modal-img,.orulo-modal-img-ph{height:180px;border-radius:14px 14px 0 0}.orulo-modal-body{padding:18px 20px}}
 </style>
 </head>
 <body>
@@ -4587,7 +4610,6 @@ async function fetchOruloBuildings(maxPrice, isMCMV, page){
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
             <div class="orulo-card-actions">
               <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0},'${nameSafe}')">▶ Simular neste imóvel</button>
-              <a class="orulo-ext-link" href="${b.orulo_url}" target="_blank" rel="noopener" title="Ver na Órulo">🔗 Ver</a>
             </div>
           </div>
         </div>`;
@@ -4690,8 +4712,9 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
           ? `<img class="orulo-card-img" src="${b.photo}" alt="${b.name.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=orulo-card-img-ph>🏢</div>'">`
           : '<div class="orulo-card-img-ph">🏢</div>';
         const nameSafe = b.name.replace(/'/g,"&#39;");
+        _oruloBuildings[b.id] = b;
         return `<div class="orulo-card">
-          ${imgHtml}
+          <div style="cursor:pointer" onclick="oruloAbrirModal('${b.id}')">${imgHtml}</div>
           <div class="orulo-card-body">
             <div class="orulo-card-top">
               <div class="orulo-card-name">${b.name}</div>
@@ -4702,8 +4725,8 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
             ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
             <div class="orulo-card-actions">
-              <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0},'${nameSafe}')">▶ Simular neste imóvel</button>
-              <a class="orulo-ext-link" href="${b.orulo_url}" target="_blank" rel="noopener" title="Ver na Órulo">🔗 Ver</a>
+              <button class="orulo-sim-btn" style="background:var(--bg);color:var(--primary);border:1.5px solid var(--primary)" onclick="oruloAbrirModal('${b.id}')">👁 Ver imóvel</button>
+              <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0},'${nameSafe}')">▶ Simular</button>
             </div>
           </div>
         </div>`;
@@ -4734,6 +4757,77 @@ function oruloDiscLoadMore(){
   fetchOruloDiscBuildings(_oruloDiscState.maxPrice, _oruloDiscState.isMCMV, _oruloDiscState.page + 1);
 }
 
+
+// ── Modal de imóvel Órulo ─────────────────────────────────────────────────
+const WA_NUMBER = '5511933661403';
+let _oruloBuildings = {};
+
+function oruloAbrirModal(id){
+  const b = _oruloBuildings[id];
+  if(!b) return;
+  const imgWrap = document.getElementById('orulo-modal-img-wrap');
+  imgWrap.innerHTML = b.photo
+    ? `<img class="orulo-modal-img" src="${b.photo}" alt="${b.name.replace(/"/g,'&quot;')}" onerror="this.parentNode.innerHTML='<div class=orulo-modal-img-ph>🏢</div>'">`
+    : '<div class="orulo-modal-img-ph">🏢</div>';
+  document.getElementById('orulo-modal-name').textContent = b.name;
+  document.getElementById('orulo-modal-dev').textContent  = b.developer ? '🏢 ' + b.developer : '';
+  const priceEl = document.getElementById('orulo-modal-price');
+  if(b.min_price){
+    const pMin = 'A partir de R\u00a0' + Number(b.min_price).toLocaleString('pt-BR');
+    const pMax = b.max_price && b.max_price !== b.min_price ? '\u00a0–\u00a0R\u00a0' + Number(b.max_price).toLocaleString('pt-BR') : '';
+    priceEl.textContent = pMin + pMax;
+  } else { priceEl.textContent = 'Consultar preço'; }
+  const infoEl = document.getElementById('orulo-modal-info');
+  const rows = [];
+  const loc = [b.neighborhood, b.city, b.state].filter(Boolean).join(', ');
+  if(loc) rows.push('<div class="orulo-modal-row">📍 <span>'+loc+'</span></div>');
+  if(b.bedrooms_min){
+    const q = b.bedrooms_max && b.bedrooms_max > b.bedrooms_min
+      ? b.bedrooms_min+'–'+b.bedrooms_max+' quartos' : b.bedrooms_min+' quarto'+(b.bedrooms_min>1?'s':'');
+    rows.push('<div class="orulo-modal-row">🛏 <span>'+q+'</span></div>');
+  }
+  if(b.status) rows.push('<div class="orulo-modal-row">📋 <span><strong>'+b.status+'</strong></span></div>');
+  infoEl.innerHTML = rows.join('');
+  const waMsg = encodeURIComponent('Olá Luciano! Vi o imóvel *' + b.name + '* no FinancieCerto e gostaria de mais informações.');
+  document.getElementById('orulo-modal-wa').href = 'https://wa.me/' + WA_NUMBER + '?text=' + waMsg;
+  const simBtn = document.getElementById('orulo-modal-sim-btn');
+  simBtn.onclick = function(){ oruloFecharModal(); oruloSimular(b.min_price||0, b.name); };
+  document.getElementById('orulo-modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function oruloFecharModal(){
+  document.getElementById('orulo-modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') oruloFecharModal(); });
+
 </script>
+
+<!-- Modal de imóvel Órulo -->
+<div id="orulo-modal-overlay" onclick="if(event.target===this)oruloFecharModal()">
+  <div id="orulo-modal-box">
+    <div class="orulo-modal-header">
+      <div id="orulo-modal-img-wrap"></div>
+      <button class="orulo-modal-close" onclick="oruloFecharModal()">✕</button>
+    </div>
+    <div class="orulo-modal-body">
+      <div class="orulo-modal-name" id="orulo-modal-name"></div>
+      <div class="orulo-modal-dev" id="orulo-modal-dev"></div>
+      <div class="orulo-modal-price" id="orulo-modal-price"></div>
+      <div class="orulo-modal-info" id="orulo-modal-info"></div>
+      <div class="orulo-modal-actions">
+        <a class="orulo-modal-wa" id="orulo-modal-wa" href="#" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          💬 Falar com o corretor
+        </a>
+        <button class="orulo-modal-sim" id="orulo-modal-sim-btn" onclick="">
+          ▶ Simular financiamento deste imóvel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
