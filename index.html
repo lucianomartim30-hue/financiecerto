@@ -3888,10 +3888,10 @@ function simular(){
 
   // Dispara busca após renderização do HTML
   setTimeout(() => {
-    _oruloState.maxPrice = ${oruloMaxPrice};
-    _oruloState.isMCMV   = ${isMCMV};
+    _oruloState.maxPrice = oruloMaxPrice;
+    _oruloState.isMCMV   = isMCMV;
     _oruloState.page     = 1;
-    fetchOruloBuildings(${oruloMaxPrice}, ${isMCMV}, 1);
+    fetchOruloBuildings(oruloMaxPrice, isMCMV, 1);
   }, 80);
 
   const el=document.getElementById('resultado');
@@ -4501,53 +4501,6 @@ function oruloBadge(status){
   return status?`<span class="orulo-card-badge orulo-badge-default">${status}</span>`:'';
 }
 
-function oruloRenderCards(buildings, append){
-  const grid = document.getElementById('orulo-grid');
-  if(!grid) return;
-  const cards = buildings.map(b => {
-    const precoMin = b.min_price ? 'A partir de <strong>R$ '+Number(b.min_price).toLocaleString('pt-BR')+'</strong>' : '';
-    const precoMax = b.max_price && b.max_price !== b.min_price ? ' – R$ '+Number(b.max_price).toLocaleString('pt-BR') : '';
-    const quartos = b.bedrooms_min
-      ? (b.bedrooms_max && b.bedrooms_max>b.bedrooms_min
-          ? `${b.bedrooms_min}–${b.bedrooms_max} quartos`
-          : `${b.bedrooms_min} quarto${b.bedrooms_min>1?'s':''}`)
-      : '';
-    const loc = [b.neighborhood, b.city].filter(Boolean).join(' · ');
-    const imgHtml = b.photo
-      ? `<img class="orulo-card-img" src="${b.photo}" alt="${b.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\"orulo-card-img-ph\">🏢</div>'">`
-      : '<div class="orulo-card-img-ph">🏢</div>';
-    return `
-    <div class="orulo-card">
-      ${imgHtml}
-      <div class="orulo-card-body">
-        <div class="orulo-card-top">
-          <div class="orulo-card-name">${b.name}</div>
-          ${oruloBadge(b.status)}
-        </div>
-        ${b.developer?`<div class="orulo-card-dev">🏢 ${b.developer}</div>`:''}
-        ${loc?`<div class="orulo-card-loc">📍 ${loc}</div>`:''}
-        ${precoMin?`<div class="orulo-card-price">${precoMin}${precoMax}</div>`:''}
-        ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
-        <div class="orulo-card-actions">
-          <button class="orulo-sim-btn" onclick="oruloSimular(${b.min_price||0}, '${b.name.replace(/'/g,'\'+'\'')}')">
-            ▶ Simular neste imóvel
-          </button>
-          <a class="orulo-ext-link" href="${b.orulo_url}" target="_blank" rel="noopener" title="Ver na Órulo">🔗</a>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
-  if(append){
-    grid.innerHTML = grid.innerHTML.replace(/<div[^>]*orulo-skel/g,'<REMOVED') + cards;
-    // Remove skeleton cards cleanly
-    const skelCards = grid.querySelectorAll('.orulo-skel-card');
-    skelCards.forEach(c=>c.remove());
-    grid.insertAdjacentHTML('beforeend', cards);
-  } else {
-    grid.innerHTML = cards;
-  }
-}
 
 async function fetchOruloBuildings(maxPrice, isMCMV, page){
   const grid = document.getElementById('orulo-grid');
