@@ -83,8 +83,11 @@ input,select,button,textarea{font-family:var(--font)}
 .btn-s:hover{border-color:var(--primary);color:var(--primary)}
 .btn-link{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;color:var(--text2);font-size:.88rem;font-weight:500;cursor:pointer;transition:all .2s;background:none;border:none;text-decoration:none}
 .btn-link:hover{color:var(--primary);text-decoration:underline}
-.hero-stats{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;margin-top:48px;padding-top:36px;border-top:1px solid rgba(0,0,0,.06)}
-.stat{text-align:center}
+.hero-stats{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-top:48px;padding-top:36px;border-top:1px solid rgba(0,0,0,.06)}
+.stat{text-align:center;cursor:default}
+.stat.clickable{cursor:pointer;border-radius:10px;padding:8px 12px;transition:background .2s,transform .15s}
+.stat.clickable:hover{background:rgba(26,86,219,.07);transform:translateY(-2px)}
+.stat.clickable:hover .stat-n{text-decoration:underline}
 .stat-n{font-size:1.75rem;font-weight:900;color:var(--primary);letter-spacing:-.02em}
 .stat-l{font-size:.76rem;color:var(--text3);margin-top:4px;font-weight:500}
 
@@ -1033,9 +1036,10 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   </div>
   <a class="btn-link" href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener">🏘️ Ver imóveis disponíveis na Órulo →</a>
   <div class="hero-stats">
-    <div class="stat"><div class="stat-n">MCMV</div><div class="stat-l">Faixas 1 a 4</div></div>
-    <div class="stat"><div class="stat-n">SAC+Price</div><div class="stat-l">Análise comparativa</div></div>
-    <div class="stat"><div class="stat-n">INCC+TR</div><div class="stat-l">Índices explicados</div></div>
+    <div class="stat clickable" onclick="ir('siglas-sec')" title="Ver explicação completa"><div class="stat-n">MCMV</div><div class="stat-l">Faixas 1 a 4</div></div>
+    <div class="stat clickable" onclick="ir('siglas-sec')" title="Ver explicação completa"><div class="stat-n">SBPE</div><div class="stat-l">Mercado convencional</div></div>
+    <div class="stat clickable" onclick="ir('siglas-sec')" title="Ver explicação completa"><div class="stat-n">SAC+Price</div><div class="stat-l">Análise comparativa</div></div>
+    <div class="stat clickable" onclick="ir('siglas-sec')" title="Ver explicação completa"><div class="stat-n">INCC+TR</div><div class="stat-l">Índices explicados</div></div>
     <div class="stat"><div class="stat-n">100%</div><div class="stat-l">Gratuito · sem cadastro</div></div>
   </div>
 </section>
