@@ -4646,7 +4646,7 @@ async function fetchOruloBuildings(maxPrice, isMCMV, page){
             ${precoLabel?`<div class="orulo-card-price">${precoLabel}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
             <div class="orulo-card-actions">
-              ${b.sharing_url?`<a class="orulo-card-btn-details" href="${b.sharing_url}" target="_blank" rel="noopener">🔍 Ver imóvel completo</a>`:''}
+              <button class="orulo-card-btn-details" onclick="imovelAbrir('${b.id}')">🔍 Ver imóvel completo</button>
               <div style="display:flex;gap:8px;width:100%">
                 <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
                 <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Fale com consultor</a>
@@ -4768,7 +4768,7 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
             ${precoLabel?`<div class="orulo-card-price">${precoLabel}</div>`:''}
             ${quartos?`<div class="orulo-card-details">🛏 ${quartos}</div>`:''}
             <div class="orulo-card-actions">
-              ${b.sharing_url?`<a class="orulo-card-btn-details" href="${b.sharing_url}" target="_blank" rel="noopener">🔍 Ver imóvel completo</a>`:''}
+              <button class="orulo-card-btn-details" onclick="imovelAbrir('${b.id}')">🔍 Ver imóvel completo</button>
               <div style="display:flex;gap:8px;width:100%">
                 <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
                 <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Fale com consultor</a>
