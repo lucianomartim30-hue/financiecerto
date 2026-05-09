@@ -677,6 +677,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   #bottom-nav{display:none}
   #mob-app-bar{display:none}
   #hdr{display:flex}
+  .nav{display:none}
   body{padding-bottom:0}
   #chat-fab-wrap{bottom:24px}
   #lgpd{bottom:0;left:0;right:0;border-radius:0;font-size:.78rem}
@@ -906,6 +907,8 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 .orulo-card-btn-consult:hover{background:#f0fdf4;transform:translateY(-1px)}
 .orulo-card-btn-details{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:9px;font-size:.82rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;text-decoration:none;margin-bottom:8px}
 .orulo-card-btn-details:hover{background:#0e3d8a;transform:translateY(-1px)}
+.orulo-ver-todos-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:13px;background:var(--primary);color:#fff;border-radius:10px;font-size:.88rem;font-weight:700;text-decoration:none;box-sizing:border-box}
+.orulo-ver-todos-btn:hover{background:#0e3d8a}
 </style>
 </head>
 <body>
@@ -3088,7 +3091,7 @@ function descobrir(){
     </div>
     <div class="orulo-grid" id="orulo-disc-grid"></div>
     <button class="orulo-load-more" id="orulo-disc-load-more" style="display:none" onclick="oruloDiscLoadMore()">Carregar mais empreendimentos →</button>
-    <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:13px;background:var(--primary);color:#fff;border-radius:10px;font-size:.88rem;font-weight:700;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#0e3d8a'" onmouseout="this.style.background='var(--primary)'">🏘️ Ver todos os empreendimentos disponíveis</a>
+    <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" class="orulo-ver-todos-btn">🏘️ Ver todos os empreendimentos disponíveis</a>
     <p style="font-size:.72rem;color:var(--text3);margin-top:12px;text-align:center">Empreendimentos via <strong>API Órulo</strong> · São Paulo</p>
   </div>`;
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -3961,7 +3964,7 @@ function simular(){
     </div>
     <div class="orulo-grid" id="orulo-grid"></div>
     <button class="orulo-load-more" id="orulo-load-more" style="display:none" onclick="oruloLoadMore()">Carregar mais empreendimentos →</button>
-    <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:13px;background:var(--primary);color:#fff;border-radius:10px;font-size:.88rem;font-weight:700;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#0e3d8a'" onmouseout="this.style.background='var(--primary)'">🏘️ Ver todos os empreendimentos disponíveis</a>
+    <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" class="orulo-ver-todos-btn">🏘️ Ver todos os empreendimentos disponíveis</a>
     <p style="font-size:.72rem;color:var(--text3);margin-top:12px;text-align:center">
       Empreendimentos via <strong>API Órulo</strong> · São Paulo
     </p>
