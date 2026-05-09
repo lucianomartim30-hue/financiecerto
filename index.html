@@ -4052,7 +4052,7 @@ function gerarTabelaObra(financiado,taxaMensal,prazoObra){
     rows+=`<tr><td>${m}</td><td>${fmt(saldo)}</td><td>${fmt(juros)}</td><td>${fmt(mipBase)}</td><td>${fmt(dfiObraBase)}</td><td>${fmt(tarifaAdmin)}</td><td><strong>${fmt(encargo)}</strong></td></tr>`;
   }
   return `<div id="tabela-obra-wrap" style="display:block;margin-top:20px">
-    <div class="tabela-title">🏗️ Tabela Estimada — Fase de Obra (${mesesMostrar} meses)</div>
+    <div class="tabela-title">🏗️ Juros de Evolução de Obra — Encargos Mensais Estimados (${mesesMostrar} meses)</div>
     <div class="tabela-scroll"><table class="tabela-est">
       <thead><tr><th>Mês</th><th>Saldo Liberado</th><th>Juros (nominal)</th><th>MIP</th><th>DFI/DFC</th><th>Tarifa</th><th>Encargo Total</th></tr></thead>
       <tbody>${rows}</tbody>
