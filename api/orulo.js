@@ -151,7 +151,8 @@ module.exports = async function handler(req, res) {
 
     // Estrutura de resposta Órulo v2: { buildings: [...], total, page, total_pages, results_limit_exceeded }
     const rawList = raw.buildings ?? raw.data ?? raw.results ?? [];
-    const buildings = rawList.map(normalizeBuilding);
+    const buildings = rawList.map(normalizeBuilding)
+      .filter(b => b.min_price && b.min_price >= 1000); // exclui imóveis sem preço ou breve lançamento
 
     return res.status(200).json({
       buildings,
