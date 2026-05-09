@@ -4308,7 +4308,7 @@ function toggleChat(){
   const w=document.getElementById('chat-win');w.classList.toggle('open',chatOpen);
   const lbl=document.getElementById('chat-fab-label');if(lbl)lbl.style.display=chatOpen?'none':'block';
   document.getElementById('cfb').style.display='none';
-  if(chatOpen&&!chatInited){chatInited=true;setTimeout(()=>addMsg('Olá! Sou o João, especialista em financiamentos imobiliários. Em que posso te auxiliar?','bot'),300);}
+  if(chatOpen&&!chatInited){chatInited=true;const _greet='Olá! Sou o João, especialista em financiamentos imobiliários. Em que posso te auxiliar?';setTimeout(()=>{addMsg(_greet,'bot');_chatHistory.push({role:'assistant',content:_greet});},300);}
   if(chatOpen)setTimeout(()=>document.getElementById('chatInput').focus(),400);
 }
 
