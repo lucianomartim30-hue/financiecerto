@@ -1098,10 +1098,10 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
         <p>Informe sua renda e o que tem disponível. O sistema calcula sua faixa de compra e qual modalidade de financiamento é ideal para você — sem precisar saber o valor do imóvel.</p>
       </div>
       <div class="sim-bd">
-        <div class="sim-section-title">📋 Seus dados financeiros</div>
+        <div class="sim-section-title">📋 Dados financeiros</div>
         <div class="sim-grid">
           <div class="sf">
-            <label>💰 Renda mensal bruta</label>
+            <label>💰 Renda familiar bruta</label>
             <div class="input-brl">
               <span class="input-brl-prefix">R$</span>
               <input type="text" inputmode="numeric" id="dRenda" placeholder="5.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
@@ -1109,12 +1109,12 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
             <span class="sf-hint">Some a renda de todos os participantes do financiamento</span>
           </div>
           <div class="sf">
-            <label>💵 Entrada / Ato</label>
+            <label>💵 Entrada própria — exceto FGTS</label>
             <div class="input-brl">
               <span class="input-brl-prefix">R$</span>
               <input type="text" inputmode="numeric" id="dEntrada" placeholder="30.000,00" oninput="maskBRL(this)" onblur="maskBRL(this)" autocomplete="off">
             </div>
-            <span class="sf-hint">Recursos próprios em conta. Deixe 0 se não tiver</span>
+            <span class="sf-hint">Recursos próprios em conta além do FGTS · deixe 0 se não tiver</span>
           </div>
           <div class="sf">
             <label>💳 Saldo FGTS disponível</label>
@@ -1125,40 +1125,126 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
             <span class="sf-hint">Consulte no app FGTS · deixe 0 se não for usar</span>
           </div>
           <div class="sf">
-            <label>🎂 Sua idade (anos)</label>
-            <input type="number" id="dIdade" placeholder="Ex: 35" min="18" max="79" autocomplete="off">
-            <span class="sf-hint">Determina o prazo máximo disponível de financiamento</span>
+            <label>🗺️ Estado (UF)</label>
+            <select id="dUF">
+              <option value="AC">AC — Acre</option>
+              <option value="AL">AL — Alagoas</option>
+              <option value="AP">AP — Amapá</option>
+              <option value="AM">AM — Amazonas</option>
+              <option value="BA">BA — Bahia</option>
+              <option value="CE">CE — Ceará</option>
+              <option value="DF">DF — Distrito Federal</option>
+              <option value="ES">ES — Espírito Santo</option>
+              <option value="GO">GO — Goiás</option>
+              <option value="MA">MA — Maranhão</option>
+              <option value="MT">MT — Mato Grosso</option>
+              <option value="MS">MS — Mato Grosso do Sul</option>
+              <option value="MG">MG — Minas Gerais</option>
+              <option value="PA">PA — Pará</option>
+              <option value="PB">PB — Paraíba</option>
+              <option value="PR">PR — Paraná</option>
+              <option value="PE">PE — Pernambuco</option>
+              <option value="PI">PI — Piauí</option>
+              <option value="RJ">RJ — Rio de Janeiro</option>
+              <option value="RN">RN — Rio Grande do Norte</option>
+              <option value="RS">RS — Rio Grande do Sul</option>
+              <option value="RO">RO — Rondônia</option>
+              <option value="RR">RR — Roraima</option>
+              <option value="SC">SC — Santa Catarina</option>
+              <option value="SP" selected>SP — São Paulo</option>
+              <option value="SE">SE — Sergipe</option>
+              <option value="TO">TO — Tocantins</option>
+            </select>
+          </div>
+          <div class="sf">
+            <label>📐 Sistema de amortização</label>
+            <select id="dSistema">
+              <option value="price">Tabela Price (parcelas fixas)</option>
+              <option value="sac">SAC (parcelas decrescentes)</option>
+            </select>
+          </div>
+          <div class="sf">
+            <label>🏗️ Tipo de imóvel</label>
+            <select id="dTipo" onchange="dAtualizarPrazoHint()">
+              <option value="pronto">Pronto (usado ou novo)</option>
+              <option value="planta">Na planta (fase de obra)</option>
+            </select>
+          </div>
+          <div class="sf">
+            <label>📅 Prazo de amortização (meses)</label>
+            <input type="number" id="dPrazo" placeholder="Ex: 420" min="1" max="420" value="420" oninput="dAtualizarPrazoHint()">
+            <span class="sf-hint" id="dPrazoHint">Prazo máximo estimado com base na idade do participante mais velho. Limite total: 80 anos e 6 meses.</span>
+          </div>
+          <div class="sf">
+            <label>🏗️ Prazo de construção (meses)</label>
+            <input type="number" id="dPrazoObra" placeholder="Ex: 36" min="1" max="60" value="36">
+            <span class="sf-hint">Só para imóvel na planta · altera o prazo máximo de amortização</span>
           </div>
         </div>
-        <div class="sim-checks" style="margin-bottom:20px">
+
+        <div class="sim-section-title">👥 Participantes</div>
+        <div style="background:var(--primary-light);border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.82rem;color:var(--text2);line-height:1.6">
+          💡 <strong style="color:var(--text)">Composição de renda:</strong> some a renda de todos os participantes no campo acima. Informe a idade de cada um — o prazo máximo é definido pela <strong>maior idade</strong> entre todos.
+        </div>
+        <div class="sim-grid">
+          <div class="sf">
+            <label>👥 Quantas pessoas vão participar?</label>
+            <select id="dNumParticipantes" onchange="dAtualizarParticipantes()">
+              <option value="1">1 pessoa</option>
+              <option value="2" selected>2 pessoas</option>
+              <option value="3">3 pessoas</option>
+              <option value="4">4 pessoas</option>
+            </select>
+            <span class="sf-hint">Todos que vão compor a renda para o financiamento</span>
+          </div>
+        </div>
+        <div class="sim-grid" id="dParticipantesGrid">
+          <div class="sf">
+            <label>🎂 Idade — 1º Participante (anos)</label>
+            <input type="number" id="dIdade1" placeholder="Ex: 35" min="18" max="79" oninput="dAtualizarPrazoHint()">
+            <span class="sf-hint">Prazo máximo calculado com base na maior idade · limite 80 anos e 6 meses</span>
+          </div>
+          <div class="sf" id="dPartField2">
+            <label>🎂 Idade — 2º Participante (anos)</label>
+            <input type="number" id="dIdade2" placeholder="Ex: 32" min="18" max="79" oninput="dAtualizarPrazoHint()">
+            <span class="sf-hint">O sistema usa sempre a maior idade entre todos os participantes</span>
+          </div>
+          <div class="sf" id="dPartField3" style="display:none">
+            <label>🎂 Idade — 3º Participante (anos)</label>
+            <input type="number" id="dIdade3" placeholder="Ex: 30" min="18" max="79" oninput="dAtualizarPrazoHint()">
+            <span class="sf-hint">O sistema usa sempre a maior idade entre todos os participantes</span>
+          </div>
+          <div class="sf" id="dPartField4" style="display:none">
+            <label>🎂 Idade — 4º Participante (anos)</label>
+            <input type="number" id="dIdade4" placeholder="Ex: 28" min="18" max="79" oninput="dAtualizarPrazoHint()">
+            <span class="sf-hint">O sistema usa sempre a maior idade entre todos os participantes</span>
+          </div>
+        </div>
+
+        <div class="sim-section-title">✅ Elegibilidade MCMV</div>
+        <div class="sim-checks">
           <label class="sc"><input type="checkbox" id="dCotista" checked> Cotista FGTS há 3+ anos</label>
           <label class="sc"><input type="checkbox" id="dPrimeiro" checked> Primeiro imóvel financiado</label>
+          <label class="sc"><input type="checkbox" id="dBenef"> Já recebeu benefício habitacional (MCMV, subsídio)</label>
+          <label class="sc"><input type="checkbox" id="dTemImovel"> Possui imóvel residencial no mesmo município</label>
+          <label class="sc"><input type="checkbox" id="dNomeNeg"> CPF com restrição (SPC/Serasa/Cadmut)</label>
+          <label class="sc"><input type="checkbox" id="dMostrarObra" checked> Mostrar tabela estimada da fase de obra</label>
+          <label class="sc" style="gap:8px">📊 Tabela de amortização:
+            <select id="dMostrarAmor" style="font-size:.82rem;padding:2px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text)">
+              <option value="0">Não mostrar</option>
+              <option value="12">Primeiros 12 meses</option>
+              <option value="full">Tabela completa (todos os meses)</option>
+            </select>
+          </label>
+          <label class="sc" style="align-items:center;gap:8px">
+            <input type="checkbox" id="dTemDep" onchange="dToggleDep()"> Possui dependentes?
+            <span id="dDepQtdWrap" style="display:none;align-items:center;gap:6px">
+              <span style="font-size:.82rem;color:var(--text2)">Quantos:</span>
+              <input type="number" id="dDepQtd" min="1" max="10" value="1" style="width:56px;padding:3px 7px;border:1px solid var(--border);border-radius:6px;font-size:.83rem;background:var(--bg);color:var(--text)">
+            </span>
+          </label>
         </div>
-        <!-- Seletor de tipo de imóvel -->
-        <div class="tipo-sel-wrap">
-          <div class="tipo-sel-label">🏘️ Qual tipo de imóvel você quer analisar?</div>
-          <div class="tipo-sel-grid">
-            <label class="tipo-sel-card ts-active" id="tsc-pronto" onclick="toggleTipo('pronto',this)">
-              <span class="ts-badge" id="tck-pronto">✓</span>
-              <span class="ts-ic">🏢</span>
-              <span class="ts-label">Pronto / Novo</span>
-              <span class="ts-desc">Chaves imediatas · preço certo</span>
-            </label>
-            <label class="tipo-sel-card" id="tsc-planta" onclick="toggleTipo('planta',this)">
-              <span class="ts-badge" id="tck-planta"></span>
-              <span class="ts-ic">🏗️</span>
-              <span class="ts-label">Na planta</span>
-              <span class="ts-desc">Lançamento · entrega futura</span>
-            </label>
-            <label class="tipo-sel-card" id="tsc-usado" onclick="toggleTipo('usado',this)">
-              <span class="ts-badge" id="tck-usado"></span>
-              <span class="ts-ic">🏠</span>
-              <span class="ts-label">Usado</span>
-              <span class="ts-desc">Negociação direta · entrada maior</span>
-            </label>
-          </div>
-          <p style="font-size:.72rem;color:var(--text3);margin-top:8px">Selecione 1 para ver resultado completo · 2 ou 3 para comparar lado a lado</p>
-        </div>
+
         <button class="disc-btn" onclick="descobrir()">🎯 Descobrir minha faixa de compra</button>
         <div id="resultado-disc" style="display:none"></div>
       </div>
@@ -2613,6 +2699,37 @@ function toggleDep(){
   const checked=document.getElementById('sTemDep').checked;
   const wrap=document.getElementById('sDepQtdWrap');
   if(wrap)wrap.style.display=checked?'inline-flex':'none';
+}
+function dToggleDep(){
+  const checked=document.getElementById('dTemDep').checked;
+  const wrap=document.getElementById('dDepQtdWrap');
+  if(wrap)wrap.style.display=checked?'inline-flex':'none';
+}
+function dAtualizarParticipantes(){
+  const n=parseInt(document.getElementById('dNumParticipantes')?.value)||1;
+  for(let i=2;i<=4;i++){
+    const field=document.getElementById('dPartField'+i);
+    const input=document.getElementById('dIdade'+i);
+    if(field) field.style.display=i<=n?'':'none';
+    if(input&&i>n) input.value='';
+  }
+  dAtualizarPrazoHint();
+}
+function dAtualizarPrazoHint(){
+  const id1=Math.max(0,parseInt(document.getElementById('dIdade1')?.value)||0);
+  const id2=Math.max(0,parseInt(document.getElementById('dIdade2')?.value)||0);
+  const id3=Math.max(0,parseInt(document.getElementById('dIdade3')?.value)||0);
+  const id4=Math.max(0,parseInt(document.getElementById('dIdade4')?.value)||0);
+  const idMV=Math.max(id1,id2,id3,id4);
+  const hint=document.getElementById('dPrazoHint');
+  if(!hint||idMV<18) return;
+  const prazoMax=Math.min(420, Math.floor((80*12+6)-(idMV*12)));
+  const prazoAtual=parseInt(document.getElementById('dPrazo')?.value)||420;
+  if(prazoAtual>prazoMax){
+    const el=document.getElementById('dPrazo');
+    if(el) el.value=prazoMax;
+  }
+  hint.textContent=`Com ${idMV} anos, o prazo máximo é ${prazoMax} meses (${Math.floor(prazoMax/12)} anos). Limite total: 80 anos e 6 meses.`;
 }
 function toggleNavDrop(id){
   const el=document.getElementById(id);
