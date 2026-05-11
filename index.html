@@ -2957,21 +2957,28 @@ function descobrir(){
   const renda=parseBRL(document.getElementById('dRenda').value);
   const entrada=parseBRL(document.getElementById('dEntrada').value);
   const fgts=parseBRL(document.getElementById('dFGTS').value);
-  const idade=parseInt(document.getElementById('dIdade').value)||0;
   const cotista=document.getElementById('dCotista').checked;
   const primeiro=document.getElementById('dPrimeiro').checked;
+
+  // Coleta idades de todos os participantes — usa a maior
+  const id1=parseInt(document.getElementById('dIdade1')?.value)||0;
+  const id2=parseInt(document.getElementById('dIdade2')?.value)||0;
+  const id3=parseInt(document.getElementById('dIdade3')?.value)||0;
+  const id4=parseInt(document.getElementById('dIdade4')?.value)||0;
+  const idade=Math.max(id1,id2,id3,id4);
 
   if(!renda){alert('Informe sua renda mensal para continuar.');return;}
   if(renda<500){alert('Renda parece muito baixa. Informe em reais. Ex: 5000');return;}
 
   const totalDisponivel=entrada+fgts;
-  const parcelaMax=renda*0.30; // comprometimento máximo — regra bancária (30% renda bruta)
+  const parcelaMax=renda*0.30;
 
-  // Prazo máximo pela idade (limite 80 anos e 6 meses — regra SFH)
-  const prazoMaxIdade=idade>=18?Math.floor((80.5-idade)*12):Infinity;
+  // Prazo: usa o campo dPrazo se preenchido, senão calcula pela maior idade
+  const prazoInput=parseInt(document.getElementById('dPrazo')?.value)||0;
+  const prazoMaxIdade=idade>=18?Math.floor((80.5-idade)*12):420;
   const prazoMax=Math.min(420,prazoMaxIdade);
-  const limitadoPorIdade=idade>=18&&prazoMaxIdade<420; // só é "por idade" se a idade for o fator limitante
-  const prazo=Math.max(120,prazoMax);
+  const limitadoPorIdade=idade>=18&&prazoMaxIdade<420;
+  const prazo=prazoInput>0?Math.min(prazoInput,prazoMax):Math.max(120,prazoMax);
 
   // Fórmula Price inversa: PV = PMT × [(1+i)^n − 1] / [i × (1+i)^n]
   function pvPrice(pmt,taxaAnual,n){
