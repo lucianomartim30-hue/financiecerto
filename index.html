@@ -3064,7 +3064,8 @@ function descobrir(){
   }
 
   // ── Tipos selecionados pelo usuário ──────────────────────────────────────────
-  const tiposSel=getTiposSelecionados(); // ['pronto','planta','usado'] ou subconjunto
+  const dTipoVal=document.getElementById('dTipo')?.value||'pronto';
+  const tiposSel=[dTipoVal]; // lê do select dTipo
   const numTipos=tiposSel.length;
 
   // ── Regras financeiras por tipo ───────────────────────────────────────────────
