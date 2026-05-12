@@ -1030,7 +1030,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
     <button class="btn-p" onclick="ir('sim-sec')">🔍 Simular financiamento</button>
     <button class="btn-s" onclick="ir('sim-sec')">🎯 Qual é meu perfil?</button>
   </div>
-  <a class="btn-link" href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener">🏘️ Ver imóveis disponíveis na Órulo →</a>
+  <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:var(--accent);color:#fff;border-radius:10px;font-size:.9rem;font-weight:600;text-decoration:none;box-shadow:0 4px 14px rgba(5,150,105,.3);transition:all .2s;margin-top:4px">🏘️ Ver imóveis disponíveis na Órulo →</a>
   <div class="hero-stats">
     <div class="stat clickable" onclick="ir('siglas-sec');setTimeout(()=>abaSigna(1),400)" title="Ver Programas e Modalidades"><div class="stat-n">MCMV</div><div class="stat-l">Faixas 1 a 4</div></div>
     <div class="stat clickable" onclick="ir('siglas-sec');setTimeout(()=>abaSigna(0),400)" title="Ver Sistemas de Crédito"><div class="stat-n">SBPE</div><div class="stat-l">Mercado convencional</div></div>
@@ -1162,8 +1162,9 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           <div class="sf">
             <label>🏗️ Tipo de imóvel</label>
             <select id="dTipo" onchange="dAtualizarPrazoHint()">
-              <option value="pronto">Pronto (usado ou novo)</option>
+              <option value="pronto">Pronto / Novo</option>
               <option value="planta">Na planta (fase de obra)</option>
+              <option value="usado">Usado</option>
             </select>
           </div>
           <div class="sf">
