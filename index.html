@@ -1038,7 +1038,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
     <button class="btn-p" onclick="ir('sim-sec')">🔍 Simular financiamento</button>
     <button class="btn-s" onclick="ir('sim-sec')">🎯 Qual é meu perfil?</button>
   </div>
-  <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:var(--accent);color:#fff;border-radius:10px;font-size:.9rem;font-weight:600;text-decoration:none;box-shadow:0 4px 14px rgba(5,150,105,.3);transition:all .2s;margin-top:4px">🏘️ Ver imóveis disponíveis na Órulo →</a>
+  <a href="https://www.orulo.com.br/a/lucianomartimimoveis" target="_blank" rel="noopener" onclick="track('click_orulo',{local:'hero'})" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:var(--accent);color:#fff;border-radius:10px;font-size:.9rem;font-weight:600;text-decoration:none;box-shadow:0 4px 14px rgba(5,150,105,.3);transition:all .2s;margin-top:4px">🏘️ Ver imóveis disponíveis na Órulo →</a>
   <div class="hero-stats">
     <div class="stat clickable" onclick="ir('siglas-sec');setTimeout(()=>abaSigna(1),400)" title="Ver Programas e Modalidades"><div class="stat-n">MCMV</div><div class="stat-l">Faixas 1 a 4</div></div>
     <div class="stat clickable" onclick="ir('siglas-sec');setTimeout(()=>abaSigna(0),400)" title="Ver Sistemas de Crédito"><div class="stat-n">SBPE</div><div class="stat-l">Mercado convencional</div></div>
@@ -1250,7 +1250,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           </label>
         </div>
 
-        <button class="disc-btn" onclick="descobrir()">🎯 Descobrir minha faixa de compra</button>
+        <button class="disc-btn" onclick="track('simulador_descoberta');descobrir()">🎯 Descobrir minha faixa de compra</button>
         <div id="resultado-disc" style="display:none"></div>
       </div>
     </div>
@@ -1417,7 +1417,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
           </span>
         </label>
       </div>
-      <button class="sim-btn" onclick="simular()">🔍 Analisar minha viabilidade</button>
+      <button class="sim-btn" onclick="track('simulador_tradicional');simular()">🔍 Analisar minha viabilidade</button>
       <div id="resultado"></div>
     </div>
   </div><!-- /sim-trad-panel -->
@@ -2707,6 +2707,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 
 // ─── UTILIDADES ──────────────────────────────────────────────────────────────
 function ir(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
+function track(event,params={}){if(typeof gtag==='function')gtag('event',event,params);}
 
 function switchPage(n){
   document.querySelectorAll('.site-page').forEach((p,i)=>{
@@ -4458,6 +4459,7 @@ function sendMsg(){
 function askS(q){document.getElementById('chatInput').value=q;sendMsg();}
 function toggleChat(){
   chatOpen=!chatOpen;
+  if(chatOpen) track('chatbot_aberto');
   const w=document.getElementById('chat-win');w.classList.toggle('open',chatOpen);
   const lbl=document.getElementById('chat-fab-label');if(lbl)lbl.style.display=chatOpen?'none':'block';
   document.getElementById('cfb').style.display='none';
