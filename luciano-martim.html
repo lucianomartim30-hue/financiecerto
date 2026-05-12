@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Luciano Martim | Consultor parceiro do QuintoAndar</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f5f7fb;
+      color:#1f2937;
+      line-height:1.6;
+    }
+
+    .topbar{
+      background:#fff;
+      border-bottom:1px solid #e5e7eb;
+      position:sticky;
+      top:0;
+      z-index:1000;
+    }
+
+    .topbar-content{
+      max-width:1200px;
+      margin:auto;
+      padding:16px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .logo{
+      font-size:18px;
+      font-weight:700;
+      color:#2563eb;
+    }
+
+    .menu{
+      display:flex;
+      gap:20px;
+    }
+
+    .menu a{
+      text-decoration:none;
+      color:#4b5563;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .hero{
+      background:linear-gradient(135deg,#0f4cc9,#2563eb);
+      color:#fff;
+      padding:70px 20px;
+    }
+
+    .hero-content{
+      max-width:1200px;
+      margin:auto;
+      display:grid;
+      grid-template-columns:1fr 420px;
+      gap:40px;
+      align-items:center;
+    }
+
+    .hero h1{
+      font-size:52px;
+      line-height:1.1;
+      margin-bottom:20px;
+    }
+
+    .hero p{
+      font-size:20px;
+      max-width:700px;
+      color:#e5edff;
+    }
+
+    .hero-buttons{
+      margin-top:30px;
+      display:flex;
+      gap:15px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      padding:15px 24px;
+      border-radius:999px;
+      text-decoration:none;
+      font-weight:700;
+      transition:0.2s;
+      display:inline-block;
+    }
+
+    .btn-primary{
+      background:#fff;
+      color:#2563eb;
+    }
+
+    .btn-primary:hover{
+      opacity:0.92;
+    }
+
+    .btn-secondary{
+      border:1px solid rgba(255,255,255,0.3);
+      color:#fff;
+      background:rgba(255,255,255,0.1);
+    }
+
+    .hero-box{
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.2);
+      padding:28px;
+      border-radius:22px;
+      backdrop-filter:blur(8px);
+    }
+
+    .hero-box h3{
+      font-size:28px;
+      margin-bottom:15px;
+    }
+
+    .hero-box p{
+      font-size:16px;
+      color:#eef4ff;
+    }
+
+    .container{
+      max-width:1200px;
+      margin:auto;
+      padding:40px 20px;
+    }
+
+    .section{
+      margin-bottom:28px;
+    }
+
+    .card{
+      background:#fff;
+      border-radius:20px;
+      padding:30px;
+      border:1px solid #e5e7eb;
+      box-shadow:0 4px 14px rgba(0,0,0,0.03);
+    }
+
+    .section-title{
+      font-size:38px;
+      margin-bottom:10px;
+    }
+
+    .section-subtitle{
+      color:#6b7280;
+      font-size:18px;
+      margin-bottom:24px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+    }
+
+    .mini-card{
+      background:#fff;
+      border-radius:18px;
+      border:1px solid #e5e7eb;
+      padding:24px;
+    }
+
+    .mini-card h3{
+      font-size:24px;
+      margin-bottom:10px;
+    }
+
+    .mini-card p{
+      color:#6b7280;
+      font-size:15px;
+    }
+
+    .consultor h2{
+      font-size:34px;
+      margin-bottom:15px;
+    }
+
+    .consultor p{
+      color:#6b7280;
+      margin-bottom:14px;
+      font-size:16px;
+    }
+
+    .badges{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:20px;
+    }
+
+    .badge{
+      background:#f3f6fb;
+      border:1px solid #dce3f0;
+      padding:10px 15px;
+      border-radius:999px;
+      font-size:14px;
+      color:#4b5563;
+    }
+
+    .form-section{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+      margin-top:30px;
+    }
+
+    .info-box{
+      background:#eef4ff;
+      border:1px solid #d6e4ff;
+      border-radius:16px;
+      padding:18px;
+      margin-top:14px;
+      color:#374151;
+      font-size:15px;
+    }
+
+    .form-card{
+      background:#fff;
+      border-radius:22px;
+      padding:30px;
+      border:1px solid #e5e7eb;
+      box-shadow:0 4px 14px rgba(0,0,0,0.03);
+    }
+
+    .form-card h3{
+      font-size:30px;
+      margin-bottom:10px;
+    }
+
+    .form-card p{
+      color:#6b7280;
+      margin-bottom:20px;
+    }
+
+    .progress{
+      display:flex;
+      gap:8px;
+      margin-bottom:24px;
+    }
+
+    .progress div{
+      flex:1;
+      height:8px;
+      background:#d9e1ef;
+      border-radius:999px;
+    }
+
+    .progress .active{
+      background:#2563eb;
+    }
+
+    .step{
+      display:none;
+    }
+
+    .step.active{
+      display:block;
+    }
+
+    label{
+      display:block;
+      margin-top:14px;
+      margin-bottom:6px;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    input,
+    select,
+    textarea{
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      border:1px solid #cfd8e3;
+      font-size:15px;
+      outline:none;
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .cols{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .buttons{
+      display:flex;
+      gap:12px;
+      margin-top:24px;
+      flex-wrap:wrap;
+    }
+
+    .btn-form{
+      border:none;
+      padding:14px 18px;
+      border-radius:999px;
+      font-weight:700;
+      cursor:pointer;
+      font-size:15px;
+    }
+
+    .btn-back{
+      background:#e5e7eb;
+      color:#111827;
+    }
+
+    .btn-next{
+      background:#2563eb;
+      color:#fff;
+      flex:1;
+    }
+
+    .footer{
+      text-align:center;
+      color:#6b7280;
+      padding:40px 20px;
+      font-size:13px;
+    }
+
+    @media(max-width:980px){
+
+      .hero-content,
+      .grid,
+      .form-section{
+        grid-template-columns:1fr;
+      }
+
+      .hero h1{
+        font-size:38px;
+      }
+
+    }
+
+    @media(max-width:640px){
+
+      .menu{
+        display:none;
+      }
+
+      .hero{
+        padding:50px 20px;
+      }
+
+      .hero h1{
+        font-size:32px;
+      }
+
+      .hero p{
+        font-size:18px;
+      }
+
+      .section-title{
+        font-size:30px;
+      }
+
+      .cols{
+        grid-template-columns:1fr;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="topbar-content">
+      <div class="logo">
+        Luciano Martim | Consultor parceiro do QuintoAndar
+      </div>
+
+      <nav class="menu">
+        <a href="#vantagens">Vantagens</a>
+        <a href="#locacao">Locação</a>
+        <a href="#venda">Venda</a>
+        <a href="#pre-cadastro">Pré-cadastro</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+
+      <div>
+
+        <h1>
+          Anuncie seu imóvel para locação pelo QuintoAndar e tenha seu aluguel garantido todos os meses
+        </h1>
+
+        <p>
+          Conte com menos burocracia, mais segurança e acompanhamento profissional desde o pré-cadastro até a assinatura do contrato.
+        </p>
+
+        <div class="hero-buttons">
+
+          <a href="#pre-cadastro" class="btn btn-primary">
+            Quero anunciar meu imóvel
+          </a>
+
+          <a
+            href="https://wa.me/5511933661403?text=Olá,%20gostaria%20de%20anunciar%20meu%20imóvel."
+            target="_blank"
+            class="btn btn-secondary"
+          >
+            Falar com especialista agora
+          </a>
+
+        </div>
+
+      </div>
+
+      <div class="hero-box">
+
+        <h3>
+          Atendimento para proprietários
+        </h3>
+
+        <p>
+          Suporte desde o pré-cadastro até as próximas etapas do processo, incluindo orientação, organização das informações e acompanhamento profissional.
+        </p>
+
+      </div>
+
+    </div>
+  </section>
+
+  <main class="container">
+
+    <section class="section card consultor">
+
+      <h2>
+        Luciano Martim | CRECI 217193
+      </h2>
+
+      <p>
+        Sou corretor de imóveis e atuo como consultor parceiro do QuintoAndar, auxiliando proprietários no processo de locação e venda de imóveis.
+      </p>
+
+      <p>
+        Acompanho todo o processo com suporte desde o preenchimento inicial das informações até a assinatura do contrato.
+      </p>
+
+      <div class="badges">
+        <div class="badge">Consultor parceiro do QuintoAndar</div>
+        <div class="badge">Suporte completo</div>
+        <div class="badge">Locação e venda</div>
+      </div>
+
+    </section>
+
+    <section class="section" id="vantagens">
+
+      <h2 class="section-title">
+        Por que anunciar?
+      </h2>
+
+      <p class="section-subtitle">
+        O site é voltado para proprietários e apresenta os principais benefícios para quem deseja alugar ou vender um imóvel com mais praticidade.
+      </p>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <h3>Menos burocracia</h3>
+          <p>
+            Processo mais digital e simplificado para facilitar a locação do imóvel.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <h3>Fotos profissionais</h3>
+          <p>
+            Após o avanço do processo, o imóvel pode receber sessão de fotos profissionais.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <h3>Suporte do início ao fim</h3>
+          <p>
+            Acompanhamento em todas as etapas do processo.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <h3>Mais visibilidade</h3>
+          <p>
+            O imóvel pode alcançar maior exposição e potencial de interessados.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="section" id="locacao">
+
+      <h2 class="section-title">
+        Mais segurança para quem quer alugar
+      </h2>
+
+      <p class="section-subtitle">
+        Benefícios específicos para proprietários de locação.
+      </p>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <h3>Aluguel garantido todos os meses</h3>
+          <p>
+            Recebimento do aluguel mesmo em casos de inadimplência do inquilino.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <h3>Sem necessidade de fiador tradicional</h3>
+          <p>
+            Locação com menos burocracia.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <h3>Garantia da locação</h3>
+          <p>
+            Mais previsibilidade e segurança para o proprietário.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <h3>Proteção adicional para o imóvel</h3>
+          <p>
+            Cobertura e intermediação durante o processo de locação.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="section" id="venda">
+
+      <h2 class="section-title">
+        Também atuo na venda de imóveis
+      </h2>
+
+      <p class="section-subtitle">
+        Atendimento e suporte para proprietários que desejam vender.
+      </p>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <h3>Suporte para venda</h3>
+          <p>
+            Cadastro do imóvel, fotos profissionais, divulgação, visitas e acompanhamento até a conclusão.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <h3>Atendimento consultivo</h3>
+          <p>
+            Mais organização e acompanhamento profissional durante o processo.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="section form-section" id="pre-cadastro">
+
+      <div>
+
+        <h2 class="section-title">
+          Pré-cadastro do proprietário
+        </h2>
+
+        <p class="section-subtitle">
+          Preencha as informações iniciais do imóvel para continuidade do atendimento.
+        </p>
+
+        <div class="info-box">
+          Após o envio, você será direcionado para o WhatsApp para continuidade do processo.
+        </div>
+
+        <div class="info-box">
+          Dependendo da modalidade do imóvel, o processo poderá seguir para autorização e agendamento das próximas etapas.
+        </div>
+
+      </div>
+
+      <div class="form-card">
+
+        <div class="progress">
+          <div class="active"></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <form id="cadastroForm">
+
+          <div class="step active">
+
+            <h3>Dados do proprietário</h3>
+
+            <p>
+              Informe os dados iniciais.
+            </p>
+
+            <label for="nome">Nome completo</label>
+            <input type="text" id="nome" name="nome" autocomplete="name" required>
+
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" autocomplete="email" required>
+
+            <label for="objetivo">Objetivo do anúncio</label>
+            <select id="objetivo" name="objetivo">
+              <option>Locação</option>
+              <option>Venda</option>
+              <option>Locação e Venda</option>
+            </select>
+
+            <div class="buttons">
+              <button type="submit" class="btn-form btn-next">
+                Continuar pelo WhatsApp
+              </button>
+            </div>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    Atendimento realizado por consultor parceiro do QuintoAndar. Este site não é oficial da plataforma.
+  </footer>
+
+  <script>
+
+    document
+      .getElementById("cadastroForm")
+      .addEventListener("submit", function(e){
+
+        e.preventDefault();
+
+        const nome = document.getElementById("nome").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const objetivo = document.getElementById("objetivo").value;
+
+        if (!nome || !email) return;
+
+        const mensagem =
+`Olá Luciano, preenchi o pré-cadastro do meu imóvel.
+
+Nome: ${nome}
+E-mail: ${email}
+Objetivo: ${objetivo}
+
+Gostaria de dar continuidade no processo.`;
+
+        const url =
+"https://wa.me/5511933661403?text=" +
+encodeURIComponent(mensagem);
+
+        window.open(url, "_blank");
+
+      });
+
+  </script>
+
+</body>
+</html>
