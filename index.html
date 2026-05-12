@@ -14,7 +14,7 @@
 <meta name="robots" content="index, follow">
 <title>Simulador de Financiamento Imobiliário | MCMV e SBPE 2026 – FinancieCerto</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a2540">
+<meta name="theme-color" content="#2563eb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FinancieCerto">
@@ -25,18 +25,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F4F6F9;--bg-card:#FFFFFF;--bg-card2:#EEF2FF;--bg-card3:#F0FDF4;--bg-card4:#FFFBEB;
-  --primary:#1A56DB;--primary-d:#1240A8;--primary-light:#EEF2FF;--primary-muted:#DBEAFE;
-  --accent:#059669;--accent-light:#ECFDF5;
-  --danger:#DC2626;--danger-light:#FEF2F2;
-  --warning:#D97706;--warning-light:#FFFBEB;
-  --purple:#7C3AED;--purple-light:#F5F3FF;
-  --orange:#EA580C;--orange-light:#FFF7ED;
-  --text:#0A1628;--text2:#4A5568;--text3:#9AA5B4;
-  --border:#E8ECF2;--border2:#D1D9E0;
-  --shadow:0 2px 8px rgba(0,0,0,.05),0 8px 32px rgba(0,0,0,.06);
-  --shadow-md:0 4px 16px rgba(0,0,0,.07),0 12px 40px rgba(0,0,0,.07);
-  --shadow-lg:0 8px 32px rgba(0,0,0,.09),0 24px 64px rgba(0,0,0,.08);
+  --bg:#fafaf9;--bg-card:#FFFFFF;--bg-card2:#eff6ff;--bg-card3:#f0fdf4;--bg-card4:#fffbeb;
+  --primary:#2563eb;--primary-d:#1d4ed8;--primary-light:#eff6ff;--primary-muted:#dbeafe;
+  --accent:#059669;--accent-light:#ecfdf5;
+  --danger:#dc2626;--danger-light:#fef2f2;
+  --warning:#d97706;--warning-light:#fffbeb;
+  --purple:#7c3aed;--purple-light:#f5f3ff;
+  --orange:#ea580c;--orange-light:#fff7ed;
+  --text:#1c1917;--text2:#57534e;--text3:#a8a29e;
+  --border:#e7e5e4;--border2:#d6d3d1;
+  --shadow:0 2px 8px rgba(0,0,0,.04),0 8px 32px rgba(0,0,0,.05);
+  --shadow-md:0 4px 16px rgba(0,0,0,.06),0 12px 40px rgba(0,0,0,.06);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.08),0 24px 64px rgba(0,0,0,.07);
   --radius:20px;--radius-sm:12px;--font:'Inter',sans-serif;
   --hh:64px;
 }
@@ -69,8 +69,16 @@ input,select,button,textarea{font-family:var(--font)}
 .nav-drop-item{display:block;width:100%;padding:8px 12px;border:none;background:transparent;color:var(--text2);font-size:.82rem;font-weight:500;cursor:pointer;border-radius:7px;text-align:left;transition:background .15s,color .15s}
 .nav-drop-item:hover{background:var(--bg-card2);color:var(--text)}
 
+/* NAVEGAÇÃO POR PÁGINAS */
+.page-nav{display:flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:4px}
+.page-nav-btn{padding:8px 20px;border-radius:9px;border:none;background:transparent;color:var(--text2);font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.page-nav-btn:hover{color:var(--text);background:var(--bg-card)}
+.page-nav-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.site-page{display:none}
+.site-page.active{display:block}
+
 /* HERO */
-#hero-wrap{background:linear-gradient(160deg,#ECF2FF 0%,#F4F6F9 55%,#E6F5EF 100%);border-bottom:1px solid var(--border)}
+#hero-wrap{background:linear-gradient(160deg,#eff6ff 0%,#fafaf9 55%,#f0fdf4 100%);border-bottom:1px solid var(--border)}
 #hero{padding:calc(var(--hh) + 72px) 24px 68px;text-align:center;max-width:860px;margin:0 auto}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.9);color:var(--primary);padding:7px 18px;border-radius:24px;font-size:.76rem;font-weight:700;margin-bottom:32px;border:1px solid rgba(26,86,219,.18);box-shadow:0 2px 12px rgba(26,86,219,.09);letter-spacing:.02em}
 .hero-title{font-size:clamp(2.1rem,4.8vw,3.3rem);font-weight:900;line-height:1.1;letter-spacing:-.03em;margin-bottom:22px;color:var(--text)}
@@ -937,23 +945,11 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
       <div>FinancieCerto<span class="logo-sub">MCMV · SBPE · Crédito Associativo · 2026</span></div>
     </div>
     <nav class="nav">
-      <button class="nb" onclick="ir('sim-sec')">Simulador</button>
-      <button class="nb" onclick="ir('entenda-sec')">Entenda</button>
-      <button class="nb" onclick="ir('obra-sec')">Fase de Obra</button>
-      <div class="nav-drop" id="navDropRef">
-        <button class="nav-drop-btn" onclick="toggleNavDrop('navDropRef')">
-          Consultas <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="nav-drop-menu">
-          <button class="nav-drop-item" onclick="navDropGo('navDropRef','siglas-sec')">🔤 Siglas</button>
-          <button class="nav-drop-item" onclick="navDropGo('navDropRef','custos-sec')">💰 Custos</button>
-          <button class="nav-drop-item" onclick="navDropGo('navDropRef','docs-sec')">📋 Documentos</button>
-        </div>
+      <div class="page-nav">
+        <button class="page-nav-btn active" id="pnav-1" onclick="switchPage(1)">🧮 Simular</button>
+        <button class="page-nav-btn" id="pnav-2" onclick="switchPage(2)">📘 Entender</button>
+        <button class="page-nav-btn" id="pnav-3" onclick="switchPage(3)">🏘️ Próximo passo</button>
       </div>
-      <button class="nb" onclick="ir('guia-sec')">Guia</button>
-      <button class="nb" onclick="ir('parceiros-sec')">Parceiros</button>
-      <button class="nb" onclick="ir('quem-somos-sec')">Quem Somos</button>
-      <button class="nb" onclick="ir('contato-sec')">✉️ Contato</button>
     </nav>
     <button class="ham-btn" onclick="toggleMobMenu()" aria-label="Menu" id="hamBtn">
       <span></span><span></span><span></span>
@@ -968,17 +964,16 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
     <button class="mob-close" onclick="closeMobMenu()">✕</button>
   </div>
   <div class="mob-nav">
-    <button class="mob-nav-btn" onclick="mobGo('sim-sec')"><span class="mnb-ic">🔍</span>Simulador</button>
-    <button class="mob-nav-btn" onclick="mobGo('entenda-sec')"><span class="mnb-ic">📖</span>Entenda o Programa</button>
-    <button class="mob-nav-btn" onclick="mobGo('obra-sec')"><span class="mnb-ic">🏗️</span>Fase de Obra</button>
+    <button class="mob-nav-btn" onclick="mobSwitchPage(1)"><span class="mnb-ic">🧮</span>Simular</button>
+    <button class="mob-nav-btn" onclick="mobSwitchPage(2)"><span class="mnb-ic">📘</span>Entender</button>
+    <button class="mob-nav-btn" onclick="mobSwitchPage(3)"><span class="mnb-ic">🏘️</span>Próximo passo</button>
     <div class="mob-nav-divider"></div>
-    <div style="padding:6px 20px 2px;font-size:.72rem;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase">Consultas</div>
-    <button class="mob-nav-btn" onclick="mobGo('siglas-sec')"><span class="mnb-ic">🔤</span>Siglas Explicadas</button>
-    <button class="mob-nav-btn" onclick="mobGo('custos-sec')"><span class="mnb-ic">💰</span>Custos</button>
-    <button class="mob-nav-btn" onclick="mobGo('docs-sec')"><span class="mnb-ic">📋</span>Documentação</button>
+    <button class="mob-nav-btn" onclick="mobGoPage(2,'siglas-sec')"><span class="mnb-ic">🔤</span>Siglas Explicadas</button>
+    <button class="mob-nav-btn" onclick="mobGoPage(2,'custos-sec')"><span class="mnb-ic">💰</span>Custos</button>
+    <button class="mob-nav-btn" onclick="mobGoPage(2,'docs-sec')"><span class="mnb-ic">📋</span>Documentação</button>
     <div class="mob-nav-divider"></div>
-    <button class="mob-nav-btn" onclick="mobGo('guia-sec')"><span class="mnb-ic">📚</span>Guia Completo</button>
-    <button class="mob-nav-btn" onclick="mobGo('parceiros-sec')"><span class="mnb-ic">🤝</span>Parceiros</button>
+    <button class="mob-nav-btn" onclick="mobGoPage(2,'guia-sec')"><span class="mnb-ic">📚</span>Guia Completo</button>
+    <button class="mob-nav-btn" onclick="mobGoPage(3,'parceiros-sec')"><span class="mnb-ic">🤝</span>Parceiros</button>
     <button class="mob-nav-btn" onclick="mobGo('quem-somos-sec')"><span class="mnb-ic">🏛️</span>Quem Somos</button>
     <button class="mob-nav-btn" onclick="mobGo('contato-sec')"><span class="mnb-ic">✉️</span>Contato</button>
   </div>
@@ -1025,6 +1020,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   </div>
 </nav>
 
+<div id="site-page-1" class="site-page active">
 <div id="hero-wrap">
 <section id="hero">
   <div class="hero-badge">✅ Simulador de financiamento imobiliário · MCMV · SBPE · 2026</div>
@@ -1451,6 +1447,9 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   </div>
 </section>
 
+</div><!-- /site-page-1 -->
+
+<div id="site-page-2" class="site-page">
 <section class="sec st" id="faixas-sec">
   <div class="sec-c">
     <span class="stag">📊 Minha Casa Minha Vida (MCMV) 2026</span>
@@ -2292,6 +2291,9 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
   </div>
 </section>
 
+</div><!-- /site-page-2 -->
+
+<div id="site-page-3" class="site-page">
 <section class="sec st parc-sec" id="parceiros-sec">
   <div class="parc-inner">
     <div class="sec-c">
@@ -2618,6 +2620,7 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
     </div>
   </div>
 </footer>
+</div><!-- /site-page-3 -->
 
 <div id="chat-fab-wrap">
   <div id="chat-fab-label">💬 Fale com o João</div>
@@ -2695,6 +2698,24 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 
 // ─── UTILIDADES ──────────────────────────────────────────────────────────────
 function ir(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
+
+function switchPage(n){
+  document.querySelectorAll('.site-page').forEach((p,i)=>{
+    p.classList.toggle('active',i+1===n);
+  });
+  document.querySelectorAll('.page-nav-btn').forEach((b,i)=>{
+    b.classList.toggle('active',i+1===n);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function mobSwitchPage(n){
+  closeMobMenu();
+  setTimeout(()=>switchPage(n),220);
+}
+function mobGoPage(page,id){
+  closeMobMenu();
+  setTimeout(()=>{switchPage(page);setTimeout(()=>ir(id),300);},220);
+}
 function toggleDep(){
   const checked=document.getElementById('sTemDep').checked;
   const wrap=document.getElementById('sDepQtdWrap');
