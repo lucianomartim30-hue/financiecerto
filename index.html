@@ -2696,8 +2696,9 @@ footer{background:var(--bg-card);border-top:1px solid var(--border);padding:36px
 //   • Coeficiente DFI: 0,000093/mês sobre valor contratado (ref.: R$24,85 / R$267k)
 //   • Seguros totais iniciais: 0,000283 × financiado ≈ R$75,71 ✓
 //   • Encargo total de amortização inicial: R$1.837,03 + R$75,56 + R$25 = R$1.937,59 ≈ R$1.937,74 ✓
-//   • Curva de liberação obra: fatorInicial=0,238 (23,8% liberado no mês 1)
-//     → mês 1: ~R$63.546 → encargo ≈ R$481 (ref.: R$480,96 do SIOPI) ✓
+//   • Curva de liberação obra: interpolação piecewise com pontos reais do SIOPI
+//     mês 1: 22,9% → R$480,96 ✓ | mês 12: 49,5% → R$871,83 ✓ | mês 24: 84,6% → R$1.514,02 ✓ | mês 36: 100% → R$1.738,85 ✓
+//   • Coeficiente médio real da prestação (fase obra): 65,5% do máximo (mês 36)
 // ───────────────────────────────────────────────────────────────────────────────
 // ESTIMATIVAS (dependem da análise real da CAIXA ECONÔMICA FEDERAL para cada contrato):
 //   • MIP varia com a idade e perfil do mutuário (coeficiente da seguradora)
@@ -3151,14 +3152,21 @@ function descobrir(){
       }
     }
 
-    const obraLinha=tipo==='planta'&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra (~36m)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
+    const obraLinha=tipo==='planta'&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra — mês final (máx.)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
 
     // Fix 1: custo duplo na planta — encargo obra média (~55% do máximo progressivo) + aluguel
     let obraAlerta='';
     if(tipo==='planta'&&bd.encargaObra>0){
-      const encObraMedia=Math.round(bd.encargaObra*0.55);
+      // Coeficiente médio 0,655 calibrado com contrato real SIOPI (22/12/2025):
+      // média das prestações dos 36 meses = 65,5% da prestação do mês final (100%)
+      const encObraJuros=Math.round(bd.encargaObra*0.655);
+      // Encargo fixo mensal: MIP + DFI + TX ADM (calibrado: R$75,71 + R$25 = R$100,71 para R$267k)
+      const i=taxaPN/100/12;
+      const saldoEstimado=i>0?bd.encargaObra/i:0;
+      const fixosMensal=Math.round(saldoEstimado*0.000283+25);
+      const encObraMedia=encObraJuros+fixosMensal;
       const comprObraPct=(encObraMedia/renda*100).toFixed(1);
-      obraAlerta=`⚠️ <strong>Custo duplo durante a obra (~36 meses):</strong> Além da parcela após as chaves, você pagará juros evolutivos com média estimada de <strong>~${fmt(encObraMedia)}/mês</strong> (${comprObraPct}% da renda). Some isso ao seu aluguel atual — o comprometimento real durante a obra pode ultrapassar os 30%.`;
+      obraAlerta=`⚠️ <strong>Custo duplo durante a obra (~36 meses):</strong> Antes das chaves, você pagará juros evolutivos sobre o saldo liberado à construtora — encargo médio estimado de <strong>~${fmt(encObraMedia)}/mês</strong> (juros ~${fmt(encObraJuros)} + seguro+tarifa ~${fmt(fixosMensal)} · ${comprObraPct}% da renda). Some isso ao aluguel atual — comprometimento real pode ultrapassar os 30%. Após as chaves: parcela definitiva de ${fmt(bd.parcela)}/mês.`;
     }
 
     // Parcela riscada se inviável
@@ -4212,6 +4220,27 @@ function gerarTabelaObra(financiado,taxaMensal,prazoObra){
   //   - Valor do MIP (varia com perfil do segurado — idade, fumante, etc.)
   //   - TR acumulada (atualiza o saldo devedor mas não integra a fórmula PMT)
   // ────────────────────────────────────────────────────────────────────────────
+  // CURVA DE LIBERAÇÃO CALIBRADA COM CONTRATO REAL CAIXA (SIOPI 22/12/2025)
+  // Pontos extraídos da planilha de evolução oficial (saldo devedor / financiado total):
+  //   mês  1: 22,9% | mês  6: 30,6% | mês 12: 49,5% | mês 18: 70,9%
+  //   mês 24: 84,6% | mês 30: 89,6% | mês 36: 100%
+  // Coeficiente médio real da prestação: 65,5% do encargo máximo (mês final)
+  // Método: interpolação linear piecewise entre os pontos reais — mais preciso
+  //         do que a função potência (que superestimava meses 6-12 em ~10 p.p.)
+  function progCurva(m, n){
+    // Pontos-chave normalizados: [posição_relativa, saldo/financiado]
+    const kp=[[0,0.229],[0.143,0.306],[0.306,0.495],[0.472,0.709],[0.639,0.846],[0.806,0.896],[1.0,1.0]];
+    if(m<=1) return kp[0][1];
+    if(m>=n) return 1.0;
+    const t=(m-1)/(n-1); // posição relativa 0→1
+    for(let i=0;i<kp.length-1;i++){
+      if(t>=kp[i][0]&&t<=kp[i+1][0]){
+        const f=(t-kp[i][0])/(kp[i+1][0]-kp[i][0]);
+        return kp[i][1]+(kp[i+1][1]-kp[i][1])*f;
+      }
+    }
+    return 1.0;
+  }
   let rows='';
   const mesesMostrar=Math.min(prazoObra,36);
   const tarifaAdmin=25;
@@ -4219,14 +4248,8 @@ function gerarTabelaObra(financiado,taxaMensal,prazoObra){
   const mipBase=financiado*0.000190;
   // DFI/DFC fixo sobre valor contratado (calibrado: 24,85/267.000 = 0,0000930%/mês — cláusula 4.3)
   const dfiObraBase=financiado*0.000093;
-  // Fator de início da curva: ~23,8% do financiado já disponível no mês 1
-  // (reflete o desembolso inicial + 1ª liberação mensal do contrato real)
-  const fatorInicial=0.238;
   for(let m=1;m<=mesesMostrar;m++){
-    // Curva calibrada: início grande (23,8%), progressão côncava até 100%
-    const progresso=mesesMostrar>1
-      ? fatorInicial+(1-fatorInicial)*Math.pow((m-1)/(mesesMostrar-1),0.65)
-      : 1.0;
+    const progresso=mesesMostrar>1 ? progCurva(m,mesesMostrar) : 1.0;
     const saldo=financiado*progresso;
     const juros=saldo*taxaMensal; // juros à taxa nominal mensal sobre saldo liberado
     const encargo=juros+mipBase+dfiObraBase+tarifaAdmin; // MIP + DFI/DFC + Tarifa (cláusulas 4.3 e 5.1.2)
