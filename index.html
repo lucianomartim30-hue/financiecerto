@@ -4114,8 +4114,14 @@ function simular(){
 
 
   // ─── EMPREENDIMENTOS COMPATÍVEIS (API Órulo) ─────────────────────────────────
-  // Faixa de preço para busca: do mínimo viável ao valor do imóvel + 20%
-  const oruloMaxPrice = Math.round(isMCMV ? Math.min(tetoMCMV, imovel * 1.15) : imovel * 1.2);
+  // Faixa de preço baseada na capacidade real de renda (não no imóvel digitado × 1.2)
+  const _pmOrulo  = renda * 0.30;
+  const _iOrulo   = taxaSBPEAnual / 100 / 12;
+  const _pvOrulo  = _iOrulo === 0 ? _pmOrulo * prazo : _pmOrulo * (1 - Math.pow(1 + _iOrulo, -prazo)) / _iOrulo;
+  const _maxAffordable = Math.min(_pvOrulo + fgtsUsado + entradaUsada, 2250000);
+  // Se o imóvel digitado está dentro da capacidade → ancora no imóvel; senão usa teto de renda
+  const _baseOrulo = comprometimento <= 30 ? imovel : _maxAffordable * 0.92;
+  const oruloMaxPrice = Math.round(isMCMV ? Math.min(tetoMCMV, imovel * 1.05) : _baseOrulo * 1.08);
   const oruloModLabel = isMCMV ? ('MCMV ' + faixa.l) : isSFI ? 'SFI' : 'SBPE';
 
   html += `
