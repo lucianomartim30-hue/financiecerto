@@ -4774,7 +4774,12 @@ async function fetchOruloBuildings(minPrice, maxPrice, isMCMV, page){
     const resp = await fetch('/api/orulo?' + params.toString());
     if(!resp.ok) throw new Error('API ' + resp.status);
     const data = await resp.json();
-    const buildings = data.buildings || [];
+    const buildings = (data.buildings || []).filter(b => {
+      if(!b.min_price) return false;
+      if(minPrice > 0 && b.min_price < minPrice * 0.95) return false;
+      if(maxPrice > 0 && b.min_price > maxPrice) return false;
+      return true;
+    });
 
     _oruloState.total = data.total || buildings.length;
     _oruloState.pages = data.pages || 1;
@@ -4898,7 +4903,12 @@ async function fetchOruloDiscBuildings(minPrice, maxPrice, isMCMV, page){
     const resp = await fetch('/api/orulo?' + params.toString());
     if(!resp.ok) throw new Error('API ' + resp.status);
     const data = await resp.json();
-    const buildings = data.buildings || [];
+    const buildings = (data.buildings || []).filter(b => {
+      if(!b.min_price) return false;
+      if(minPrice > 0 && b.min_price < minPrice * 0.95) return false;
+      if(maxPrice > 0 && b.min_price > maxPrice) return false;
+      return true;
+    });
 
     _oruloDiscState.total = data.total || buildings.length;
     _oruloDiscState.pages = data.pages || 1;
