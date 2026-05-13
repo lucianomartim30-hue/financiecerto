@@ -3118,7 +3118,9 @@ function descobrir(){
   // ── Contexto específico por tipo (exibido abaixo do card) ────────────────────
   const ctxInfo={
     pronto:'✅ Financiamento imediato · sem fase de obra · análise bancária padrão · chaves na assinatura do contrato.',
-    planta:`🏗️ Fase de obra: encargos mensais crescentes sobre o saldo liberado, sem amortizar capital. Após entrega, parcela normal. Valor de lançamento = ${fmt(valorPN)} → valor estimado na entrega: <strong>~${fmt(Math.round(valorPN*1.20))}</strong> (+20% valorização estimada).`,
+    planta:isMCMV
+      ?`🏗️ MCMV/Crédito Associativo: durante a obra você paga juros evolutivos ao banco sobre o saldo liberado (sem amortizar capital). Após a entrega, começa a parcela definitiva. Lançamento = ${fmt(valorPN)} → estimativa na entrega: <strong>~${fmt(Math.round(valorPN*1.20))}</strong> (+20%).`
+      :`🏗️ SBPE na planta: o financiamento bancário é assinado <strong>somente na entrega das chaves</strong>. Durante a obra você paga parcelas da entrada à incorporadora, corrigidas pelo INCC. Lançamento = ${fmt(valorPN)} → estimativa na entrega: <strong>~${fmt(Math.round(valorPN*1.20))}</strong> (+20%).`,
     usado:isMCMV
       ?`⚠️ MCMV para imóvel usado exige entrada de 30%–50% (Sul/Sudeste, 2026). Banco exige laudo de vistoria e o imóvel não pode ter pendências judiciais ou ônus. Considere o SBPE se a entrada for menor.`
       :`🏠 Imóvel usado tipicamente 10–15% mais barato que o novo. Banco fará vistoria e a avaliação pode ficar abaixo do preço pedido — você paga a diferença. ITBI incide sobre o valor venal ou de transação (o maior).`
@@ -3132,7 +3134,7 @@ function descobrir(){
   // Diagnóstico adicional por tipo
   const diagTipoTexto={
     pronto:'Imóvel pronto é o caminho com <strong>menor risco operacional</strong>: o que você vê é o que financía, sem surpresas de obra ou INCC. Aprovação bancária em 30–60 dias.',
-    planta:'Comprar na planta pode custar <strong>10–20% menos no lançamento</strong>, mas exige planejamento para a fase de obra (juros evolutivos + aluguel). Confirme a construtora credenciada junto à Caixa.',
+    planta:isMCMV?'Comprar na planta no MCMV (Crédito Associativo) pode custar <strong>10–20% menos no lançamento</strong>, mas exige planejamento: durante a obra você paga <strong>juros evolutivos ao banco</strong> + aluguel. Confirme a construtora credenciada junto à Caixa.':'Comprar na planta no SBPE pode custar <strong>10–20% menos no lançamento</strong>. Durante a obra você paga parcelas da entrada à incorporadora corrigidas pelo <strong>INCC</strong>. O financiamento bancário é assinado apenas na entrega das chaves.',
     usado:isMCMV?'MCMV para imóvel usado exige entrada maior e é mais restrito. Avalie se vale buscar dentro do teto do MCMV.':'Imóvel usado oferece <strong>oportunidade de negociação</strong> e entrega imediata. O banco fará avaliação — negocie o preço com margem para eventual discrepância de laudo.'
   };
   const diagTipo=tiposSel.map(t=>diagTipoTexto[t]).join('<br><br>');
@@ -3152,21 +3154,36 @@ function descobrir(){
       }
     }
 
-    const obraLinha=tipo==='planta'&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra — mês final (máx.)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
+    // Linha de encargo de obra: só MCMV (juros evolutivos ao banco)
+    const obraLinha=tipo==='planta'&&isMCMV&&bd.encargaObra>0?`<div class="disc-brow obra"><span>⚙ Encargo obra — mês final (máx.)</span><span>${fmt(bd.encargaObra)}/mês</span></div>`:'';
 
-    // Fix 1: custo duplo na planta — encargo obra média (~55% do máximo progressivo) + aluguel
     let obraAlerta='';
-    if(tipo==='planta'&&bd.encargaObra>0){
-      // Coeficiente médio 0,655 calibrado com contrato real SIOPI (22/12/2025):
-      // média das prestações dos 36 meses = 65,5% da prestação do mês final (100%)
-      const encObraJuros=Math.round(bd.encargaObra*0.655);
-      // Encargo fixo mensal: MIP + DFI + TX ADM (calibrado: R$75,71 + R$25 = R$100,71 para R$267k)
-      const i=taxaPN/100/12;
-      const saldoEstimado=i>0?bd.encargaObra/i:0;
-      const fixosMensal=Math.round(saldoEstimado*0.000283+25);
-      const encObraMedia=encObraJuros+fixosMensal;
-      const comprObraPct=(encObraMedia/renda*100).toFixed(1);
-      obraAlerta=`⚠️ <strong>Custo duplo durante a obra (~36 meses):</strong> Antes das chaves, você pagará juros evolutivos sobre o saldo liberado à construtora — encargo médio estimado de <strong>~${fmt(encObraMedia)}/mês</strong> (juros ~${fmt(encObraJuros)} + seguro+tarifa ~${fmt(fixosMensal)} · ${comprObraPct}% da renda). Some isso ao aluguel atual — comprometimento real pode ultrapassar os 30%. Após as chaves: parcela definitiva de ${fmt(bd.parcela)}/mês.`;
+    if(tipo==='planta'){
+      const prazoObraMeses=bd.prazoObra||36;
+      if(isMCMV&&bd.encargaObra>0){
+        // ── MCMV / Crédito Associativo: banco libera recursos → comprador paga juros evolutivos ──
+        // Coeficiente médio 0,655 calibrado com contrato real SIOPI (22/12/2025)
+        const encObraJuros=Math.round(bd.encargaObra*0.655);
+        const i=taxaPN/100/12;
+        const saldoEstimado=i>0?bd.encargaObra/i:0;
+        const fixosMensal=Math.round(saldoEstimado*0.000283+25);
+        const encObraMedia=encObraJuros+fixosMensal;
+        const comprObraPct=(encObraMedia/renda*100).toFixed(1);
+        obraAlerta=`⚠️ <strong>Custo duplo durante a obra (~${prazoObraMeses} meses):</strong> No MCMV/Crédito Associativo, o banco libera recursos à construtora e você paga juros evolutivos sobre o saldo já liberado — encargo médio estimado de <strong>~${fmt(encObraMedia)}/mês</strong> (juros ~${fmt(encObraJuros)} + seguro+tarifa ~${fmt(fixosMensal)} · ${comprObraPct}% da renda). Some isso ao aluguel atual. Após as chaves: parcela definitiva de ${fmt(bd.parcela)}/mês.`;
+      } else if(!isMCMV){
+        // ── SBPE: comprador assina o financiamento bancário só na entrega ──
+        // Durante a obra, paga parcelamento da entrada à construtora corrigido por INCC
+        const inccMensal=0.006; // ~0,6%/mês (ref. INCC médio 2024-2025: ~7,2%/a.a.)
+        // Estimativa: construtora pede ~30% de entrada; comprador paga ~10% no ato
+        // e os ~20% restantes em parcelas durante a obra — bases no padrão de mercado SP
+        const entradaObraPct=0.20; // 20% do imóvel parcelado à construtora durante obra
+        const saldoConstrutora=bd.valorImovel*entradaObraPct;
+        // Parcela simples (sem INCC), corrigida pela metade do INCC acumulado (saldo médio)
+        const parcelaBase=Math.round(saldoConstrutora/prazoObraMeses);
+        const inccMedio=Math.round(parcelaBase*(1+inccMensal*prazoObraMeses/2));
+        const comprPct=(inccMedio/renda*100).toFixed(1);
+        obraAlerta=`ℹ️ <strong>Parcelas à construtora durante a obra (~${prazoObraMeses} meses):</strong> No SBPE, o financiamento bancário é assinado apenas na entrega das chaves. Durante a obra, você paga o saldo da entrada em parcelas direto à construtora, corrigidas pelo <strong>INCC</strong> (~0,6%/mês · ref. 2025). Estimativa típica (20% do imóvel parcelado): <strong>~${fmt(inccMedio)}/mês</strong> (${comprPct}% da renda). Ao assinar o financiamento na entrega, a parcela bancária passa a ser ${fmt(bd.parcela)}/mês.`;
+      }
     }
 
     // Parcela riscada se inviável
@@ -3714,7 +3731,18 @@ function simular(){
 
   // Tipo planta
   if(tipo==='planta'&&isMCMV)alerts.push({t:'warn',ic:'🏗️',m:'<strong>Imóvel na planta — fase de obra (MCMV/Crédito Associativo):</strong> Durante a construção você paga juros evolutivos mensais ao banco sobre o saldo já liberado à construtora — sem amortizar o capital. Com base em contrato real CAIXA ECONÔMICA FEDERAL (SIOPI): mês 1 ≈ 25% do encargo definitivo · mês 12 ≈ 44% · mês 24 ≈ 77% · mês final ≈ 88–100%. Planeje esse custo junto ao aluguel atual.'});
-  if(tipo==='planta'&&!isMCMV)alerts.push({t:'warn',ic:'🏗️',m:'<strong>Imóvel na planta — fase de obra (SBPE):</strong> Dois custos simultâneos durante a construção: (1) <strong>Boletos à incorporadora</strong> — a parcela da entrada ('+fmt(entradaUsada)+') costuma ser paga em prestações mensais durante a obra (~'+fmt(Math.round(entradaUsada/(prazoObra||36)))+'/mês); (2) <strong>Juros evolutivos ao banco</strong> — cobrados mensalmente sobre o saldo liberado à construtora, crescentes conforme o andamento da obra. Após a entrega das chaves inicia a amortização normal ('+( sistema==='price'?'Tabela Price':'SAC')+'). Planeje ter capacidade financeira para as duas cobranças, além do aluguel se for o caso.'});
+  if(tipo==='planta'&&!isMCMV){
+    // SBPE planta: o financiamento bancário é assinado APENAS na entrega das chaves.
+    // Durante a obra, o comprador paga somente o parcelamento da entrada à construtora, corrigido por INCC.
+    // NÃO há juros evolutivos ao banco no SBPE — isso é exclusivo do MCMV/Crédito Associativo.
+    const prazoObraRef=prazoObra||36;
+    const inccMensal=0.006; // ~0,6%/mês (ref. INCC médio 2025)
+    // Estimativa: 20% do imóvel parcelado à construtora durante a obra (padrão mercado SP)
+    const saldoConstr=imovel*0.20;
+    const parcelaConstr=Math.round(saldoConstr/prazoObraRef);
+    const parcelaComINCC=Math.round(parcelaConstr*(1+inccMensal*prazoObraRef/2));
+    alerts.push({t:'warn',ic:'🏗️',m:'<strong>Imóvel na planta — fase de obra (SBPE):</strong> O financiamento bancário é assinado <strong>somente na entrega das chaves</strong> — não há juros ao banco durante a construção. O custo durante a obra é o <strong>parcelamento da entrada à incorporadora</strong>, corrigido mensalmente pelo <strong>INCC</strong> (~0,6%/mês · ref. 2025). Estimativa típica (20% do imóvel de '+fmt(imovel)+' em '+prazoObraRef+' meses): <strong>~'+fmt(parcelaComINCC)+'/mês</strong> — some isso ao aluguel atual. Na entrega, você assina o financiamento e a parcela bancária passa a ser '+fmt(totalParcela)+'/mês ('+( sistema==='price'?'Tabela Price':'SAC')+'). Dica: confirme com a incorporadora os exatos percentuais e prazo do parcelamento.'});
+  }
 
   // MCMV vs SBPE
   if(!isMCMV&&faixa===null)alerts.push({t:'warn',ic:'📊',m:'<strong>Fora do MCMV (renda acima de R$ 13.000):</strong> O financiamento será via SBPE. Compare taxas entre CAIXA ECONÔMICA FEDERAL, Bradesco, Itaú e Santander — diferença pode ser R$ 400–800/mês na parcela para o mesmo valor financiado.'});
@@ -4120,7 +4148,8 @@ function simular(){
 
   `;
 
-  if(tipo==='planta'&&mostrarObra){html+=gerarTabelaObra(valorFinanciado,taxaMensal,prazoObra);}
+  // Tabela de obra: só no MCMV (juros evolutivos ao banco). SBPE assina o financiamento só na entrega.
+  if(tipo==='planta'&&isMCMV&&mostrarObra){html+=gerarTabelaObra(valorFinanciado,taxaMensal,prazoObra);}
   if(mostrarAmor){
     if(isMCMV)html+=gerarTabelaAmor(valorFinanciado,taxaMensal,prazo,sistema,mipEstimado,dfiEstimado,'Cenário MCMV — '+taxaAnual+'% a.a.',amorMeses);
     html+=gerarTabelaAmor(vfSemSub,taxaSBPEMensal,prazo,sistema,mipSBPE,dfiSBPE,'Cenário SBPE — '+taxaSBPEAnual+'% a.a. (Caixa 2026)',amorMeses);
@@ -4339,7 +4368,7 @@ const CHAT_CONTEXT={
 let chatOpen=false,chatInited=false,dIdx=0;
 const resps=[
   {k:['fase de obra','encargo de obra','juros de obra','parcela de obra','evolução de obra'],
-   r:'Durante a fase de obra, você paga juros mensais sobre o valor que a CAIXA ECONÔMICA FEDERAL já liberou para a construtora — sem amortizar o capital ainda. Com base em contrato real SIOPI: o encargo no mês 1 é ~25% do encargo definitivo, sobe para ~44% no mês 12, ~77% no mês 24 e pode chegar a ~88%–100% no último mês de obra. O encargo inclui os juros sobre o saldo liberado, MIP, DFI/DFC e Tarifa de Administração. No simulador você pode ver essa evolução mês a mês na tabela de obra.'},
+   r:'Depende da modalidade. No <strong>MCMV (Crédito Associativo)</strong>: o banco libera recursos progressivamente à construtora e você paga juros evolutivos mensais sobre o saldo já liberado, sem amortizar capital ainda. Com base em contrato real SIOPI: encargo no mês 1 ≈ 23% do definitivo, mês 12 ≈ 47%, mês 24 ≈ 86%, mês 36 ≈ 100%. Inclui juros + MIP + DFI/DFC + Tarifa de Administração. Já no <strong>SBPE (fora do MCMV)</strong>: o financiamento bancário é assinado somente na entrega das chaves. Durante a obra, você paga parcelas da entrada direto à incorporadora, corrigidas mensalmente pelo INCC (~0,6%/mês ref. 2025) — sem nenhum juros ao banco nessa fase.'},
 
   {k:['incc','índice nacional de custo','correção da construtora','correção da incorporadora'],
    r:'O INCC-M é o índice que corrige os boletos que você paga direto para a incorporadora durante a obra. É diferente da TR do contrato bancário — são duas coisas separadas. Cada empresa define no contrato como aplica esse índice. Quando chegar o habite-se, o indexador pode mudar para IPCA + juros. Vale ler essa cláusula com atenção no seu CCV antes de assinar.'},
@@ -4402,7 +4431,7 @@ const resps=[
    r:'O resultado mostra quatro coisas principais: (1) a faixa MCMV ou linha de crédito compatível com o seu perfil; (2) o encargo mensal estimado — prestação + seguros (MIP e DFI) + tarifa; (3) o comprometimento de renda — o quanto da sua renda mensal vai para a parcela (o limite da CAIXA ECONÔMICA FEDERAL é 30%); e (4) o subsídio estimado, se houver. Tudo isso é estimativa — os números definitivos saem na análise da CAIXA ECONÔMICA FEDERAL.'},
 
   {k:['como usar simulador','como simular','como funciona simulador','campos simulador'],
-   r:'É bem direto: informe a renda familiar bruta total, o valor do imóvel que está buscando, o FGTS disponível (se houver), a entrada própria além do FGTS, selecione o estado e o tipo de imóvel (pronto ou na planta). Clique em Analisar — o sistema calcula a faixa, taxa, subsídio estimado e o encargo mensal. Se for na planta, a tabela de obra mês a mês também aparece.'},
+   r:'É bem direto: informe a renda familiar bruta total, o valor do imóvel que está buscando, o FGTS disponível (se houver), a entrada própria além do FGTS, selecione o estado e o tipo de imóvel (pronto ou na planta). Clique em Analisar — o sistema calcula a faixa, taxa, subsídio estimado e o encargo mensal. Se for MCMV na planta, a tabela de evolução de obra mês a mês aparece. Se for SBPE na planta, o simulador mostra a estimativa de parcelas à incorporadora corrigidas por INCC e o encargo bancário que começa após a entrega.'},
 
   {k:['receber relatorio','salvar simulacao','guardar resultado','imprimir'],
    r:'Você tem duas opções: clicar em "Salvar simulação completa (PDF)" — o navegador abre a janela de impressão e você salva como PDF; ou clicar em "Receber relatório por e-mail", informar nome e e-mail, e o resumo será aberto no seu cliente de e-mail pra enviar. Nenhum dado fica armazenado aqui — tudo roda localmente no seu dispositivo.'},
