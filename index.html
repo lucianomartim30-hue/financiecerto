@@ -2721,13 +2721,19 @@ function dMostrarAnos(inputId,spanId){
 }
 
 function switchPage(n){
+  const currentPage=[...document.querySelectorAll('.site-page')].findIndex(p=>p.classList.contains('active'))+1;
   document.querySelectorAll('.site-page').forEach((p,i)=>{
     p.classList.toggle('active',i+1===n);
   });
   document.querySelectorAll('.page-nav-btn').forEach((b,i)=>{
     b.classList.toggle('active',i+1===n);
   });
-  window.scrollTo({top:0,behavior:'smooth'});
+  // Já está na página 1 → rola direto ao simulador
+  if(n===1 && currentPage===1){
+    setTimeout(()=>document.getElementById('sim-sec')?.scrollIntoView({behavior:'smooth',block:'start'}),50);
+  } else {
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
 }
 function mobSwitchPage(n){
   closeMobMenu();
