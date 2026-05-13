@@ -4881,8 +4881,8 @@ async function fetchOruloBuildings(minPrice, maxPrice, isMCMV, page){
             <div class="orulo-card-actions">
               <a class="orulo-card-btn-details" href="https://www.orulo.com.br/a/lucianomartimimoveis/${b.id}" target="_blank" rel="noopener">🔍 Ver imóvel completo</a>
               <div style="display:flex;gap:8px;width:100%">
-                <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
-                <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Fale com consultor</a>
+                <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.'+( b.orulo_url?' Segue o link: '+b.orulo_url:''))}" target="_blank" rel="noopener">📅 Agendar visita</a>
+                <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.'+( b.orulo_url?' Segue o link: '+b.orulo_url:''))}" target="_blank" rel="noopener">💬 Fale com consultor</a>
               </div>
             </div>
           </div>
@@ -5009,8 +5009,8 @@ async function fetchOruloDiscBuildings(minPrice, maxPrice, isMCMV, page){
             <div class="orulo-card-actions">
               <a class="orulo-card-btn-details" href="https://www.orulo.com.br/a/lucianomartimimoveis/${b.id}" target="_blank" rel="noopener">🔍 Ver imóvel completo</a>
               <div style="display:flex;gap:8px;width:100%">
-                <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.')}" target="_blank" rel="noopener">📅 Agendar visita</a>
-                <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.')}" target="_blank" rel="noopener">💬 Fale com consultor</a>
+                <a class="orulo-card-btn-visit" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *'+b.name+'* que vi no FinancieCerto.'+( b.orulo_url?' Segue o link: '+b.orulo_url:''))}" target="_blank" rel="noopener">📅 Agendar visita</a>
+                <a class="orulo-card-btn-consult" href="https://wa.me/5511933661403?text=${encodeURIComponent('Olá Luciano! Vi o imóvel *'+b.name+'* no FinancieCerto e quero mais informações.'+( b.orulo_url?' Segue o link: '+b.orulo_url:''))}" target="_blank" rel="noopener">💬 Fale com consultor</a>
               </div>
             </div>
           </div>
@@ -5073,7 +5073,7 @@ function oruloAbrirModal(id){
   }
   if(b.status) rows.push('<div class="orulo-modal-row">📋 <span><strong>'+b.status+'</strong></span></div>');
   infoEl.innerHTML = rows.join('');
-  const waMsg = encodeURIComponent('Olá Luciano! Vi o imóvel *' + b.name + '* no FinancieCerto e gostaria de mais informações.');
+  const waMsg = encodeURIComponent('Olá Luciano! Vi o imóvel *' + b.name + '* no FinancieCerto e gostaria de mais informações.' + (b.orulo_url ? ' Segue o link: ' + b.orulo_url : ''));
   document.getElementById('orulo-modal-wa').href = 'https://wa.me/' + WA_NUMBER + '?text=' + waMsg;
   const simBtn = document.getElementById('orulo-modal-sim-btn');
   simBtn.onclick = function(){ oruloFecharModal(); oruloSimular(b.min_price||0, b.name); };
@@ -5143,8 +5143,9 @@ function imovelAbrir(id){
   ).join('');
 
   // WhatsApp
-  const waMsgVisita = encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *' + b.name + '* que vi no FinancieCerto.');
-  const waMsgInfo   = encodeURIComponent('Olá Luciano! Vi o imóvel *' + b.name + '* no FinancieCerto e gostaria de mais informações.');
+  const _link = b.orulo_url ? ' Segue o link: ' + b.orulo_url : '';
+  const waMsgVisita = encodeURIComponent('Olá Luciano! Gostaria de agendar uma visita ao imóvel *' + b.name + '* que vi no FinancieCerto.' + _link);
+  const waMsgInfo   = encodeURIComponent('Olá Luciano! Vi o imóvel *' + b.name + '* no FinancieCerto e gostaria de mais informações.' + _link);
   const waBase = 'https://wa.me/5511933661403?text=';
   document.getElementById('imovel-wa-visita').href = waBase + waMsgVisita;
   document.getElementById('imovel-wa-info').href   = waBase + waMsgInfo;
