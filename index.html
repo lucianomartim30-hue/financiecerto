@@ -3252,7 +3252,7 @@ function descobrir(){
         <div class="orulo-sec-title">🏘️ Empreendimentos compatíveis com seu perfil</div>
         <div class="orulo-sec-sub" id="orulo-disc-sub">Carregando empreendimentos em São Paulo…</div>
       </div>
-      <span class="orulo-filter-tag" id="orulo-disc-tag">📋 ${isMCMV?faixa.l+' MCMV':'SBPE'} · até R\u00a0${Math.round(valorSeguro).toLocaleString('pt-BR')}</span>
+      <span class="orulo-filter-tag" id="orulo-disc-tag">📋 ${isMCMV?faixa.l+' MCMV':'SBPE'} · R ${Math.round(valorSeguro*0.70).toLocaleString('pt-BR')} – R ${Math.round(valorSeguro*1.1).toLocaleString('pt-BR')}</span>
     </div>
     <div class="orulo-grid" id="orulo-disc-grid"></div>
     <button class="orulo-load-more" id="orulo-disc-load-more" style="display:none" onclick="oruloDiscLoadMore()">Carregar mais empreendimentos →</button>
@@ -3262,12 +3262,14 @@ function descobrir(){
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
 
   // Busca empreendimentos compatíveis para o modo descobrir
-  const oruloDiscMax = Math.round(valorSeguro * 1.1);
+  const oruloDiscMax = Math.round(isMCMV ? Math.min(valorMax, valorSeguro * 1.05) : valorSeguro * 1.1);
+  const oruloDiscMin = Math.round(isMCMV ? valorSeguro * 0.50 : valorSeguro * 0.70);
   setTimeout(() => {
+    _oruloDiscState.minPrice = oruloDiscMin;
     _oruloDiscState.maxPrice = oruloDiscMax;
     _oruloDiscState.isMCMV   = isMCMV;
     _oruloDiscState.page     = 1;
-    fetchOruloDiscBuildings(oruloDiscMax, isMCMV, 1);
+    fetchOruloDiscBuildings(oruloDiscMin, oruloDiscMax, isMCMV, 1);
   }, 80);
 }
 
@@ -4122,6 +4124,8 @@ function simular(){
   // Se o imóvel digitado está dentro da capacidade → ancora no imóvel; senão usa teto de renda
   const _baseOrulo = comprometimento <= 30 ? imovel : _maxAffordable * 0.92;
   const oruloMaxPrice = Math.round(isMCMV ? Math.min(tetoMCMV, imovel * 1.05) : _baseOrulo * 1.08);
+  // Preço mínimo: 70% do valor de referência — filtra imóveis muito abaixo do perfil
+  const oruloMinPrice = Math.round(isMCMV ? imovel * 0.50 : _baseOrulo * 0.70);
   const oruloModLabel = isMCMV ? ('MCMV ' + faixa.l) : isSFI ? 'SFI' : 'SBPE';
 
   html += `
@@ -4131,7 +4135,7 @@ function simular(){
         <div class="orulo-sec-title">🏘️ Empreendimentos compatíveis com seu perfil</div>
         <div class="orulo-sec-sub" id="orulo-sec-sub">Carregando empreendimentos em São Paulo…</div>
       </div>
-      <span class="orulo-filter-tag">📋 ${oruloModLabel} · até R\u00a0${oruloMaxPrice.toLocaleString('pt-BR')}</span>
+      <span class="orulo-filter-tag">📋 ${oruloModLabel} · R ${oruloMinPrice.toLocaleString('pt-BR')} – R ${oruloMaxPrice.toLocaleString('pt-BR')}</span>
     </div>
     <div class="orulo-grid" id="orulo-grid"></div>
     <button class="orulo-load-more" id="orulo-load-more" style="display:none" onclick="oruloLoadMore()">Carregar mais empreendimentos →</button>
@@ -4143,12 +4147,12 @@ function simular(){
 
   // Dispara busca após renderização do HTML
   setTimeout(() => {
+    _oruloState.minPrice = oruloMinPrice;
     _oruloState.maxPrice = oruloMaxPrice;
     _oruloState.isMCMV   = isMCMV;
     _oruloState.page     = 1;
-    fetchOruloBuildings(oruloMaxPrice, isMCMV, 1);
+    fetchOruloBuildings(oruloMinPrice, oruloMaxPrice, isMCMV, 1);
   }, 80);
-
   const el=document.getElementById('resultado');
   el.style.display='block';
   el.innerHTML=html;
@@ -4720,7 +4724,7 @@ if('serviceWorker' in navigator){
 }
 
 // ── Órulo: busca e renderização de empreendimentos ────────────────────────
-let _oruloState = { page:1, maxPrice:0, isMCMV:false, loading:false, total:0, pages:1 };
+let _oruloState = { page:1, minPrice:0, maxPrice:0, isMCMV:false, loading:false, total:0, pages:1 };
 
 function oruloSkeletons(n){
   return Array.from({length:n},()=>`
@@ -4746,7 +4750,7 @@ function oruloBadge(status){
 }
 
 
-async function fetchOruloBuildings(maxPrice, isMCMV, page){
+async function fetchOruloBuildings(minPrice, maxPrice, isMCMV, page){
   const grid = document.getElementById('orulo-grid');
   const sub  = document.getElementById('orulo-sec-sub');
   const btn  = document.getElementById('orulo-load-more');
@@ -4765,6 +4769,7 @@ async function fetchOruloBuildings(maxPrice, isMCMV, page){
 
   try{
     const params = new URLSearchParams({ page: String(page), city: 'São Paulo', state: 'SP' });
+    if(minPrice > 0) params.set('min_price', String(minPrice));
     if(maxPrice > 0) params.set('max_price', String(maxPrice));
     const resp = await fetch('/api/orulo?' + params.toString());
     if(!resp.ok) throw new Error('API ' + resp.status);
@@ -4843,7 +4848,7 @@ async function fetchOruloBuildings(maxPrice, isMCMV, page){
 
 function oruloLoadMore(){
   if(_oruloState.loading) return;
-  fetchOruloBuildings(_oruloState.maxPrice, _oruloState.isMCMV, _oruloState.page + 1);
+  fetchOruloBuildings(_oruloState.minPrice, _oruloState.maxPrice, _oruloState.isMCMV, _oruloState.page + 1);
 }
 
 function oruloSimular(preco, nome){
@@ -4868,9 +4873,9 @@ function oruloSimular(preco, nome){
 
 
 // ── Órulo: modo DESCOBRIR (faixa de compra) ───────────────────────────────
-let _oruloDiscState = { page:1, maxPrice:0, isMCMV:false, loading:false, pages:1, total:0 };
+let _oruloDiscState = { page:1, minPrice:0, maxPrice:0, isMCMV:false, loading:false, pages:1, total:0 };
 
-async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
+async function fetchOruloDiscBuildings(minPrice, maxPrice, isMCMV, page){
   const grid = document.getElementById('orulo-disc-grid');
   const sub  = document.getElementById('orulo-disc-sub');
   const btn  = document.getElementById('orulo-disc-load-more');
@@ -4888,6 +4893,7 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
 
   try{
     const params = new URLSearchParams({ page: String(page), city: 'São Paulo', state: 'SP' });
+    if(minPrice > 0) params.set('min_price', String(minPrice));
     if(maxPrice > 0) params.set('max_price', String(maxPrice));
     const resp = await fetch('/api/orulo?' + params.toString());
     if(!resp.ok) throw new Error('API ' + resp.status);
@@ -4965,7 +4971,7 @@ async function fetchOruloDiscBuildings(maxPrice, isMCMV, page){
 
 function oruloDiscLoadMore(){
   if(_oruloDiscState.loading) return;
-  fetchOruloDiscBuildings(_oruloDiscState.maxPrice, _oruloDiscState.isMCMV, _oruloDiscState.page + 1);
+  fetchOruloDiscBuildings(_oruloDiscState.minPrice, _oruloDiscState.maxPrice, _oruloDiscState.isMCMV, _oruloDiscState.page + 1);
 }
 
 
