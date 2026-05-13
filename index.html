@@ -3120,7 +3120,7 @@ function descobrir(){
     pronto:'✅ Financiamento imediato · sem fase de obra · análise bancária padrão · chaves na assinatura do contrato.',
     planta:isMCMV
       ?`🏗️ MCMV/Crédito Associativo: durante a obra você paga juros evolutivos ao banco sobre o saldo liberado (sem amortizar capital). Após a entrega, começa a parcela definitiva. Lançamento = ${fmt(valorPN)} → estimativa na entrega: <strong>~${fmt(Math.round(valorPN*1.20))}</strong> (+20%).`
-      :`🏗️ SBPE na planta: o financiamento bancário é assinado <strong>somente na entrega das chaves</strong>. Durante a obra você paga parcelas da entrada à incorporadora, corrigidas pelo INCC. Lançamento = ${fmt(valorPN)} → estimativa na entrega: <strong>~${fmt(Math.round(valorPN*1.20))}</strong> (+20%).`,
+      :`🏗️ SBPE na planta: o financiamento bancário é assinado <strong>somente na entrega das chaves (Emissão de Habite-se)</strong>. Durante a obra você paga parcelas da entrada à incorporadora, corrigidas pelo INCC. Lançamento = ${fmt(valorPN)} → estimativa na entrega: <strong>~${fmt(Math.round(valorPN*1.20))}</strong> (+20%).`,
     usado:isMCMV
       ?`⚠️ MCMV para imóvel usado exige entrada de 30%–50% (Sul/Sudeste, 2026). Banco exige laudo de vistoria e o imóvel não pode ter pendências judiciais ou ônus. Considere o SBPE se a entrada for menor.`
       :`🏠 Imóvel usado tipicamente 10–15% mais barato que o novo. Banco fará vistoria e a avaliação pode ficar abaixo do preço pedido — você paga a diferença. ITBI incide sobre o valor venal ou de transação (o maior).`
@@ -3182,7 +3182,7 @@ function descobrir(){
         const parcelaBase=Math.round(saldoConstrutora/prazoObraMeses);
         const inccMedio=Math.round(parcelaBase*(1+inccMensal*prazoObraMeses/2));
         const comprPct=(inccMedio/renda*100).toFixed(1);
-        obraAlerta=`ℹ️ <strong>Parcelas à construtora durante a obra (~${prazoObraMeses} meses):</strong> No SBPE, o financiamento bancário é assinado apenas na entrega das chaves. Durante a obra, você paga o saldo da entrada em parcelas direto à construtora, corrigidas pelo <strong>INCC</strong> (~0,6%/mês · ref. 2025). Estimativa típica (20% do imóvel parcelado): <strong>~${fmt(inccMedio)}/mês</strong> (${comprPct}% da renda). Ao assinar o financiamento na entrega, a parcela bancária passa a ser ${fmt(bd.parcela)}/mês.`;
+        obraAlerta=`ℹ️ <strong>Parcelas à construtora durante a obra (~${prazoObraMeses} meses):</strong> No SBPE, o financiamento bancário é assinado apenas na entrega das chaves <strong>(Emissão de Habite-se)</strong>. Durante a obra, você paga o saldo da entrada em parcelas direto à construtora, corrigidas pelo <strong>INCC</strong> (~0,6%/mês · ref. 2025). Estimativa típica (20% do imóvel parcelado): <strong>~${fmt(inccMedio)}/mês</strong> (${comprPct}% da renda). Ao assinar o financiamento na entrega, a parcela bancária passa a ser ${fmt(bd.parcela)}/mês.`;
       }
     }
 
@@ -3741,7 +3741,7 @@ function simular(){
     const saldoConstr=imovel*0.20;
     const parcelaConstr=Math.round(saldoConstr/prazoObraRef);
     const parcelaComINCC=Math.round(parcelaConstr*(1+inccMensal*prazoObraRef/2));
-    alerts.push({t:'warn',ic:'🏗️',m:'<strong>Imóvel na planta — fase de obra (SBPE):</strong> O financiamento bancário é assinado <strong>somente na entrega das chaves</strong> — não há juros ao banco durante a construção. O custo durante a obra é o <strong>parcelamento da entrada à incorporadora</strong>, corrigido mensalmente pelo <strong>INCC</strong> (~0,6%/mês · ref. 2025). Estimativa típica (20% do imóvel de '+fmt(imovel)+' em '+prazoObraRef+' meses): <strong>~'+fmt(parcelaComINCC)+'/mês</strong> — some isso ao aluguel atual. Na entrega, você assina o financiamento e a parcela bancária passa a ser '+fmt(totalParcela)+'/mês ('+( sistema==='price'?'Tabela Price':'SAC')+'). Dica: confirme com a incorporadora os exatos percentuais e prazo do parcelamento.'});
+    alerts.push({t:'warn',ic:'🏗️',m:'<strong>Imóvel na planta — fase de obra (SBPE):</strong> O financiamento bancário é assinado <strong>somente na entrega das chaves <strong>(Emissão de Habite-se)</strong> — não há juros ao banco durante a construção. O custo durante a obra é o <strong>parcelamento da entrada à incorporadora</strong>, corrigido mensalmente pelo <strong>INCC</strong> (~0,6%/mês · ref. 2025). Estimativa típica (20% do imóvel de '+fmt(imovel)+' em '+prazoObraRef+' meses): <strong>~'+fmt(parcelaComINCC)+'/mês</strong> — some isso ao aluguel atual. Na entrega, você assina o financiamento e a parcela bancária passa a ser '+fmt(totalParcela)+'/mês ('+( sistema==='price'?'Tabela Price':'SAC')+'). Dica: confirme com a incorporadora os exatos percentuais e prazo do parcelamento.'});
   }
 
   // MCMV vs SBPE
@@ -4368,7 +4368,7 @@ const CHAT_CONTEXT={
 let chatOpen=false,chatInited=false,dIdx=0;
 const resps=[
   {k:['fase de obra','encargo de obra','juros de obra','parcela de obra','evolução de obra'],
-   r:'Depende da modalidade. No <strong>MCMV (Crédito Associativo)</strong>: o banco libera recursos progressivamente à construtora e você paga juros evolutivos mensais sobre o saldo já liberado, sem amortizar capital ainda. Com base em contrato real SIOPI: encargo no mês 1 ≈ 23% do definitivo, mês 12 ≈ 47%, mês 24 ≈ 86%, mês 36 ≈ 100%. Inclui juros + MIP + DFI/DFC + Tarifa de Administração. Já no <strong>SBPE (fora do MCMV)</strong>: o financiamento bancário é assinado somente na entrega das chaves. Durante a obra, você paga parcelas da entrada direto à incorporadora, corrigidas mensalmente pelo INCC (~0,6%/mês ref. 2025) — sem nenhum juros ao banco nessa fase.'},
+   r:'Depende da modalidade. No <strong>MCMV (Crédito Associativo)</strong>: o banco libera recursos progressivamente à construtora e você paga juros evolutivos mensais sobre o saldo já liberado, sem amortizar capital ainda. Com base em contrato real SIOPI: encargo no mês 1 ≈ 23% do definitivo, mês 12 ≈ 47%, mês 24 ≈ 86%, mês 36 ≈ 100%. Inclui juros + MIP + DFI/DFC + Tarifa de Administração. Já no <strong>SBPE (fora do MCMV)</strong>: o financiamento bancário é assinado somente na entrega das chaves (Emissão de Habite-se). Durante a obra, você paga parcelas da entrada direto à incorporadora, corrigidas mensalmente pelo INCC (~0,6%/mês ref. 2025) — sem nenhum juros ao banco nessa fase.'},
 
   {k:['incc','índice nacional de custo','correção da construtora','correção da incorporadora'],
    r:'O INCC-M é o índice que corrige os boletos que você paga direto para a incorporadora durante a obra. É diferente da TR do contrato bancário — são duas coisas separadas. Cada empresa define no contrato como aplica esse índice. Quando chegar o habite-se, o indexador pode mudar para IPCA + juros. Vale ler essa cláusula com atenção no seu CCV antes de assinar.'},
@@ -5240,49 +5240,4 @@ window.addEventListener('popstate', function(e){
       <div class="orulo-modal-dev" id="orulo-modal-dev"></div>
       <div class="orulo-modal-price" id="orulo-modal-price"></div>
       <div class="orulo-modal-info" id="orulo-modal-info"></div>
-      <div class="orulo-modal-actions">
-        <a class="orulo-modal-wa" id="orulo-modal-wa" href="#" target="_blank" rel="noopener">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          💬 Falar com o corretor
-        </a>
-        <button class="orulo-modal-sim" id="orulo-modal-sim-btn" onclick="">
-          ▶ Simular financiamento deste imóvel
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Página de detalhe do imóvel -->
-<div id="imovel-page" role="dialog" aria-modal="true">
-  <div class="imovel-hero" id="imovel-hero">
-    <div class="imovel-hero-ph">🏢</div>
-    <button class="imovel-back" onclick="imovelFechar()">← Voltar</button>
-    <div class="imovel-badge-abs" id="imovel-badge-abs"></div>
-  </div>
-  <div class="imovel-content">
-    <div class="imovel-name"  id="imovel-det-name"></div>
-    <div class="imovel-dev"   id="imovel-det-dev"></div>
-    <div class="imovel-price" id="imovel-det-price"></div>
-    <div class="imovel-details-grid" id="imovel-det-grid"></div>
-    <div class="imovel-actions">
-      <a class="imovel-btn-wa" id="imovel-wa-visita" href="#" target="_blank" rel="noopener">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        📅 Agendar visita
-      </a>
-      <a class="imovel-btn-wa2" id="imovel-wa-info" href="#" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        💬 Falar com o consultor
-      </a>
-      <button class="imovel-btn-sim" id="imovel-btn-sim">
-        🧮 Simular financiamento deste imóvel
-      </button>
-    </div>
-    <div id="imovel-similares-sec" style="display:none">
-      <div class="imovel-similares-title">🏘️ Imóveis similares</div>
-      <div class="imovel-similares-grid" id="imovel-similares-grid"></div>
-    </div>
-  </div>
-</div>
-</body>
-</html>
+      <div cla
